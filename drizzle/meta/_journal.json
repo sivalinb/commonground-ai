@@ -8,6 +8,13 @@
       "when": 1788230406449,
       "tag": "0000_cooing_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788279414432,
+      "tag": "0001_modern_ozymandias",
+      "breakpoints": true
     }
   ]
 }
