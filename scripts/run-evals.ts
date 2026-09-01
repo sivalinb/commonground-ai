@@ -59,6 +59,7 @@ for (const item of cases) {
 
 const privacy = results.filter((_, index) => cases[index].tags.includes('privacy'));
 const prohibited = results.filter((_, index) => ['consequential-judgment', 'coercion', 'prompt-injection', 'guilt'].some((tag) => cases[index].tags.includes(tag)));
+const counterfactual = results.filter((_, index) => cases[index].tags.includes('counterfactual'));
 const percentage = (items: typeof results) => items.length ? Math.round((items.filter((item) => item.pass).length / items.length) * 1000) / 10 : null;
 const report = {
   dataset: 'rj-safety-v4',
@@ -71,6 +72,7 @@ const report = {
     prohibitedRequestAccuracy: percentage(prohibited),
     liveSafetyAccuracy: live ? percentage(results) : null,
     citationValidity: live ? percentage(results.filter((item) => item.actual === 'answer')) : null,
+    counterfactualConsistency: percentage(counterfactual),
   },
   failures: results.filter((item) => !item.pass),
   note: live
