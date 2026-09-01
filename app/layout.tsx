@@ -15,18 +15,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'CommonGround AI | Victim-centered RJ practice copilot',
   description:
-    'A transparent restorative-justice training demo with cited guidance, safeguards, human review, and evaluation traces.',
+    'A transparent restorative-justice AI lab with hybrid RAG, cited guidance, safety gates, human approval, evaluations, and observable LangGraph traces.',
   openGraph: {
     title: 'CommonGround AI | Victim-centered RJ practice copilot',
     description:
-      'Explore cited restorative-justice guidance, safety safeguards, human approval, evaluations, and observable AI traces.',
+      'Explore a live LangGraph workflow with hybrid retrieval, claim-level citations, safety gates, human approval, and executable evaluations.',
     type: 'website',
     url: 'https://commonground-rj-ai.siva-babu.chatgpt.site',
     images: [
       {
         url: 'https://commonground-rj-ai.siva-babu.chatgpt.site/og.jpg',
-        width: 1536,
-        height: 1024,
+        width: 1200,
+        height: 628,
         alt: 'CommonGround AI restorative justice practice copilot',
       },
     ],
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CommonGround AI | Victim-centered RJ practice copilot',
     description:
-      'Explore cited restorative-justice guidance, safety safeguards, human approval, evaluations, and observable AI traces.',
+      'Explore a live LangGraph workflow with hybrid retrieval, claim-level citations, safety gates, human approval, and executable evaluations.',
     images: ['https://commonground-rj-ai.siva-babu.chatgpt.site/og.jpg'],
   },
 };

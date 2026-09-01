@@ -12,13 +12,16 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 
 - A public, accessible case workspace with three fictional scenarios
 - Deterministic privacy screening before external AI calls
-- Fireworks Qwen3 embeddings, reranking, and JSON-schema-constrained generation
+- A real LangGraph state machine with conditional stop paths and a durable human-approval checkpoint
+- Fireworks Qwen3 embeddings, reranking, JSON-schema-constrained generation, and an independent safety critic
+- Hybrid retrieval using Pinecone dense search, local BM25, reciprocal-rank fusion, and jurisdiction filtering
 - A dedicated, deletion-protected Pinecone index and isolated namespace
 - A second Fireworks call acting as an independent safety critic
-- Source-linked evidence, groundedness signals, abstention, and required human approval
+- Claim-level source citations, deterministic citation validation, groundedness signals, abstention, and required human approval
 - Metadata-only LangSmith production traces and evaluator feedback
 - You.com freshness research restricted to authoritative public domains
-- Evaluation views covering retrieval, citations, refusals, safety, and human handoffs
+- A versioned 40-case evaluation suite plus 15 deterministic unit tests
+- Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
 
 ## Architecture
 
@@ -26,12 +29,17 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 flowchart LR
     UI[Public React workspace] --> PII[Local PII screen]
     PII -->|blocked| STOP[Safe refusal]
-    PII -->|fictional/de-identified| EMB[Fireworks embedding]
-    EMB --> PC[Pinecone vector retrieval]
-    PC --> RR[Fireworks reranker]
+    PII -->|fictional/de-identified| LG[LangGraph StateGraph]
+    LG --> EMB[Fireworks embedding]
+    EMB --> PC[Pinecone dense retrieval]
+    LG --> BM25[Local BM25 retrieval]
+    PC --> RRF[Reciprocal-rank fusion]
+    BM25 --> RRF
+    RRF --> RR[Fireworks reranker]
     RR --> GEN[Structured practice brief]
     GEN --> CRITIC[Independent safety critic]
-    CRITIC -->|pass| HUMAN[Human approval interrupt]
+    CRITIC -->|pass| HUMAN[Human approval checkpoint]
+    HUMAN --> D1[D1 approval record]
     CRITIC -->|fail| STOP
     PII -. metadata only .-> LS[LangSmith]
     PC -. scores and counts .-> LS
@@ -49,24 +57,31 @@ The public-research path is deliberately separate from policy evidence. Search r
 | Experience | React 19, Vinext, Tailwind CSS, shadcn/ui | Responsive interactive website |
 | Generation | Fireworks AI | Structured practice brief and independent safety critique |
 | Embeddings | Fireworks Qwen3 Embedding | 1,024-dimensional vectors |
-| Retrieval | Pinecone Serverless | Dedicated cosine index, namespace isolation, metadata |
+| Orchestration | LangGraph | Typed state, conditional routing, and a human-review checkpoint |
+| Retrieval | Pinecone Serverless + BM25 | Dense and lexical retrieval with namespace isolation |
+| Fusion | Reciprocal-rank fusion | Combines semantic and exact-term rankings |
 | Reranking | Fireworks Qwen3 Reranker | Relevance ordering before generation |
 | Observability | LangSmith | Privacy-minimized traces and evaluator feedback |
 | Freshness | You.com Search API | Allowlisted public-source discovery for curator review |
+| Durable state | Cloudflare D1 + Drizzle | Approval audit metadata and distributed rate windows |
+| Abuse defense | Cloudflare Turnstile | Optional production challenge before provider calls |
+| Testing | Vitest + versioned JSONL evals | Unit tests and deterministic/provider-backed evaluation modes |
 | Hosting | OpenAI Sites / Cloudflare Workers | Public server-rendered application and protected secrets |
 
 ## Safety and privacy design
 
 The application is designed to fail closed:
 
-1. Input length and rate limits run at the public API boundary.
+1. Same-origin, content-type, input-length, Turnstile, and distributed rate-limit checks run at the public API boundary.
 2. Email, phone, address, and case-number patterns are blocked before provider calls.
 3. Retrieval is restricted to a curated restorative-justice and victim-services corpus.
-4. Empty retrieval triggers abstention rather than unsupported generation.
-5. The generation prompt prohibits consequential person-level judgments.
-6. A separate model audits coercion, victim blaming, unsupported claims, and policy conflicts.
-7. No message, referral, eligibility decision, or record update is performed automatically.
-8. LangSmith receives character counts, latency, scores, and status—not raw narratives or generated briefs.
+4. Dense and lexical rankings are fused, filtered by jurisdiction, and independently reranked.
+5. Weak evidence triggers abstention rather than unsupported generation.
+6. JSON-schema output and a deterministic claim-level citation gate reject malformed or unsupported briefs.
+7. A separate model audits autonomy, coercion, evidence support, and policy conflicts against release thresholds.
+8. LangGraph marks the result as awaiting human review; D1 stores only approval and rate metadata.
+9. No message, referral, eligibility decision, or record update is performed automatically.
+10. LangSmith receives counts, latency, scores, status, and version IDs—not raw narratives or generated briefs.
 
 This is not a substitute for local law, agency policy, trained facilitators, victim advocates, legal counsel, mental-health professionals, or emergency services.
 
@@ -80,18 +95,21 @@ Each successful production run records the following metadata in the `commongrou
 - Abstention status
 - End-to-end latency
 - Model identifier
-- Human-approval interrupt as the final workflow stage
+- Human-approval checkpoint as the final workflow stage
 
-Evaluator feedback keys are `grounding`, `safety_approved`, and `has_citations`. The interface also demonstrates a versioned 40-case offline evaluation suite covering direct policy questions, multi-document synthesis, missing-corpus abstention, coercive requests, prompt injection, privacy, and correct human handoff.
+Evaluator feedback keys are `grounding`, `safety_approved`, and `has_citations`. The checked-in `rj-safety-v4` dataset contains 40 synthetic cases covering direct policy questions, missing-corpus abstention, coercive requests, consequential judgments, prompt injection, privacy, and correct human handoff. `pnpm eval` runs deterministic release preflight; `pnpm eval:live` runs the same cases through the configured public API.
 
 ## Knowledge base
 
-The checked-in [`data/knowledge.json`](data/knowledge.json) contains short, attributed summaries and source URLs from public materials including:
+The checked-in [`data/knowledge.json`](data/knowledge.json) contains short, attributed summaries and direct public-source URLs including:
 
-- U.S. Department of Justice Office for Victims of Crime
-- Colorado Commission on Criminal and Juvenile Justice
-- Colorado public-safety materials
-- StopBullying.gov
+- [U.S. Department of Justice Office for Victims of Crime — Restorative Justice](https://ovc.ojp.gov/sites/ovc/files/pubs/OVC_Archives/nvaa/ch21-5rj.htm)
+- [OVC — Guidelines for Victim-Sensitive Victim-Offender Mediation](https://ovc.ojp.gov/sites/ovc/files/pubs/OVC_Archives/reports/96517-gdlines_victims-sens/guide1.html)
+- [OVC — Model Standards for Serving Victims and Survivors](https://ovc.ojp.gov/sites/ovc/files/model-standards/6/pfv.html)
+- [Colorado Commission on Criminal and Juvenile Justice — Colorado RJ Law](https://cdpsdocs.state.co.us/ccjj/Committees/SRTF/Materials/2021-07-27_CCJJ-SRTF-SentStructWG-Porter-CO-RJ-Law.pdf)
+- [Colorado Commission on Criminal and Juvenile Justice — Annual Report](https://cdpsdocs.state.co.us/ccjj/Resources/Report/2015-11_CCJJAnnRpt.pdf)
+- [StopBullying.gov — Cyberbullying tactics](https://www.stopbullying.gov/cyberbullying/cyberbullying-tactics)
+- [StopBullying.gov — How to report cyberbullying](https://www.stopbullying.gov/cyberbullying/how-to-report)
 
 The summaries are training evidence, not a comprehensive statement of law or agency policy. Review and approval are required before adding local or operational documents.
 
@@ -102,7 +120,7 @@ Requirements:
 - Node.js 22.13 or newer
 - pnpm
 - Fireworks and Pinecone credentials for the live analysis route
-- Optional LangSmith and You.com credentials
+- Optional LangSmith, You.com, and Cloudflare Turnstile credentials
 
 ```bash
 pnpm install
@@ -137,6 +155,10 @@ The application requires `FIREWORKS_API_KEY`, `PINECONE_API_KEY`, `PINECONE_INDE
 ## Production checks
 
 ```bash
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm eval
 pnpm build
 ```
 
@@ -157,4 +179,4 @@ An agency deployment requires its own security, accessibility, legal, records-re
 
 ## Project status
 
-The live demo is operational with Fireworks, Pinecone, LangSmith, and You.com. Cloudflare Turnstile or equivalent distributed abuse protection is recommended before promoting unrestricted public use.
+The public demo is operational with Fireworks, Pinecone, LangSmith, You.com, LangGraph, and D1-backed durable metadata. Turnstile integration is implemented and becomes enforced when the site and secret keys are configured and `TURNSTILE_ENFORCED=true`.
