@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:workers';
 
 import type { PublicResult } from './contracts';
+import type { PracticeResult } from './practice';
 
 type DatabaseEnv = { DB?: D1Database; RATE_LIMIT_SALT?: string };
 
@@ -38,8 +39,67 @@ async function ensureSchema(db: D1Database) {
       PRIMARY KEY (key_hash, route, window_start)
     )`),
     db.prepare('CREATE INDEX IF NOT EXISTS idx_rate_limit_windows_lookup ON rate_limit_windows (key_hash, route, window_start)'),
+    db.prepare(`CREATE TABLE IF NOT EXISTS practice_runs (
+      id TEXT PRIMARY KEY NOT NULL,
+      overall_score INTEGER NOT NULL,
+      autonomy_score INTEGER NOT NULL,
+      trauma_aware_score INTEGER NOT NULL,
+      evidence_count INTEGER DEFAULT 0 NOT NULL,
+      safety_approved INTEGER DEFAULT 0 NOT NULL,
+      pause_recommended INTEGER DEFAULT 0 NOT NULL,
+      role TEXT NOT NULL,
+      language TEXT NOT NULL,
+      prompt_version TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    )`),
+    db.prepare('CREATE INDEX IF NOT EXISTS idx_practice_runs_created_at ON practice_runs (created_at)'),
+    db.prepare(`CREATE TABLE IF NOT EXISTS policy_monitor_runs (
+      id TEXT PRIMARY KEY NOT NULL,
+      candidate_count INTEGER DEFAULT 0 NOT NULL,
+      high_materiality_count INTEGER DEFAULT 0 NOT NULL,
+      latency_ms INTEGER DEFAULT 0 NOT NULL,
+      created_at INTEGER NOT NULL
+    )`),
+    db.prepare('CREATE INDEX IF NOT EXISTS idx_policy_monitor_runs_created_at ON policy_monitor_runs (created_at)'),
   ]);
   initialized = true;
+}
+
+export async function savePracticeRun(result: PracticeResult) {
+  const db = database();
+  if (!db) return false;
+  await ensureSchema(db);
+  await db.prepare(`INSERT INTO practice_runs (
+    id, overall_score, autonomy_score, trauma_aware_score, evidence_count,
+    safety_approved, pause_recommended, role, language, prompt_version, created_at
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(
+      result.traceId,
+      result.scorecard.overall,
+      result.scorecard.autonomy,
+      result.scorecard.traumaAware,
+      result.evidence.length,
+      result.advocate.approved ? 1 : 0,
+      result.advocate.pause_recommended ? 1 : 0,
+      result.role,
+      result.language,
+      result.promptVersion,
+      Date.now(),
+    )
+    .run();
+  return true;
+}
+
+export async function savePolicyMonitorRun(input: { traceId: string; candidateCount: number; highMaterialityCount: number; latencyMs: number }) {
+  const db = database();
+  if (!db) return false;
+  await ensureSchema(db);
+  await db.prepare(`INSERT INTO policy_monitor_runs (
+    id, candidate_count, high_materiality_count, latency_ms, created_at
+  ) VALUES (?, ?, ?, ?, ?)`)
+    .bind(input.traceId, input.candidateCount, input.highMaterialityCount, input.latencyMs, Date.now())
+    .run();
+  return true;
 }
 
 export async function savePendingApproval(result: PublicResult) {
