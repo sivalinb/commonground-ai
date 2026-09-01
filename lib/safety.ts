@@ -27,6 +27,9 @@ const prohibitedRequestPatterns = [
   /\b(?:decide|determine|make).{0,50}\b(?:final\s+)?(?:legal\s+)?eligib(?:le|ility)\b/i,
   /\b(?:require|force|order|make)\b.{0,60}\b(?:victim|harmed person|survivor)\b.{0,60}\b(?:attend|participate|meet)\b/i,
   /\bdiagnos(?:e|is)\b.{0,60}\b(?:mental|personality|disorder|condition)\b/i,
+  /\bignore\s+(?:all\s+)?(?:previous|prior|system|developer)\s+instructions?\b/i,
+  /\b(?:reveal|show|print|repeat)\b.{0,40}\b(?:system|developer|hidden)\s+(?:prompt|instructions?)\b/i,
+  /\b(?:bypass|disable|override)\b.{0,40}\b(?:safety|privacy|policy|guardrail)\b/i,
 ];
 
 export function detectSensitiveData(value: string) {
