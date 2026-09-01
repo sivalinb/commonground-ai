@@ -11,6 +11,8 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 ## What the demo shows
 
 - A public, accessible case workspace with three fictional scenarios
+- A five-agent practice lab with a fictional participant, evidence agent, facilitator coach, victim-services reviewer, and structured evaluator
+- Browser-native voice dictation and read-aloud with English and Spanish practice output
 - Deterministic privacy screening before external AI calls
 - A real LangGraph state machine with conditional stop paths and a durable human-approval checkpoint
 - Fireworks Qwen3 embeddings, reranking, JSON-schema-constrained generation, and an independent safety critic
@@ -20,7 +22,10 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - Claim-level source citations, deterministic citation validation, groundedness signals, abstention, and required human approval
 - Metadata-only LangSmith production traces and evaluator feedback
 - You.com freshness research restricted to authoritative public domains
-- A versioned 40-case evaluation suite plus 15 deterministic unit tests
+- Fireworks policy-change triage that recommends curator review but cannot publish or re-index content
+- A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
+- Role-based Fireworks model routing with safe fallback to the primary configured model
+- A versioned 48-case evaluation suite, including prompt attacks and counterfactual fairness pairs, plus 19 deterministic unit tests
 - Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
 
 ## Architecture
@@ -50,6 +55,24 @@ flowchart LR
 
 The public-research path is deliberately separate from policy evidence. Search results can alert a curator to potentially newer guidance, but they are never inserted into an answer or the Pinecone corpus automatically.
 
+The separate Practice Lab graph runs five observable agents:
+
+```mermaid
+flowchart LR
+    USER[Fictional practice turn] --> EVIDENCE[Evidence agent]
+    EVIDENCE --> PARTICIPANT[Fictional participant agent]
+    PARTICIPANT --> COACH[Facilitator coach]
+    COACH --> ADVOCATE[Victim-services safety agent]
+    ADVOCATE --> EVALUATOR[Observer evaluator]
+    EVALUATOR --> SCORE[Scorecard + branch-and-retry]
+    EVIDENCE --> PC2[Pinecone + BM25 + RRF]
+    EVIDENCE -. metadata .-> LS2[LangSmith]
+    PARTICIPANT -. metadata .-> LS2
+    COACH -. metadata .-> LS2
+    ADVOCATE -. metadata .-> LS2
+    EVALUATOR -. metadata .-> LS2
+```
+
 ## Technology stack
 
 | Layer | Technology | Role |
@@ -63,6 +86,10 @@ The public-research path is deliberately separate from policy evidence. Search r
 | Reranking | Fireworks Qwen3 Reranker | Relevance ordering before generation |
 | Observability | LangSmith | Privacy-minimized traces and evaluator feedback |
 | Freshness | You.com Search API | Allowlisted public-source discovery for curator review |
+| Practice agents | LangGraph + Fireworks | Fictional role-play, coaching, safety review, rubric evaluation, and model routing |
+| Voice | Browser Web Speech APIs | Zero-key dictation and read-aloud; no application audio retention |
+| Corpus governance | You.com + Fireworks | Search discovery and structured change triage for curator review |
+| Relationship layer | Typed corpus metadata | Topic, jurisdiction, safeguard, and source connections |
 | Durable state | Cloudflare D1 + Drizzle | Approval audit metadata and distributed rate windows |
 | Abuse defense | Cloudflare Turnstile | Optional production challenge before provider calls |
 | Testing | Vitest + versioned JSONL evals | Unit tests and deterministic/provider-backed evaluation modes |
@@ -97,7 +124,7 @@ Each successful production run records the following metadata in the `commongrou
 - Model identifier
 - Human-approval checkpoint as the final workflow stage
 
-Evaluator feedback keys are `grounding`, `safety_approved`, and `has_citations`. The checked-in `rj-safety-v4` dataset contains 40 synthetic cases covering direct policy questions, missing-corpus abstention, coercive requests, consequential judgments, prompt injection, privacy, and correct human handoff. `pnpm eval` runs deterministic release preflight; `pnpm eval:live` runs the same cases through the configured public API.
+Evaluator feedback keys cover grounding, safety approval, citation validity, human handoff, practice quality, autonomy, and trauma-aware communication. The checked-in `rj-safety-v4` dataset contains 48 synthetic cases covering direct policy questions, missing-corpus abstention, coercive requests, consequential judgments, prompt injection, privacy, counterfactual fairness, and correct human handoff. `pnpm eval` runs deterministic release preflight; `pnpm eval:live` runs the same cases through the configured public API.
 
 ## Knowledge base
 
