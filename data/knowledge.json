@@ -1,0 +1,92 @@
+[
+  {
+    "id": "ovc-voluntary-participation",
+    "title": "National Victim Assistance Academy — Restorative Justice",
+    "section": "Victim participation and choice",
+    "url": "https://ovc.ojp.gov/sites/ovc/files/pubs/OVC_Archives/nvaa/ch21-5rj.htm",
+    "jurisdiction": "United States",
+    "topic": "victim-autonomy",
+    "text": "Restorative practice must remain victim-centered. Participation by a person harmed must be fully voluntary, and coercion conflicts with the goal of restoration. A victim may decline restorative dialogue while continuing to receive rights, information, advocacy, and support."
+  },
+  {
+    "id": "ovc-safety-first",
+    "title": "Guidelines for Victim-Sensitive Victim-Offender Mediation",
+    "section": "Victim safety",
+    "url": "https://ovc.ojp.gov/sites/ovc/files/pubs/OVC_Archives/reports/96517-gdlines_victims-sens/guide5.html",
+    "jurisdiction": "United States",
+    "topic": "safety",
+    "text": "Victim safety is a fundamental requirement throughout preparation and dialogue. Facilitators should continually assess safety and well-being, provide options, respond immediately to concerns, and be prepared to pause or end a process when a person feels unsafe."
+  },
+  {
+    "id": "ovc-separate-preparation",
+    "title": "Guidelines for Victim-Sensitive Victim-Offender Mediation",
+    "section": "Preparation and process design",
+    "url": "https://ovc.ojp.gov/sites/ovc/files/pubs/OVC_Archives/reports/96517-gdlines_victims-sens/guide1.html",
+    "jurisdiction": "United States",
+    "topic": "preparation",
+    "text": "Separate preparation conversations allow each participant to describe impact, needs, concerns, support preferences, and readiness without pressure from another participant. A direct meeting is only one possible format and should not be treated as the default."
+  },
+  {
+    "id": "ovc-continuing-choice",
+    "title": "Guidelines for Victim-Sensitive Victim-Offender Mediation",
+    "section": "Victim choices",
+    "url": "https://ovc.ojp.gov/sites/ovc/files/pubs/OVC_Archives/reports/96517-gdlines_victims-sens/guide5.html",
+    "jurisdiction": "United States",
+    "topic": "victim-autonomy",
+    "text": "Choice should continue throughout a restorative process. The person harmed may say no, take time, choose support people, set communication and meeting conditions, request alternatives, or withdraw. Facilitators provide accurate information without imposing expectations."
+  },
+  {
+    "id": "ovc-privacy",
+    "title": "OVC Model Standards for Serving Victims and Survivors",
+    "section": "Privacy, confidentiality, and data security",
+    "url": "https://ovc.ojp.gov/sites/ovc/files/model-standards/6/ethical_standards_4.html",
+    "jurisdiction": "United States",
+    "topic": "privacy",
+    "text": "Victim-service providers should protect privacy according to the highest applicable legal, ethical, professional, and program standard. Technology use should minimize disclosure, de-identify personally identifiable information, explain limits of confidentiality, and restrict access to sensitive information."
+  },
+  {
+    "id": "colorado-rj-law",
+    "title": "Colorado Restorative Justice Law — CCJJ Handout",
+    "section": "Definition and victim rights",
+    "url": "https://cdpsdocs.state.co.us/ccjj/Committees/SRTF/Materials/2021-07-27_CCJJ-SRTF-SentStructWG-Porter-CO-RJ-Law.pdf",
+    "jurisdiction": "Colorado",
+    "topic": "law-and-policy",
+    "text": "Colorado law describes restorative justice as victim-centered practices intended to repair harm and support accountability. Victims have a right to be informed about restorative options. Information about an option is not the same as requiring participation or selecting a process for a victim."
+  },
+  {
+    "id": "colorado-bullying-caution",
+    "title": "Colorado Commission on Criminal and Juvenile Justice Annual Report",
+    "section": "Restorative justice and bullying",
+    "url": "https://cdpsdocs.state.co.us/ccjj/Resources/Report/2015-11_CCJJAnnRpt.pdf",
+    "jurisdiction": "Colorado",
+    "topic": "youth-safety",
+    "text": "Restorative approaches do not fit every bullying situation. Power imbalance and continued peer contact can increase harm. Local policy, resources, careful case analysis, and the victim's interest and consent should control whether and how a restorative option proceeds."
+  },
+  {
+    "id": "stopbullying-digital-harm",
+    "title": "StopBullying.gov — Cyberbullying Tactics",
+    "section": "Photo and video sharing and exploitation",
+    "url": "https://www.stopbullying.gov/cyberbullying/cyberbullying-tactics",
+    "jurisdiction": "United States",
+    "topic": "youth-safety",
+    "text": "Nonconsensual sharing of private images can create continuing harm, humiliation, threats, and exploitation. A young person can seek help from a trusted caregiver or adult, a school official, or appropriate authorities. Responses should support the child and avoid blame."
+  },
+  {
+    "id": "stopbullying-reporting",
+    "title": "StopBullying.gov — Report Cyberbullying",
+    "section": "Preserve evidence and report serious conduct",
+    "url": "https://www.stopbullying.gov/cyberbullying/how-to-report",
+    "jurisdiction": "United States",
+    "topic": "youth-safety",
+    "text": "When cyberbullying involves threats, exploitation, or private images, preserve available evidence and use appropriate platform, school, or legal reporting paths. Support and immediate safety planning should be separated from any later restorative discussion."
+  },
+  {
+    "id": "ovc-trauma-informed",
+    "title": "OVC Model Standards for Serving Victims and Survivors",
+    "section": "Trauma-informed services and referrals",
+    "url": "https://ovc.ojp.gov/sites/ovc/files/model-standards/6/pfv.html",
+    "jurisdiction": "United States",
+    "topic": "victim-services",
+    "text": "Victim-centered and trauma-informed services seek to avoid retraumatization and preserve control over personal information and choices. Support may include safety planning, advocacy, referrals, mental-health resources, and consultation with trained professionals."
+  }
+]
