@@ -5,7 +5,6 @@ import Image from 'next/image';
 import {
   Activity,
   AlertTriangle,
-  ArrowRight,
   BarChart3,
   BookOpenCheck,
   Bot,
@@ -40,6 +39,9 @@ import {
 } from 'lucide-react';
 
 import { TurnstileGate } from '@/components/turnstile-gate';
+import { KnowledgeMap } from '@/components/knowledge-map';
+import { PolicyMonitor } from '@/components/policy-monitor';
+import { PracticeLab } from '@/components/practice-lab';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,7 +50,7 @@ import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import knowledge from '@/data/knowledge.json';
 
-type View = 'workspace' | 'evidence' | 'evals' | 'trace' | 'sources' | 'architecture';
+type View = 'workspace' | 'practice' | 'evidence' | 'evals' | 'trace' | 'monitor' | 'map' | 'sources' | 'architecture';
 type ScenarioKey = 'autonomy' | 'youth' | 'unsupported';
 type Citation = {
   id: string;
@@ -132,9 +134,12 @@ const graphSteps = [
 
 const tabs: Array<[View, string, typeof MessageSquareText]> = [
   ['workspace', 'Live workflow', MessageSquareText],
+  ['practice', 'AI practice lab', Bot],
   ['evidence', 'Evidence', BookOpenCheck],
   ['evals', 'Evaluations', BarChart3],
   ['trace', 'Trace', Activity],
+  ['monitor', 'Policy monitor', Globe2],
+  ['map', 'Knowledge map', Network],
   ['sources', 'Public sources', Globe2],
   ['architecture', 'Architecture', Network],
 ];
@@ -337,9 +342,9 @@ export default function Home() {
 
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
-                  ['Graph', '8 guarded nodes', Waypoints],
+                  ['Graphs', '2 workflows · 13 nodes', Waypoints],
                   ['Corpus', '10 public sources', Database],
-                  ['Evaluation', '40 versioned cases', BarChart3],
+                  ['Evaluation', '48 versioned cases', BarChart3],
                   ['Privacy', 'Metadata-only traces', LockKeyhole],
                 ].map(([label, value, Icon]) => (
                   <Card key={label as string} size="sm" className="border border-border/70 bg-card/90"><CardContent className="flex h-full flex-col justify-between gap-3"><Icon className="size-5 text-primary" /><div><p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label as string}</p><p className="mt-1 text-xs font-semibold">{value as string}</p></div></CardContent></Card>
@@ -422,6 +427,8 @@ export default function Home() {
           </section>
         )}
 
+        {activeView === 'practice' && <PracticeLab />}
+
         {activeView === 'evidence' && (
           <section aria-label="Evidence explorer"><SectionHeading eyebrow="Retrieval engineering" title="Inspect the exact evidence behind each claim." description="The live pipeline combines Pinecone semantic retrieval with local BM25, fuses both rankings, applies jurisdiction metadata filters, and reranks the strongest passages before generation." />
             {!liveResult?.citations.length ? <Alert><Search /><AlertTitle>Run a live workflow first</AlertTitle><AlertDescription>The Evidence view displays only the sources and real scores selected by the current analysis. The Public sources tab contains the complete approved library.</AlertDescription></Alert> : <div className="grid gap-4 xl:grid-cols-2">{liveResult.citations.map((citation, index) => <Card key={citation.id} className="border border-border/70"><CardHeader><div className="mb-2 flex flex-wrap gap-2"><Badge>Rank {index + 1}</Badge><Badge variant="outline">{citation.jurisdiction}</Badge><Badge variant="outline">{citation.topic}</Badge></div><CardTitle>{citation.title}</CardTitle><CardDescription>{citation.section}</CardDescription></CardHeader><CardContent><p className="border-l-2 border-primary pl-4 text-sm leading-6 text-muted-foreground">{citation.snippet}</p><div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{[['Dense', citation.denseScore], ['BM25', citation.keywordScore], ['RRF', citation.fusionScore], ['Rerank', citation.rerankScore]].map(([label, value]) => <div key={label as string} className="rounded-lg bg-muted/40 p-2"><div className="mb-2 flex items-center justify-between gap-2"><span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{label as string}</span><Score value={value as number} /></div><Progress value={Math.min(100, (value as number) * (label === 'RRF' ? 2000 : 100))} /></div>)}</div></CardContent><CardFooter className="justify-between"><span className="font-mono text-[10px] text-muted-foreground">{citation.id}</span><a href={citation.url} target="_blank" rel="noreferrer"><Button size="sm" variant="outline">Open public source <ExternalLink /></Button></a></CardFooter></Card>)}</div>}
@@ -429,7 +436,7 @@ export default function Home() {
         )}
 
         {activeView === 'evals' && (
-          <section aria-label="Evaluation lab"><SectionHeading eyebrow="Versioned evaluation" title="Measured safeguards—not decorative percentages." description="The repository includes 40 executable synthetic cases. Deterministic preflight checks run locally; live mode exercises the complete provider-backed workflow while production traces and evaluator feedback are recorded in LangSmith." />
+          <section aria-label="Evaluation lab"><SectionHeading eyebrow="Versioned evaluation" title="Measured safeguards—not decorative percentages." description="The repository includes 48 executable synthetic cases, including counterfactual fairness pairs and prompt attacks. Deterministic preflight checks run locally; live mode exercises the provider-backed workflow while production traces and evaluator feedback are recorded in LangSmith." />
             <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{evalReport?.categories.map((category) => <Card key={category.label} size="sm"><CardContent><p className="font-mono text-3xl font-semibold">{category.count}</p><p className="mt-1 text-xs text-muted-foreground">{category.label}</p></CardContent></Card>)}</div>
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
               <Card><CardHeader><CardTitle>Latest executable report</CardTitle><CardDescription>{evalReport?.dataset || 'Loading evaluation report'} · {evalReport?.mode || '—'} mode</CardDescription><CardAction><Badge className={evalReport?.passed === evalReport?.total ? 'bg-emerald-700 text-white' : 'bg-amber-700 text-white'}>{evalReport ? `${evalReport.passed}/${evalReport.total} passed` : 'Loading'}</Badge></CardAction></CardHeader><CardContent className="space-y-3">{evalReport && Object.entries(evalReport.metrics).map(([key, value]) => <div key={key}><div className="mb-1.5 flex items-center justify-between"><span className="text-xs font-medium">{key.replace(/([A-Z])/g, ' $1').replace(/^./, (letter) => letter.toUpperCase())}</span><span className="font-mono text-xs font-semibold">{value === null ? 'Run live experiment' : `${value}%`}</span></div><Progress value={value || 0} /></div>)}<p className="rounded-xl bg-muted/40 p-3 text-xs leading-5 text-muted-foreground">{evalReport?.note}</p></CardContent></Card>
@@ -444,6 +451,10 @@ export default function Home() {
           </section>
         )}
 
+        {activeView === 'monitor' && <PolicyMonitor />}
+
+        {activeView === 'map' && <KnowledgeMap />}
+
         {activeView === 'sources' && (
           <section aria-label="Approved public sources"><SectionHeading eyebrow="Public evidence library" title="Open every approved source for more information." description="The RAG corpus contains attributed summaries for retrieval. The links below lead to the original public materials; always review the authoritative source and current local policy." />
             <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{knowledge.map((source) => <Card key={source.id} className="border border-border/70"><CardHeader><div className="mb-2 flex gap-2"><Badge variant="outline">{source.jurisdiction}</Badge><Badge variant="secondary">{source.topic}</Badge></div><CardTitle>{source.title}</CardTitle><CardDescription>{source.section}</CardDescription></CardHeader><CardContent><p className="text-sm leading-6 text-muted-foreground">{source.text}</p></CardContent><CardFooter className="justify-between"><span className="font-mono text-[9px] text-muted-foreground">Curated summary · {source.id}</span><a href={source.url} target="_blank" rel="noreferrer"><Button size="sm" variant="outline">More information <ExternalLink /></Button></a></CardFooter></Card>)}</div>
@@ -453,13 +464,14 @@ export default function Home() {
 
         {activeView === 'architecture' && (
           <section aria-label="Technical architecture"><SectionHeading eyebrow="Technical architecture" title="A production-minded AI system, not a chatbot wrapper." description="Each layer is independently testable and replaceable. The browser never receives Fireworks, Pinecone, You.com, LangSmith, or Turnstile secret keys." />
-            <div className="grid gap-4 lg:grid-cols-5">{[
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">{[
               { title: 'Experience', icon: MessageSquareText, items: ['React 19 + TypeScript', 'Tailwind + shadcn', 'Accessible working surface'], tone: 'border-sky-200 bg-sky-50' },
-              { title: 'Orchestration', icon: GitBranch, items: ['LangGraph StateGraph', 'Conditional stop paths', 'Human checkpoint + D1 record'], tone: 'border-violet-200 bg-violet-50' },
+              { title: 'Orchestration', icon: GitBranch, items: ['Two LangGraph workflows', 'Five specialized agents', 'Human checkpoint + D1 record'], tone: 'border-violet-200 bg-violet-50' },
               { title: 'Retrieval', icon: Database, items: ['Pinecone dense search', 'BM25 lexical ranking', 'RRF + Fireworks rerank'], tone: 'border-emerald-200 bg-emerald-50' },
-              { title: 'Models', icon: BrainCircuit, items: ['Qwen3 embeddings', 'Structured generation', 'Independent safety critic'], tone: 'border-amber-200 bg-amber-50' },
-              { title: 'Assurance', icon: ShieldCheck, items: ['40-case eval dataset', 'LangSmith child spans', 'Turnstile + D1 rate limits'], tone: 'border-rose-200 bg-rose-50' },
-            ].map(({ title, icon: Icon, items, tone }, index) => <div key={title} className="flex flex-col gap-3"><Card className={`h-full border ${tone}`}><CardHeader><span className="mb-2 grid size-10 place-items-center rounded-xl bg-white/80"><Icon className="size-5" /></span><CardTitle>{title}</CardTitle></CardHeader><CardContent className="space-y-2">{items.map((item) => <p key={item} className="flex items-start gap-2 text-xs leading-5"><Check className="mt-1 size-3 shrink-0" />{item}</p>)}</CardContent></Card>{index < 4 && <ArrowRight className="mx-auto hidden text-muted-foreground lg:block" />}</div>)}</div>
+              { title: 'Models', icon: BrainCircuit, items: ['Role-based model routing', 'Schema-constrained agents', 'Independent safety critic'], tone: 'border-amber-200 bg-amber-50' },
+              { title: 'Intelligence', icon: Globe2, items: ['You.com allowlist search', 'AI change triage', 'Corpus relationship map'], tone: 'border-cyan-200 bg-cyan-50' },
+              { title: 'Assurance', icon: ShieldCheck, items: ['48-case eval dataset', 'Fairness + attack tests', 'LangSmith child spans'], tone: 'border-rose-200 bg-rose-50' },
+            ].map(({ title, icon: Icon, items, tone }) => <div key={title} className="flex flex-col gap-3"><Card className={`h-full border ${tone}`}><CardHeader><span className="mb-2 grid size-10 place-items-center rounded-xl bg-white/80"><Icon className="size-5" /></span><CardTitle>{title}</CardTitle></CardHeader><CardContent className="space-y-2">{items.map((item) => <p key={item} className="flex items-start gap-2 text-xs leading-5"><Check className="mt-1 size-3 shrink-0" />{item}</p>)}</CardContent></Card></div>)}</div>
             <div className="mt-6 grid gap-4 md:grid-cols-3"><Card><CardHeader><CardTitle>Fail-closed controls</CardTitle></CardHeader><CardContent className="space-y-2 text-xs leading-5 text-muted-foreground"><p><ChevronRight className="mr-1 inline size-3 text-primary" />Privacy and prohibited-decision rules run before AI calls.</p><p><ChevronRight className="mr-1 inline size-3 text-primary" />Low evidence, invalid citations, or safety failure withholds output.</p><p><ChevronRight className="mr-1 inline size-3 text-primary" />Provider calls have timeouts and one bounded transient retry.</p></CardContent></Card><Card><CardHeader><CardTitle>Operational boundaries</CardTitle></CardHeader><CardContent className="space-y-2 text-xs leading-5 text-muted-foreground"><p><ChevronRight className="mr-1 inline size-3 text-primary" />No eligibility, guilt, credibility, remorse, diagnosis, or risk decisions.</p><p><ChevronRight className="mr-1 inline size-3 text-primary" />No automatic message, referral, or case-system update.</p><p><ChevronRight className="mr-1 inline size-3 text-primary" />Agency use requires local governance and security review.</p></CardContent></Card><Card><CardHeader><CardTitle>Deployment</CardTitle></CardHeader><CardContent className="space-y-2 text-xs leading-5 text-muted-foreground"><p><Zap className="mr-1 inline size-3 text-primary" />OpenAI Sites and Cloudflare Workers.</p><p><Database className="mr-1 inline size-3 text-primary" />D1 stores only rate and approval metadata.</p><p><Code2 className="mr-1 inline size-3 text-primary" />Public source, versioned prompts, corpus, migrations, and evals.</p></CardContent></Card></div>
           </section>
         )}
