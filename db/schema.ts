@@ -35,3 +35,33 @@ export const rateLimitWindows = sqliteTable(
     uniqueIndex('idx_rate_limit_windows_lookup').on(table.keyHash, table.route, table.windowStart),
   ],
 );
+
+export const practiceRuns = sqliteTable(
+  'practice_runs',
+  {
+    id: text('id').primaryKey(),
+    overallScore: integer('overall_score').notNull(),
+    autonomyScore: integer('autonomy_score').notNull(),
+    traumaAwareScore: integer('trauma_aware_score').notNull(),
+    evidenceCount: integer('evidence_count').notNull().default(0),
+    safetyApproved: integer('safety_approved', { mode: 'boolean' }).notNull().default(false),
+    pauseRecommended: integer('pause_recommended', { mode: 'boolean' }).notNull().default(false),
+    role: text('role').notNull(),
+    language: text('language').notNull(),
+    promptVersion: text('prompt_version').notNull(),
+    createdAt: integer('created_at').notNull(),
+  },
+  (table) => [index('idx_practice_runs_created_at').on(table.createdAt)],
+);
+
+export const policyMonitorRuns = sqliteTable(
+  'policy_monitor_runs',
+  {
+    id: text('id').primaryKey(),
+    candidateCount: integer('candidate_count').notNull().default(0),
+    highMaterialityCount: integer('high_materiality_count').notNull().default(0),
+    latencyMs: integer('latency_ms').notNull().default(0),
+    createdAt: integer('created_at').notNull(),
+  },
+  (table) => [index('idx_policy_monitor_runs_created_at').on(table.createdAt)],
+);
