@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import {
   Activity,
   AlertTriangle,
@@ -298,13 +299,43 @@ export default function Home() {
 
         {activeView === 'workspace' && (
           <section aria-label="Live restorative justice workflow">
-            <div className="mb-5 grid gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
-              <div>
-                <p className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.17em] text-primary"><Sparkles className="size-3.5" /> Evidence before advice</p>
-                <h1 className="max-w-3xl font-heading text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">Follow every decision from question to human review.</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">A real LangGraph workflow combines deterministic policy gates, hybrid retrieval, structured model outputs, claim-level citations, an independent safety release gate, and a durable approval record.</p>
+            <div className="mb-5 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 text-white shadow-2xl shadow-slate-950/15">
+              <div className="grid xl:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]">
+                <div className="relative flex flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 xl:px-12">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(45,212,191,0.16),transparent_34rem)]" aria-hidden="true" />
+                  <div className="relative">
+                    <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-teal-300"><Sparkles className="size-3.5" /> Evidence before advice</p>
+                    <h1 className="max-w-2xl font-heading text-3xl font-semibold tracking-[-0.045em] sm:text-5xl">Repair harm. Protect choice. Keep people in charge.</h1>
+                    <p className="mt-4 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">CommonGround AI helps restorative-justice and victim-services practitioners explore safer options using public evidence, visible safeguards, and required human review.</p>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100"><HeartHandshake /> Voluntary participation</Badge>
+                      <Badge className="border border-sky-300/25 bg-sky-300/10 text-sky-100"><ShieldCheck /> Safety and support</Badge>
+                      <Badge className="border border-amber-300/25 bg-amber-300/10 text-amber-100"><UserCheck /> Human-approved guidance</Badge>
+                    </div>
+                  </div>
+                </div>
+                <figure className="relative min-h-72 overflow-hidden border-t border-white/10 xl:min-h-[410px] xl:border-l xl:border-t-0">
+                  <Image src="/commonground-rj-hero-v1.jpg" alt="A diverse, voluntary restorative-practice circle in a welcoming community room. A facilitator and victim-services advocate support participants while an open chair and pathway represent choice; a subtle evidence, privacy, and human-approval network illustrates CommonGround AI assisting the process." fill priority sizes="(min-width: 1280px) 55vw, 100vw" className="object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent px-5 pb-5 pt-20">
+                    <p className="max-w-2xl text-xs leading-5 text-white/90"><strong>AI supports the practice—it does not run it.</strong> The people, their safety, and their choices remain authoritative.</p>
+                  </div>
+                </figure>
               </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="grid border-t border-white/10 sm:grid-cols-3">
+                {[
+                  ['Restorative justice', 'Repair harm through voluntary, accountable, community-centered options.', HeartHandshake],
+                  ['Victim services', 'Prioritize safety, voice, privacy, advocacy, and continuing choice.', ShieldCheck],
+                  ['CommonGround AI', 'Find cited public guidance, test safeguards, and wait for a trained reviewer.', BrainCircuit],
+                ].map(([label, description, Icon], index) => (
+                  <div key={label as string} className={`flex gap-3 px-5 py-4 ${index ? 'border-t border-white/10 sm:border-l sm:border-t-0' : ''}`}>
+                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/10 text-teal-200"><Icon className="size-4" /></span>
+                    <div><p className="text-xs font-semibold text-white">{label as string}</p><p className="mt-1 text-[11px] leading-4 text-slate-400">{description as string}</p></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   ['Graph', '8 guarded nodes', Waypoints],
                   ['Corpus', '10 public sources', Database],
@@ -313,7 +344,6 @@ export default function Home() {
                 ].map(([label, value, Icon]) => (
                   <Card key={label as string} size="sm" className="border border-border/70 bg-card/90"><CardContent className="flex h-full flex-col justify-between gap-3"><Icon className="size-5 text-primary" /><div><p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label as string}</p><p className="mt-1 text-xs font-semibold">{value as string}</p></div></CardContent></Card>
                 ))}
-              </div>
             </div>
 
             <div className="grid gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
