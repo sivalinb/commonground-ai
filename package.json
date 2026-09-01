@@ -10,6 +10,7 @@
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "seed:pinecone": "node scripts/seed-pinecone.mjs",
+    "seed:neo4j": "node scripts/seed-neo4j.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "eval": "node --import tsx scripts/run-evals.ts",

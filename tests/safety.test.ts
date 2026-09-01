@@ -1,24 +1,35 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Evidence, PracticeBrief } from '@/lib/contracts';
-import { containsProhibitedJudgment, detectProhibitedRequest, detectSensitiveData, validateCitationUsage } from '@/lib/safety';
+import {
+  containsProhibitedJudgment,
+  detectProhibitedRequest,
+  detectSensitiveData,
+  validateCitationUsage,
+} from '@/lib/safety';
 
-const evidence: Evidence[] = [{
-  id: 'source-1',
-  title: 'Public guidance',
-  section: 'Choice',
-  url: 'https://example.gov/guidance',
-  snippet: 'Participation is voluntary.',
-  jurisdiction: 'United States',
-  topic: 'victim-autonomy',
-  denseScore: 0.8,
-  keywordScore: 0.7,
-  fusionScore: 0.03,
-  rerankScore: 0.9,
-}];
+const evidence: Evidence[] = [
+  {
+    id: 'source-1',
+    title: 'Public guidance',
+    section: 'Choice',
+    url: 'https://example.gov/guidance',
+    snippet: 'Participation is voluntary.',
+    jurisdiction: 'United States',
+    topic: 'victim-autonomy',
+    denseScore: 0.8,
+    keywordScore: 0.7,
+    fusionScore: 0.03,
+    graphScore: 0,
+    rerankScore: 0.9,
+  },
+];
 
 const brief: PracticeBrief = {
-  finding: { text: 'Participation remains voluntary.', citation_ids: ['source-1'] },
+  finding: {
+    text: 'Participation remains voluntary.',
+    citation_ids: ['source-1'],
+  },
   options: [
     { text: 'Offer time.', citation_ids: ['source-1'] },
     { text: 'Offer an advocate.', citation_ids: ['source-1'] },
@@ -49,15 +60,23 @@ describe('privacy screening', () => {
 
 describe('policy gates', () => {
   it('detects a request to judge remorse', () => {
-    expect(detectProhibitedRequest('Decide whether the person is genuinely remorseful.')).toBe(true);
+    expect(
+      detectProhibitedRequest(
+        'Decide whether the person is genuinely remorseful.',
+      ),
+    ).toBe(true);
   });
 
   it('detects coercive participation', () => {
-    expect(detectProhibitedRequest('Force the victim to attend the meeting.')).toBe(true);
+    expect(
+      detectProhibitedRequest('Force the victim to attend the meeting.'),
+    ).toBe(true);
   });
 
   it('detects prohibited language in an output', () => {
-    expect(containsProhibitedJudgment('The participant is high risk.')).toBe(true);
+    expect(containsProhibitedJudgment('The participant is high risk.')).toBe(
+      true,
+    );
   });
 
   it.each([

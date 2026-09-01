@@ -9,7 +9,11 @@ const turnstileResponseSchema = z.object({
   'error-codes': z.array(z.string()).optional(),
 });
 
-export async function verifyTurnstile(token: string | undefined, request: Request) {
+export async function verifyTurnstile(
+  token: string | undefined,
+  request: Request,
+  expectedAction: string,
+) {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   const enforced = process.env.TURNSTILE_ENFORCED === 'true';
   if (!secret) return { configured: false, verified: !enforced };
@@ -30,5 +34,11 @@ export async function verifyTurnstile(token: string | undefined, request: Reques
   );
   if (!response.ok) return { configured: true, verified: false };
   const parsed = turnstileResponseSchema.safeParse(await response.json());
-  return { configured: true, verified: parsed.success && parsed.data.success };
+  const requestHostname = new URL(request.url).hostname;
+  const verified =
+    parsed.success &&
+    parsed.data.success &&
+    parsed.data.action === expectedAction &&
+    parsed.data.hostname === requestHostname;
+  return { configured: true, verified };
 }

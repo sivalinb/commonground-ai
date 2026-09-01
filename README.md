@@ -17,14 +17,16 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - A real LangGraph state machine with conditional stop paths and a durable human-approval checkpoint
 - Fireworks Qwen3 embeddings, reranking, JSON-schema-constrained generation, and an independent safety critic
 - Hybrid retrieval using Pinecone dense search, local BM25, reciprocal-rank fusion, and jurisdiction filtering
+- Neo4j Aura GraphRAG expansion over approved source, safeguard, and jurisdiction relationships
 - A dedicated, deletion-protected Pinecone index and isolated namespace
-- A second Fireworks call acting as an independent safety critic
+- A Fireworks safety critic plus an independent Mistral cross-provider release panel
 - Claim-level source citations, deterministic citation validation, groundedness signals, abstention, and required human approval
 - Metadata-only LangSmith production traces and evaluator feedback
 - You.com freshness research restricted to authoritative public domains
 - Fireworks policy-change triage that recommends curator review but cannot publish or re-index content
 - A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
 - Role-based Fireworks model routing with safe fallback to the primary configured model
+- Deepgram Nova-3 transcription and Aura-2 bilingual read-aloud with no application audio retention
 - A versioned 48-case evaluation suite, including prompt attacks and counterfactual fairness pairs, plus 19 deterministic unit tests
 - Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
 
@@ -75,25 +77,27 @@ flowchart LR
 
 ## Technology stack
 
-| Layer | Technology | Role |
-|---|---|---|
-| Experience | React 19, Vinext, Tailwind CSS, shadcn/ui | Responsive interactive website |
-| Generation | Fireworks AI | Structured practice brief and independent safety critique |
-| Embeddings | Fireworks Qwen3 Embedding | 1,024-dimensional vectors |
-| Orchestration | LangGraph | Typed state, conditional routing, and a human-review checkpoint |
-| Retrieval | Pinecone Serverless + BM25 | Dense and lexical retrieval with namespace isolation |
-| Fusion | Reciprocal-rank fusion | Combines semantic and exact-term rankings |
-| Reranking | Fireworks Qwen3 Reranker | Relevance ordering before generation |
-| Observability | LangSmith | Privacy-minimized traces and evaluator feedback |
-| Freshness | You.com Search API | Allowlisted public-source discovery for curator review |
-| Practice agents | LangGraph + Fireworks | Fictional role-play, coaching, safety review, rubric evaluation, and model routing |
-| Voice | Browser Web Speech APIs | Zero-key dictation and read-aloud; no application audio retention |
-| Corpus governance | You.com + Fireworks | Search discovery and structured change triage for curator review |
-| Relationship layer | Typed corpus metadata | Topic, jurisdiction, safeguard, and source connections |
-| Durable state | Cloudflare D1 + Drizzle | Approval audit metadata and distributed rate windows |
-| Abuse defense | Cloudflare Turnstile | Optional production challenge before provider calls |
-| Testing | Vitest + versioned JSONL evals | Unit tests and deterministic/provider-backed evaluation modes |
-| Hosting | OpenAI Sites / Cloudflare Workers | Public server-rendered application and protected secrets |
+| Layer              | Technology                                | Role                                                                               |
+| ------------------ | ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| Experience         | React 19, Vinext, Tailwind CSS, shadcn/ui | Responsive interactive website                                                     |
+| Generation         | Fireworks AI                              | Structured practice brief, role-play, coaching, and first safety critique          |
+| Model panel        | Mistral AI                                | Independent cross-provider safety review and victim-services practice agent        |
+| Embeddings         | Fireworks Qwen3 Embedding                 | 1,024-dimensional vectors                                                          |
+| Orchestration      | LangGraph                                 | Typed state, conditional routing, and a human-review checkpoint                    |
+| Retrieval          | Pinecone Serverless + BM25                | Dense and lexical retrieval with namespace isolation                               |
+| GraphRAG           | Neo4j Aura Query API                      | Expands candidates through safeguard and jurisdiction relationships over HTTPS     |
+| Fusion             | Reciprocal-rank fusion                    | Combines semantic and exact-term rankings                                          |
+| Reranking          | Fireworks Qwen3 Reranker                  | Relevance ordering before generation                                               |
+| Observability      | LangSmith                                 | Privacy-minimized traces and evaluator feedback                                    |
+| Freshness          | You.com Search API                        | Allowlisted public-source discovery for curator review                             |
+| Practice agents    | LangGraph + Fireworks                     | Fictional role-play, coaching, safety review, rubric evaluation, and model routing |
+| Voice              | Deepgram Nova-3 + Aura-2                  | English/Spanish transcription and read-aloud; no application audio retention       |
+| Corpus governance  | You.com + Fireworks                       | Search discovery and structured change triage for curator review                   |
+| Relationship layer | Typed corpus metadata                     | Topic, jurisdiction, safeguard, and source connections                             |
+| Durable state      | Cloudflare D1 + Drizzle                   | Approval audit metadata and distributed rate windows                               |
+| Abuse defense      | Cloudflare Turnstile                      | Optional production challenge before provider calls                                |
+| Testing            | Vitest + versioned JSONL evals            | Unit tests and deterministic/provider-backed evaluation modes                      |
+| Hosting            | OpenAI Sites / Cloudflare Workers         | Public server-rendered application and protected secrets                           |
 
 ## Safety and privacy design
 
@@ -102,10 +106,10 @@ The application is designed to fail closed:
 1. Same-origin, content-type, input-length, Turnstile, and distributed rate-limit checks run at the public API boundary.
 2. Email, phone, address, and case-number patterns are blocked before provider calls.
 3. Retrieval is restricted to a curated restorative-justice and victim-services corpus.
-4. Dense and lexical rankings are fused, filtered by jurisdiction, and independently reranked.
+4. Dense and lexical rankings are fused, expanded through Neo4j relationships, filtered by jurisdiction, and independently reranked.
 5. Weak evidence triggers abstention rather than unsupported generation.
 6. JSON-schema output and a deterministic claim-level citation gate reject malformed or unsupported briefs.
-7. A separate model audits autonomy, coercion, evidence support, and policy conflicts against release thresholds.
+7. Fireworks and Mistral independently audit autonomy, coercion, evidence support, and policy conflicts against release thresholds.
 8. LangGraph marks the result as awaiting human review; D1 stores only approval and rate metadata.
 9. No message, referral, eligibility decision, or record update is performed automatically.
 10. LangSmith receives counts, latency, scores, status, and version IDs—not raw narratives or generated briefs.
@@ -147,7 +151,7 @@ Requirements:
 - Node.js 22.13 or newer
 - pnpm
 - Fireworks and Pinecone credentials for the live analysis route
-- Optional LangSmith, You.com, and Cloudflare Turnstile credentials
+- Optional LangSmith, You.com, Cloudflare Turnstile, Mistral, Deepgram, and Neo4j credentials
 
 ```bash
 pnpm install
@@ -173,11 +177,21 @@ pnpm seed:pinecone
 
 Pinecone namespaces are created automatically on the first upsert.
 
+### Create the Neo4j knowledge graph
+
+Create an AuraDB Free instance and add its connection credentials to the environment. The application uses Neo4j's HTTPS Query API, which is compatible with Cloudflare Workers. Seed only the checked-in approved corpus:
+
+```bash
+pnpm seed:neo4j
+```
+
+The script uses idempotent constraints and `MERGE`; rerunning it updates the same CommonGround evidence nodes without deleting unrelated graph data.
+
 ## Environment variables
 
 Copy [`.env.example`](.env.example) and populate it locally. Never commit credentials. All production credentials must be encrypted server-side secrets.
 
-The application requires `FIREWORKS_API_KEY`, `PINECONE_API_KEY`, `PINECONE_INDEX_HOST`, and `LIVE_AI_ENABLED=true` for live analysis. LangSmith and You.com are optional integrations.
+The application requires `FIREWORKS_API_KEY`, `PINECONE_API_KEY`, `PINECONE_INDEX_HOST`, and `LIVE_AI_ENABLED=true` for live analysis. Mistral adds cross-provider review, Neo4j adds GraphRAG expansion, Deepgram adds protected voice input/output, LangSmith adds observability, and You.com adds curator-only freshness discovery.
 
 ## Production checks
 
@@ -206,4 +220,4 @@ An agency deployment requires its own security, accessibility, legal, records-re
 
 ## Project status
 
-The public demo is operational with Fireworks, Pinecone, LangSmith, You.com, LangGraph, and D1-backed durable metadata. Turnstile integration is implemented and becomes enforced when the site and secret keys are configured and `TURNSTILE_ENFORCED=true`.
+The public demo is operational with Fireworks, Pinecone, Mistral, Deepgram, Neo4j Aura, LangSmith, You.com, LangGraph, D1-backed durable metadata, and enforced Cloudflare Turnstile verification.

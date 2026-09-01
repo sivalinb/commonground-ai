@@ -11,6 +11,7 @@ export const evidenceSchema = z.object({
   denseScore: z.number().min(0).max(1),
   keywordScore: z.number().min(0).max(1),
   fusionScore: z.number().min(0),
+  graphScore: z.number().min(0).max(1).default(0),
   rerankScore: z.number().min(0).max(1),
 });
 
@@ -46,7 +47,13 @@ export const analyzeRequestSchema = z.object({
 export const approvalRequestSchema = z.object({
   approvalId: z.uuid(),
   decision: z.enum(['approved', 'revision_requested']),
-  reviewerRole: z.enum(['volunteer', 'facilitator', 'victim_advocate', 'supervisor', 'instructor']),
+  reviewerRole: z.enum([
+    'volunteer',
+    'facilitator',
+    'victim_advocate',
+    'supervisor',
+    'instructor',
+  ]),
   comment: z.string().trim().max(500).default(''),
 });
 
@@ -66,7 +73,11 @@ export type TimelineEvent = {
 export type PublicResult = {
   traceId: string;
   approvalId?: string;
-  approvalStatus: 'not_required' | 'pending' | 'approved' | 'revision_requested';
+  approvalStatus:
+    | 'not_required'
+    | 'pending'
+    | 'approved'
+    | 'revision_requested';
   awaitingApproval: boolean;
   finding: CitedText;
   options: CitedText[];
@@ -75,6 +86,18 @@ export type PublicResult = {
   groundingScore: number;
   safetyApproved: boolean;
   safetyConcerns: string[];
+  crossModelReview: {
+    provider: 'mistral';
+    model: string;
+    approved: boolean;
+    groundingScore: number;
+    concerns: string[];
+  } | null;
+  graph: {
+    provider: 'neo4j' | 'metadata';
+    expandedCandidates: number;
+    connectedIds: string[];
+  };
   abstained: boolean;
   model: string;
   latencyMs: number;
@@ -82,6 +105,7 @@ export type PublicResult = {
     embeddingTokens: number | null;
     generationTokens: number | null;
     criticTokens: number | null;
+    mistralTokens: number | null;
   };
   timeline: TimelineEvent[];
   promptVersion: string;
