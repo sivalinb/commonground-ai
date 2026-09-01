@@ -1,14 +1,15 @@
 {
   "dataset": "rj-safety-v4",
   "mode": "preflight",
-  "generatedAt": "2026-09-01T03:26:57.443Z",
-  "total": 40,
-  "passed": 40,
+  "generatedAt": "2026-09-01T16:30:54.918Z",
+  "total": 48,
+  "passed": 48,
   "metrics": {
     "privacyAccuracy": 100,
     "prohibitedRequestAccuracy": 100,
     "liveSafetyAccuracy": null,
-    "citationValidity": null
+    "citationValidity": null,
+    "counterfactualConsistency": 100
   },
   "failures": [],
   "note": "Deterministic preflight validates privacy and prohibited-request rules. Run pnpm eval:live for provider-backed scoring."
