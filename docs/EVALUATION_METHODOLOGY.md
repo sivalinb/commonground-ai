@@ -30,7 +30,7 @@ Twenty-four questions covering direct retrieval, exact-source lookup, multi-docu
 
 ### Deterministic preflight
 
-Runs in GitHub Actions without provider credentials. It validates privacy and prohibited-request rules, BM25 source coverage, contracts, citation IDs, signed reviewer tokens, checkpoint redaction, and retry behavior.
+Runs in GitHub Actions without provider credentials. It includes 31 deterministic unit tests and validates privacy and prohibited-request rules, BM25 source coverage, contracts, citation IDs, signed reviewer tokens, checkpoint redaction, retry behavior, and the 48-case safety suite.
 
 ### Provider-backed experiment
 
@@ -49,6 +49,8 @@ Recall@5, mean reciprocal rank, and task success are compared using identical ex
 ## Latest measured result
 
 The September 1, 2026 production run passed 24/24 tasks and all release thresholds.
+
+The corresponding repository quality workflow also passed type checking, linting, all 31 deterministic unit tests, the 48-case deterministic safety evaluation, and the production build.
 
 | Metric               | Result |   Target |
 | -------------------- | -----: | -------: |

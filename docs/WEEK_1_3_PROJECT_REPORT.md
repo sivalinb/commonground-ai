@@ -8,6 +8,10 @@ Public demo: https://commonground-rj-ai.siva-babu.chatgpt.site/
 
 Source code: https://github.com/sivalinb/commonground-ai
 
+### Verification snapshot
+
+Documentation and production behavior were rechecked on September 1, 2026. The public demo, GitHub source, four submission documents, and deployed evaluation report agree on the current system scope and measured results. The latest quality workflow passes type checking, linting, 31 deterministic unit tests, the 48-case safety suite, and the production build.
+
 ## Week 1 — Data application with vibe coding
 
 ### Problem statement
