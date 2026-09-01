@@ -1,6 +1,10 @@
 import { readFile } from 'node:fs/promises';
 
-const required = ['FIREWORKS_API_KEY', 'PINECONE_API_KEY', 'PINECONE_INDEX_HOST'];
+const required = [
+  'FIREWORKS_API_KEY',
+  'PINECONE_API_KEY',
+  'PINECONE_INDEX_HOST',
+];
 for (const key of required) {
   if (!process.env[key]) throw new Error(`Missing ${key}`);
 }
@@ -55,5 +59,8 @@ if (!upsertResponse.ok) {
 }
 const upsertBody = await upsertResponse.json();
 console.log(
-  JSON.stringify({ namespace, upserted: upsertBody.upsertedCount ?? vectors.length }),
+  JSON.stringify({
+    namespace,
+    upserted: upsertBody.upsertedCount ?? vectors.length,
+  }),
 );

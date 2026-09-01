@@ -20,6 +20,7 @@ import {
   FileSearch,
   GitBranch,
   Globe2,
+  GraduationCap,
   HeartHandshake,
   Info,
   Layers3,
@@ -67,7 +68,8 @@ type View =
   | 'monitor'
   | 'map'
   | 'sources'
-  | 'architecture';
+  | 'architecture'
+  | 'course';
 type ScenarioKey = 'autonomy' | 'youth' | 'unsupported';
 type Citation = {
   id: string;
@@ -94,6 +96,7 @@ type TimelineEvent = {
 type LiveResult = {
   traceId: string;
   approvalId?: string;
+  approvalToken?: string;
   approvalStatus:
     | 'not_required'
     | 'pending'
@@ -143,6 +146,21 @@ type EvalReport = {
   note: string;
   categories: Array<{ label: string; count: number }>;
   releaseThresholds: Record<string, number>;
+  retrieval: {
+    dataset: string;
+    mode: string;
+    total: number;
+    passed: number;
+    metrics: Record<string, number | null>;
+    targets: Record<string, number>;
+    note: string;
+    ablation: null | {
+      queryCount: number;
+      vector: Record<string, number | null>;
+      hybrid: Record<string, number | null>;
+      graph: Record<string, number | null>;
+    };
+  };
 };
 
 const scenarios: Record<
@@ -250,6 +268,7 @@ const tabs: Array<[View, string, typeof MessageSquareText]> = [
   ['map', 'Knowledge map', Network],
   ['sources', 'Public sources', Globe2],
   ['architecture', 'Architecture', Network],
+  ['course', 'Week 1–3 evidence', GraduationCap],
 ];
 
 function Score({ value }: { value: number }) {
@@ -390,7 +409,7 @@ export default function Home() {
   }
 
   async function submitApproval(decision: 'approved' | 'revision_requested') {
-    if (!liveResult?.approvalId) return;
+    if (!liveResult?.approvalId || !liveResult.approvalToken) return;
     setSavingApproval(true);
     try {
       const response = await fetch('/api/approvals', {
@@ -398,6 +417,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           approvalId: liveResult.approvalId,
+          approvalToken: liveResult.approvalToken,
           decision,
           reviewerRole,
           comment: approvalComment,
@@ -617,7 +637,7 @@ export default function Home() {
               {[
                 ['Graphs', '2 workflows · 15 nodes', Waypoints],
                 ['Corpus', '10 public sources', Database],
-                ['Evaluation', '48 versioned cases', BarChart3],
+                ['Evaluation', '48 safety · 24 retrieval', BarChart3],
                 ['Privacy', 'Metadata-only traces', LockKeyhole],
               ].map(([label, value, Icon]) => (
                 <Card
@@ -928,8 +948,10 @@ export default function Home() {
                   <CardHeader>
                     <CardTitle>4. Human approval checkpoint</CardTitle>
                     <CardDescription>
-                      The decision is persisted as metadata. The fictional
-                      narrative and brief are not stored.
+                      LangGraph is durably interrupted in D1 and resumes only
+                      with this short-lived signed reviewer session. The
+                      fictional narrative, vectors, evidence excerpts, and
+                      generated brief are not persisted in the checkpoint.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -1199,6 +1221,81 @@ export default function Home() {
                 </CardContent>
               </Card>
             </div>
+            {evalReport?.retrieval && (
+              <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Retrieval-quality report</CardTitle>
+                    <CardDescription>
+                      {evalReport.retrieval.dataset} ·{' '}
+                      {evalReport.retrieval.mode}
+                    </CardDescription>
+                    <CardAction>
+                      <Badge
+                        className={
+                          evalReport.retrieval.passed ===
+                          evalReport.retrieval.total
+                            ? 'bg-emerald-700 text-white'
+                            : 'bg-amber-700 text-white'
+                        }
+                      >
+                        {evalReport.retrieval.passed}/
+                        {evalReport.retrieval.total} passed
+                      </Badge>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent className="grid gap-3 sm:grid-cols-2">
+                    {Object.entries(evalReport.retrieval.metrics).map(
+                      ([key, value]) => (
+                        <div key={key} className="rounded-xl border p-3">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                            {key.replace(/([A-Z])/g, ' $1')}
+                          </p>
+                          <p className="mt-1 font-mono text-xl font-semibold">
+                            {value === null
+                              ? 'Pending live run'
+                              : key.toLowerCase().includes('latency')
+                                ? `${value} ms`
+                                : `${value}%`}
+                          </p>
+                        </div>
+                      ),
+                    )}
+                    <p className="sm:col-span-2 rounded-xl bg-muted/40 p-3 text-xs leading-5 text-muted-foreground">
+                      {evalReport.retrieval.note}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>RAG release targets</CardTitle>
+                    <CardDescription>
+                      Faithfulness, retrieval quality, abstention, and latency
+                      are separate gates.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {Object.entries(evalReport.retrieval.targets).map(
+                      ([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex items-center justify-between rounded-xl border p-3"
+                        >
+                          <span className="text-xs font-medium">
+                            {key.replace(/([A-Z])/g, ' $1')}
+                          </span>
+                          <Badge variant="outline">
+                            {key.toLowerCase().includes('latency')
+                              ? `≤ ${value} ms`
+                              : `≥ ${value}%`}
+                          </Badge>
+                        </div>
+                      ),
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </section>
         )}
 
@@ -1498,7 +1595,7 @@ export default function Home() {
                   title: 'Assurance',
                   icon: ShieldCheck,
                   items: [
-                    '48-case eval dataset',
+                    '48 safety + 24 retrieval evals',
                     'Fairness + attack tests',
                     'LangSmith child spans',
                   ],
@@ -1581,13 +1678,151 @@ export default function Home() {
                   </p>
                   <p>
                     <Database className="mr-1 inline size-3 text-primary" />
-                    D1 stores only rate and approval metadata.
+                    D1 stores rate/approval metadata and a privacy-minimized
+                    LangGraph control checkpoint.
                   </p>
                   <p>
                     <Code2 className="mr-1 inline size-3 text-primary" />
                     Public source, versioned prompts, corpus, migrations, and
                     evals.
                   </p>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        )}
+
+        {activeView === 'course' && (
+          <section aria-label="Week 1 through Week 3 course evidence">
+            <SectionHeading
+              eyebrow="Cumulative course evidence"
+              title="One project demonstrating all three weeks of AI learning."
+              description="CommonGround AI progresses from a vibe-coded working application, to measurable hybrid RAG, to a durable multi-agent LangGraph workflow with tools, voice, evaluations, and human control."
+            />
+            <div className="grid gap-4 lg:grid-cols-3">
+              {[
+                {
+                  week: 'Week 1',
+                  title: 'Vibe-coded data application',
+                  score: 'Complete',
+                  icon: Code2,
+                  items: [
+                    'AI-assisted implementation with Codex',
+                    'Public interactive React application',
+                    'Charts, workflow traces, filters, and evidence views',
+                    'GitHub source and reproducible quality workflow',
+                  ],
+                },
+                {
+                  week: 'Week 2',
+                  title: 'Evaluated hybrid RAG + GraphRAG',
+                  score: 'Complete',
+                  icon: Database,
+                  items: [
+                    'Fireworks embeddings and Pinecone vector storage',
+                    'BM25, reciprocal-rank fusion, and reranking',
+                    'Neo4j graph expansion and cited answers',
+                    '24-query retrieval suite with declared release targets',
+                  ],
+                },
+                {
+                  week: 'Week 3',
+                  title: 'Agentic AI system',
+                  score: 'Complete',
+                  icon: GitBranch,
+                  items: [
+                    'Five specialized practice agents and tool calls',
+                    'Conditional state, retries, and safe stop paths',
+                    'D1-backed LangGraph interrupt and resume',
+                    'Signed reviewer session and metadata-only audit record',
+                  ],
+                },
+              ].map(({ week, title, score, icon: Icon, items }) => (
+                <Card key={week} className="border border-border/70">
+                  <CardHeader>
+                    <span className="mb-2 grid size-11 place-items-center rounded-2xl bg-primary/10 text-primary">
+                      <Icon className="size-5" />
+                    </span>
+                    <CardTitle>{week}</CardTitle>
+                    <CardDescription>{title}</CardDescription>
+                    <CardAction>
+                      <Badge className="bg-emerald-700 text-white">
+                        <CheckCircle2 /> {score}
+                      </Badge>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {items.map((item) => (
+                      <p
+                        key={item}
+                        className="flex items-start gap-2 text-xs leading-5"
+                      >
+                        <Check className="mt-1 size-3 shrink-0 text-emerald-700" />
+                        {item}
+                      </p>
+                    ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(300px,0.8fr)]">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Declared success criteria</CardTitle>
+                  <CardDescription>
+                    The project is judged on task completion and safe failure,
+                    not whether a single model response sounds convincing.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-3 sm:grid-cols-2">
+                  {[
+                    ['Recall@5', '94.2% · target ≥85%'],
+                    ['Citation precision', '97% · target ≥95%'],
+                    ['Claim faithfulness', '100% · target ≥90%'],
+                    ['Correct abstention', '100% · target ≥90%'],
+                    ['P95 latency', '7.93 s · target ≤15 s'],
+                    ['Task success', '24/24 · 100%'],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="flex items-center justify-between rounded-xl border p-3"
+                    >
+                      <span className="text-xs font-medium">{label}</span>
+                      <span className="font-mono text-xs font-semibold">
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+              <Card className="border-sky-200 bg-sky-50">
+                <CardHeader>
+                  <CardTitle>Submission package</CardTitle>
+                  <CardDescription>
+                    Public evidence for instructors and restorative-justice
+                    reviewers.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {[
+                    ['Project report', 'docs/WEEK_1_3_PROJECT_REPORT.md'],
+                    ['Evaluation method', 'docs/EVALUATION_METHODOLOGY.md'],
+                    [
+                      'Prompt and iteration log',
+                      'docs/PROMPTS_AND_ITERATIONS.md',
+                    ],
+                    ['Five-minute demo guide', 'docs/FIVE_MINUTE_DEMO.md'],
+                  ].map(([label, path]) => (
+                    <a
+                      key={path}
+                      href={`https://github.com/sivalinb/commonground-ai/blob/main/${path}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between rounded-xl border border-sky-200 bg-white p-3 text-xs font-semibold hover:border-sky-400"
+                    >
+                      {label} <ExternalLink className="size-3.5" />
+                    </a>
+                  ))}
                 </CardContent>
               </Card>
             </div>

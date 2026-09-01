@@ -71,14 +71,27 @@
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
-  html { @apply font-sans; }
-  body { @apply bg-background text-foreground antialiased; }
-  button, textarea { font: inherit; }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  button,
+  textarea {
+    font: inherit;
+  }
 }
 
 body {
   background-image:
-    radial-gradient(circle at 7% 4%, oklch(0.91 0.045 174 / 55%), transparent 24rem),
+    radial-gradient(
+      circle at 7% 4%,
+      oklch(0.91 0.045 174 / 55%),
+      transparent 24rem
+    ),
     linear-gradient(to bottom, transparent, oklch(0.96 0.01 198));
 }

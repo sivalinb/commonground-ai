@@ -1,4 +1,5 @@
 import report from '@/data/eval-report.json';
+import retrieval from '@/data/retrieval-eval-report.json';
 import { secureJson } from '@/lib/http';
 
 export async function GET() {
@@ -17,5 +18,6 @@ export async function GET() {
       citationValidity: 95,
       counterfactualConsistency: 100,
     },
+    retrieval,
   });
 }

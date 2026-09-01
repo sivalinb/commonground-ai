@@ -42,10 +42,12 @@ export const analyzeRequestSchema = z.object({
   caseText: z.string().trim().min(20).max(3000),
   jurisdiction: z.enum(['colorado', 'national']).default('colorado'),
   turnstileToken: z.string().max(2048).optional(),
+  retrievalMode: z.enum(['vector', 'hybrid', 'graph']).optional(),
 });
 
 export const approvalRequestSchema = z.object({
   approvalId: z.uuid(),
+  approvalToken: z.string().min(32).max(256),
   decision: z.enum(['approved', 'revision_requested']),
   reviewerRole: z.enum([
     'volunteer',
@@ -73,6 +75,7 @@ export type TimelineEvent = {
 export type PublicResult = {
   traceId: string;
   approvalId?: string;
+  approvalToken?: string;
   approvalStatus:
     | 'not_required'
     | 'pending'

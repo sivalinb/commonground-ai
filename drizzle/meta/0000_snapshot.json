@@ -106,17 +106,12 @@
       "indexes": {
         "idx_approval_requests_trace_id": {
           "name": "idx_approval_requests_trace_id",
-          "columns": [
-            "trace_id"
-          ],
+          "columns": ["trace_id"],
           "isUnique": false
         },
         "idx_approval_requests_status_updated": {
           "name": "idx_approval_requests_status_updated",
-          "columns": [
-            "status",
-            "updated_at"
-          ],
+          "columns": ["status", "updated_at"],
           "isUnique": false
         }
       },
@@ -161,11 +156,7 @@
       "indexes": {
         "idx_rate_limit_windows_lookup": {
           "name": "idx_rate_limit_windows_lookup",
-          "columns": [
-            "key_hash",
-            "route",
-            "window_start"
-          ],
+          "columns": ["key_hash", "route", "window_start"],
           "isUnique": true
         }
       },

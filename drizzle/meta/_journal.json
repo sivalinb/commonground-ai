@@ -15,6 +15,13 @@
       "when": 1788279414432,
       "tag": "0001_modern_ozymandias",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788292339061,
+      "tag": "0002_slippery_darwin",
+      "breakpoints": true
     }
   ]
 }

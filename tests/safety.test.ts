@@ -56,6 +56,16 @@ describe('privacy screening', () => {
   ])('detects %s', (_name, value) => {
     expect(detectSensitiveData(value).length).toBeGreaterThan(0);
   });
+
+  it.each([
+    'What steps can someone take to document and report cyberbullying?',
+    'Which local officer is assigned to case training next Tuesday?',
+  ])(
+    'does not mistake ordinary case or report language for an ID: %s',
+    (value) => {
+      expect(detectSensitiveData(value)).toEqual([]);
+    },
+  );
 });
 
 describe('policy gates', () => {

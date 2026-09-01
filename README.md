@@ -27,7 +27,7 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
 - Role-based Fireworks model routing with safe fallback to the primary configured model
 - Deepgram Nova-3 transcription and Aura-2 bilingual read-aloud with no application audio retention
-- A versioned 48-case evaluation suite, including prompt attacks and counterfactual fairness pairs, plus 19 deterministic unit tests
+- A versioned 48-case safety suite, a 24-query retrieval suite with vector/hybrid/GraphRAG ablation, and 31 deterministic unit tests
 - Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
 
 ## Architecture
@@ -110,7 +110,7 @@ The application is designed to fail closed:
 5. Weak evidence triggers abstention rather than unsupported generation.
 6. JSON-schema output and a deterministic claim-level citation gate reject malformed or unsupported briefs.
 7. Fireworks and Mistral independently audit autonomy, coercion, evidence support, and policy conflicts against release thresholds.
-8. LangGraph marks the result as awaiting human review; D1 stores only approval and rate metadata.
+8. LangGraph durably interrupts before human review; D1 stores approval/rate metadata and a privacy-minimized control checkpoint with narratives, vectors, evidence excerpts, and generated briefs removed.
 9. No message, referral, eligibility decision, or record update is performed automatically.
 10. LangSmith receives counts, latency, scores, status, and version IDs—not raw narratives or generated briefs.
 
@@ -129,6 +129,17 @@ Each successful production run records the following metadata in the `commongrou
 - Human-approval checkpoint as the final workflow stage
 
 Evaluator feedback keys cover grounding, safety approval, citation validity, human handoff, practice quality, autonomy, and trauma-aware communication. The checked-in `rj-safety-v4` dataset contains 48 synthetic cases covering direct policy questions, missing-corpus abstention, coercive requests, consequential judgments, prompt injection, privacy, counterfactual fairness, and correct human handoff. `pnpm eval` runs deterministic release preflight; `pnpm eval:live` runs the same cases through the configured public API.
+
+The `rj-retrieval-v1` dataset adds 24 labeled retrieval questions and explicit targets for Recall@5, mean reciprocal rank, citation precision, claim faithfulness, correct abstention, and P95 latency. Provider-backed mode uses Mistral as an independent claim-to-evidence judge and compares vector-only, hybrid, and GraphRAG retrieval on 10 shared queries. See [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md).
+
+Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97% citation precision**, **100% claim faithfulness**, **100% correct abstention**, and **7.93 s P95 latency**. On the 10-query ablation, GraphRAG reached **100%** Recall@5 and task success versus **70%** for vector-only and hybrid modes.
+
+## Course submission evidence
+
+- [`docs/WEEK_1_3_PROJECT_REPORT.md`](docs/WEEK_1_3_PROJECT_REPORT.md) — cumulative Week 1–3 report
+- [`docs/PROMPTS_AND_ITERATIONS.md`](docs/PROMPTS_AND_ITERATIONS.md) — AI-assisted development prompt and iteration log
+- [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md) — metrics, datasets, targets, and ablation method
+- [`docs/FIVE_MINUTE_DEMO.md`](docs/FIVE_MINUTE_DEMO.md) — timed demonstration script
 
 ## Knowledge base
 

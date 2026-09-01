@@ -15,7 +15,9 @@
     "test": "vitest run",
     "eval": "node --import tsx scripts/run-evals.ts",
     "eval:live": "node --import tsx scripts/run-evals.ts --live",
-    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "eval:retrieval": "node --import tsx scripts/run-retrieval-evals.ts",
+    "eval:retrieval:live": "node --import tsx scripts/run-retrieval-evals.ts --live",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm eval && pnpm eval:retrieval && pnpm build",
     "db:generate": "drizzle-kit generate",
     "lint": "oxlint app lib db tests scripts components/turnstile-gate.tsx components/practice-lab.tsx components/policy-monitor.tsx components/knowledge-map.tsx",
     "format": "oxfmt"
@@ -24,6 +26,7 @@
     "@base-ui/react": "1.7.0",
     "@langchain/core": "^1.2.9",
     "@langchain/langgraph": "^1.4.13",
+    "@langchain/langgraph-checkpoint": "1.1.5",
     "@shadcn/react": "0.3.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",

@@ -11,15 +11,21 @@ export async function fetchWithPolicy(
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetch(input, { ...init, signal: controller.signal });
-      if (response.ok || (response.status < 500 && response.status !== 429)) return response;
+      const response = await fetch(input, {
+        ...init,
+        signal: controller.signal,
+      });
+      if (response.ok || (response.status < 500 && response.status !== 429))
+        return response;
       lastError = new Error(`${options.label} returned ${response.status}`);
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error(`${options.label} failed`);
+      lastError =
+        error instanceof Error ? error : new Error(`${options.label} failed`);
     } finally {
       clearTimeout(timeout);
     }
-    if (attempt < retries) await new Promise((resolve) => setTimeout(resolve, 180 * 2 ** attempt));
+    if (attempt < retries)
+      await new Promise((resolve) => setTimeout(resolve, 180 * 2 ** attempt));
   }
 
   throw lastError || new Error(`${options.label} failed`);

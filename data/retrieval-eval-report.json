@@ -1,0 +1,45 @@
+{
+  "dataset": "rj-retrieval-v1",
+  "mode": "provider-backed",
+  "generatedAt": "2026-09-01T20:16:19.038Z",
+  "targets": {
+    "recallAt5": 85,
+    "meanReciprocalRank": 75,
+    "citationPrecision": 95,
+    "claimFaithfulness": 90,
+    "correctAbstention": 90,
+    "p95LatencyMs": 15000
+  },
+  "total": 24,
+  "passed": 24,
+  "metrics": {
+    "recallAt5": 94.2,
+    "meanReciprocalRank": 94.2,
+    "citationPrecision": 97,
+    "claimFaithfulness": 100,
+    "correctAbstention": 100,
+    "p95LatencyMs": 7930,
+    "taskSuccessRate": 100
+  },
+  "ablation": {
+    "queryCount": 10,
+    "vector": {
+      "recallAt5": 70,
+      "meanReciprocalRank": 70,
+      "passRate": 70
+    },
+    "hybrid": {
+      "recallAt5": 70,
+      "meanReciprocalRank": 70,
+      "passRate": 70
+    },
+    "graph": {
+      "recallAt5": 100,
+      "meanReciprocalRank": 100,
+      "passRate": 100
+    }
+  },
+  "failures": [],
+  "qualityWarnings": [],
+  "note": "Provider-backed GraphRAG run with an independent Mistral claim-faithfulness judge and a 10-query vector/hybrid/graph ablation."
+}

@@ -3,7 +3,30 @@ import knowledge from '@/data/knowledge.json';
 export type KnowledgeDocument = (typeof knowledge)[number];
 
 const STOP_WORDS = new Set([
-  'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'has', 'in', 'is', 'it', 'of', 'on', 'or', 'that', 'the', 'this', 'to', 'was', 'were', 'with',
+  'a',
+  'an',
+  'and',
+  'are',
+  'as',
+  'at',
+  'be',
+  'by',
+  'for',
+  'from',
+  'has',
+  'in',
+  'is',
+  'it',
+  'of',
+  'on',
+  'or',
+  'that',
+  'the',
+  'this',
+  'to',
+  'was',
+  'were',
+  'with',
 ]);
 
 export function tokenize(value: string) {
@@ -14,10 +37,15 @@ export function tokenize(value: string) {
     .filter((token) => token.length > 2 && !STOP_WORDS.has(token));
 }
 
-export function bm25Search(query: string, documents: KnowledgeDocument[] = knowledge) {
+export function bm25Search(
+  query: string,
+  documents: KnowledgeDocument[] = knowledge,
+) {
   const tokenized = documents.map((document) => tokenize(document.text));
   const queryTokens = [...new Set(tokenize(query))];
-  const averageLength = tokenized.reduce((sum, tokens) => sum + tokens.length, 0) / Math.max(1, tokenized.length);
+  const averageLength =
+    tokenized.reduce((sum, tokens) => sum + tokens.length, 0) /
+    Math.max(1, tokenized.length);
   const k1 = 1.2;
   const b = 0.75;
   const raw = documents.map((document, index) => {
@@ -25,9 +53,16 @@ export function bm25Search(query: string, documents: KnowledgeDocument[] = knowl
     const score = queryTokens.reduce((total, term) => {
       const frequency = tokens.filter((token) => token === term).length;
       if (!frequency) return total;
-      const containing = tokenized.filter((candidate) => candidate.includes(term)).length;
-      const idf = Math.log(1 + (documents.length - containing + 0.5) / (containing + 0.5));
-      const normalized = (frequency * (k1 + 1)) / (frequency + k1 * (1 - b + b * (tokens.length / Math.max(1, averageLength))));
+      const containing = tokenized.filter((candidate) =>
+        candidate.includes(term),
+      ).length;
+      const idf = Math.log(
+        1 + (documents.length - containing + 0.5) / (containing + 0.5),
+      );
+      const normalized =
+        (frequency * (k1 + 1)) /
+        (frequency +
+          k1 * (1 - b + b * (tokens.length / Math.max(1, averageLength))));
       return total + idf * normalized;
     }, 0);
     return { document, score };
@@ -44,8 +79,12 @@ export function reciprocalRankFusion(
 ) {
   const scores = new Map<string, number>();
   const k = 60;
-  dense.forEach((item, index) => scores.set(item.id, (scores.get(item.id) || 0) + 1 / (k + index + 1)));
-  lexical.forEach((item, index) => scores.set(item.id, (scores.get(item.id) || 0) + 1 / (k + index + 1)));
+  dense.forEach((item, index) =>
+    scores.set(item.id, (scores.get(item.id) || 0) + 1 / (k + index + 1)),
+  );
+  lexical.forEach((item, index) =>
+    scores.set(item.id, (scores.get(item.id) || 0) + 1 / (k + index + 1)),
+  );
   return [...scores.entries()]
     .map(([id, score]) => ({ id, score }))
     .sort((a, bValue) => bValue.score - a.score);

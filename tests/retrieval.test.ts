@@ -11,8 +11,14 @@ describe('hybrid retrieval', () => {
 
   it('fuses dense and lexical ranks', () => {
     const fused = reciprocalRankFusion(
-      [{ id: 'a', score: 0.9 }, { id: 'b', score: 0.8 }],
-      [{ id: 'b', score: 0.9 }, { id: 'c', score: 0.8 }],
+      [
+        { id: 'a', score: 0.9 },
+        { id: 'b', score: 0.8 },
+      ],
+      [
+        { id: 'b', score: 0.9 },
+        { id: 'c', score: 0.8 },
+      ],
     );
     expect(fused[0].id).toBe('b');
   });

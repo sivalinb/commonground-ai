@@ -1,9 +1,13 @@
 import { analyzeRequestSchema } from '@/lib/contracts';
-import { consumeRateLimit, savePendingApproval } from '@/lib/db';
+import { issueApprovalToken } from '@/lib/approval';
+import { consumeRateLimit, getDatabase, savePendingApproval } from '@/lib/db';
+import { D1CheckpointSaver } from '@/lib/d1-checkpointer';
+import { hasEvaluationAccess } from '@/lib/evaluation-access';
 import { requireSameOrigin, secureJson } from '@/lib/http';
 import { detectSensitiveData } from '@/lib/safety';
 import { verifyTurnstile } from '@/lib/turnstile';
 import { executeWorkflow, WorkflowExecutionError } from '@/lib/workflow';
+import { workflowRuntimeFromEnvironment } from '@/lib/workflow-runtime';
 import { ZodError } from 'zod';
 
 function failureClass(error: unknown) {
@@ -24,6 +28,10 @@ function failureClass(error: unknown) {
 
 export async function POST(request: Request) {
   const traceId = `cg_${crypto.randomUUID()}`;
+  const evaluationAccess = hasEvaluationAccess(request);
+  const preserveEvaluationCheckpoint =
+    evaluationAccess &&
+    request.headers.get('x-eval-preserve-checkpoint') === 'true';
   if (!requireSameOrigin(request))
     return secureJson(
       { error: 'Cross-origin requests are not accepted.', traceId },
@@ -35,7 +43,14 @@ export async function POST(request: Request) {
       415,
     );
   }
-  if (!(await consumeRateLimit(request, 'analysis', 20, 10 * 60 * 1000))) {
+  if (
+    !(await consumeRateLimit(
+      request,
+      evaluationAccess ? 'evaluation' : 'analysis',
+      evaluationAccess ? 100 : 20,
+      10 * 60 * 1000,
+    ))
+  ) {
     return secureJson(
       { error: 'Demo request limit reached. Please try again later.', traceId },
       429,
@@ -52,7 +67,8 @@ export async function POST(request: Request) {
         },
         400,
       );
-    const { caseText, jurisdiction, turnstileToken } = parsed.data;
+    const { caseText, jurisdiction, turnstileToken, retrievalMode } =
+      parsed.data;
     const sensitive = detectSensitiveData(caseText);
     if (sensitive.length) {
       return secureJson(
@@ -64,11 +80,9 @@ export async function POST(request: Request) {
         422,
       );
     }
-    const turnstile = await verifyTurnstile(
-      turnstileToken,
-      request,
-      'commonground_analysis',
-    );
+    const turnstile = evaluationAccess
+      ? { verified: true, configured: true }
+      : await verifyTurnstile(turnstileToken, request, 'commonground_analysis');
     if (!turnstile.verified)
       return secureJson(
         {
@@ -79,20 +93,17 @@ export async function POST(request: Request) {
         403,
       );
 
-    const fireworksKey = process.env.FIREWORKS_API_KEY;
-    const pineconeKey = process.env.PINECONE_API_KEY;
-    const pineconeHost = process.env.PINECONE_INDEX_HOST;
-    if (
-      !fireworksKey ||
-      !pineconeKey ||
-      !pineconeHost ||
-      process.env.LIVE_AI_ENABLED !== 'true'
-    ) {
+    const runtime = workflowRuntimeFromEnvironment();
+    const approvalSecret = process.env.APPROVAL_SIGNING_SECRET;
+    if (!runtime || !approvalSecret) {
       return secureJson(
         { error: 'The live AI adapter is not configured.', traceId },
         503,
       );
     }
+
+    const db = getDatabase();
+    const checkpointer = db ? new D1CheckpointSaver(db) : undefined;
 
     const result = await executeWorkflow({
       caseText,
@@ -100,43 +111,40 @@ export async function POST(request: Request) {
       traceId,
       approvalId: crypto.randomUUID(),
       runtime: {
-        fireworksKey,
-        pineconeKey,
-        pineconeHost,
-        namespace: process.env.PINECONE_NAMESPACE || 'commonground-rj-v1',
-        embeddingModel:
-          process.env.FIREWORKS_EMBEDDING_MODEL ||
-          'accounts/fireworks/models/qwen3-embedding-8b',
-        rerankModel:
-          process.env.FIREWORKS_RERANK_MODEL ||
-          'accounts/fireworks/models/qwen3-reranker-8b',
-        chatModel:
-          process.env.FIREWORKS_CHAT_MODEL ||
-          'accounts/fireworks/models/qwen3p7-plus',
-        mistralKey: process.env.MISTRAL_API_KEY,
-        mistralModel: process.env.MISTRAL_MODEL || 'mistral-small-latest',
-        neo4j:
-          process.env.NEO4J_URI &&
-          process.env.NEO4J_USERNAME &&
-          process.env.NEO4J_PASSWORD
-            ? {
-                uri: process.env.NEO4J_URI,
-                username: process.env.NEO4J_USERNAME,
-                password: process.env.NEO4J_PASSWORD,
-                database: process.env.NEO4J_DATABASE || 'neo4j',
-              }
-            : undefined,
+        ...runtime,
+        retrievalMode: evaluationAccess ? retrievalMode : 'graph',
       },
+      checkpointer,
     });
-    if (result.awaitingApproval)
+    if (
+      result.awaitingApproval &&
+      evaluationAccess &&
+      !preserveEvaluationCheckpoint &&
+      result.approvalId
+    ) {
+      await checkpointer
+        ?.deleteThread(result.approvalId)
+        .catch(() => undefined);
+    } else if (result.awaitingApproval) {
       await savePendingApproval(result).catch(() => undefined);
-    return secureJson({ ...result, turnstileConfigured: turnstile.configured });
+    }
+    const approvalToken = result.approvalId
+      ? await issueApprovalToken(result.approvalId, approvalSecret)
+      : undefined;
+    return secureJson({
+      ...result,
+      approvalToken,
+      turnstileConfigured: turnstile.configured,
+    });
   } catch (error) {
     const classified = failureClass(error);
     console.error(
       traceId,
       classified,
       error instanceof Error ? error.message : 'Unknown live analysis error',
+      error instanceof WorkflowExecutionError && error.cause instanceof Error
+        ? error.cause.message
+        : '',
     );
     return secureJson(
       {
