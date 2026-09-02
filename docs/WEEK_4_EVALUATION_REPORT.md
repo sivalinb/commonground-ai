@@ -14,6 +14,18 @@ I measured safe task completion, claim faithfulness, Recall@5, autonomy-preservi
 - Distribution: 20 happy path, 12 edge, 6 known failure, 2 adversarial
 - Labels: expected disposition, expected sources, critical flag, scenario tags, manually specified rationale, autonomy/trauma/handoff references
 
+### Golden-corpus expansion
+
+- LangSmith dataset: [commonground-rj-week4-200-v2](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/c62c1460-3673-447a-8eba-454628212369)
+- Version strategy: immutable dataset name plus `2.0.0` metadata
+- Verified examples: 200
+- Distribution: 100 happy path, 60 edge, 30 known failure, 10 adversarial
+- Cohorts: 40 provider-tested benchmark-core cases and 160 golden-extension cases
+- Reference outcomes: 139 answer, 28 abstain, 20 refuse, 13 privacy block; 87 critical cases
+- Validation: exact distribution, unique IDs and narratives, known source IDs, required labels, and deterministic privacy/refusal activation
+
+The numeric baseline-versus-improved results below remain scoped to the 40-case provider-tested core. The full 200-case provider experiment has not been run and is not implied by these results.
+
 ## Baseline versus improved
 
 | Metric                          |     Baseline |     Improved |         Delta |
@@ -76,4 +88,4 @@ Improved: Pinecone + BM25 + Neo4j GraphRAG, eight candidates, top-five reranking
 
 ## Reproduction
 
-`pnpm eval:week4` validates the dataset without credentials. `pnpm eval:week4:live` runs through an authorized HTTP environment. `pnpm eval:week4:direct` runs the provider-backed pipeline directly and publishes the dataset and experiments to LangSmith.
+`pnpm eval:week4` validates the 40-case experiment core. `pnpm eval:week4:dataset` validates the 200-case v2 corpus without credentials. `pnpm eval:week4:dataset:sync` verifies it in LangSmith. `pnpm eval:week4:live` runs the controlled provider experiment through an authorized HTTP environment. `pnpm eval:week4:direct` runs the provider-backed 40-case pipeline directly and publishes its experiments to LangSmith.

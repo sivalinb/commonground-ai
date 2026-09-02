@@ -27,7 +27,7 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
 - Role-based Fireworks model routing with safe fallback to the primary configured model
 - Deepgram Nova-3 transcription and Aura-2 bilingual read-aloud with no application audio retention
-- A versioned 48-case safety suite, a 24-query retrieval suite, a 40-case end-to-end golden dataset with frozen baseline/post-improvement LangSmith experiments, and 36 deterministic unit tests
+- A versioned 48-case safety suite, a 24-query retrieval suite, a 200-case LangSmith golden dataset with a 40-case frozen baseline/post-improvement core, and 36 deterministic unit tests
 - Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
 
 ## Architecture
@@ -134,6 +134,8 @@ The `rj-retrieval-v1` dataset adds 24 labeled retrieval questions and explicit t
 
 The `commonground-rj-week4-v1` LangSmith dataset adds 40 end-to-end cases: 20 happy paths, 12 edge cases, six known failures, and two adversarial inputs. The same cases run against a frozen hybrid-RAG baseline and the improved GraphRAG agent. Code evaluators, an independent Mistral judge, trajectory checks, manually specified reference outcomes, latency, token usage, estimated cost, case-linked trace IDs, and failure clusters are recorded. The provider-backed report is generated directly from the executable experiment; see [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md).
 
+The immutable `commonground-rj-week4-200-v2` LangSmith dataset expands coverage to **200 cases**: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. It includes the 40-case provider-tested benchmark core plus a 160-case golden extension. Every case has a unique synthetic narrative, expected disposition, source labels, critical flag, scenario tags, rationale, and autonomy/trauma/handoff labels. CI validates all 200 examples; provider-backed results remain explicitly scoped to the 40-case core until a separately recorded full-corpus run is completed.
+
 Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97% citation precision**, **100% claim faithfulness**, **100% correct abstention**, and **7.93 s P95 latency**. On the 10-query ablation, GraphRAG reached **100%** Recall@5 and task success versus **70%** for vector-only and hybrid modes.
 
 ## Course submission evidence
@@ -216,6 +218,7 @@ pnpm lint
 pnpm test
 pnpm eval
 pnpm eval:week4
+pnpm eval:week4:dataset
 pnpm build
 ```
 
@@ -228,7 +231,7 @@ Before deployment, also verify:
 - Missing evidence produces abstention.
 - The safety critic can prevent output.
 - LangSmith traces contain metadata only.
-- The 40-case dataset validates, and provider-backed Week 4 experiments use the same dataset/version and evaluator schema.
+- The 200-case v2 dataset validates exactly, and the frozen provider-backed experiments remain scoped to its 40-case benchmark core.
 - Public API abuse controls and spending limits are appropriate for the audience.
 
 ## Operational boundary

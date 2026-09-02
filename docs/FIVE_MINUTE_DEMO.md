@@ -22,7 +22,7 @@ Return to the live result. Explain that LangGraph interrupts before approval, D1
 
 ## 3:55–4:35 — Evaluation and observability
 
-Open Evaluations. Start with the 40-case golden dataset and show its exact 50/30/15/5 distribution. Compare the frozen baseline with the post-improvement experiment: safe completion, critical guardrails, Recall@5, source coverage, faithfulness, trajectory, handoff, p95 latency, tokens, and estimated cost. Point out the four tested changes and any remaining failure rather than presenting only successes. Then show the 48-case safety suite and 24-query retrieval suite. Open Trace and show case ID, stage timings, model agreement, token counts, and metadata-only LangSmith telemetry.
+Open Evaluations. Start with the versioned 200-case golden corpus and its exact 100/60/30/10 distribution. Explain that it contains a 40-case provider-tested benchmark core plus 160 expanded coverage cases, all deterministically validated. Then compare the frozen baseline with the post-improvement experiment on that 40-case core: safe completion, critical guardrails, Recall@5, source coverage, faithfulness, trajectory, handoff, p95 latency, tokens, and estimated cost. Point out the four tested changes and the explicit evidence boundary rather than implying a 200-case provider run. Then show the 48-case safety suite and 24-query retrieval suite. Open Trace and show case ID, stage timings, model agreement, token counts, and metadata-only LangSmith telemetry.
 
 ## 4:35–5:00 — Closing
 

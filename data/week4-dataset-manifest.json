@@ -1,0 +1,40 @@
+{
+  "dataset": "commonground-rj-week4-200-v2",
+  "datasetVersion": "2.0.0",
+  "generatedAt": "2026-09-02T17:04:02.725Z",
+  "langsmith": {
+    "datasetId": "c62c1460-3673-447a-8eba-454628212369",
+    "datasetName": "commonground-rj-week4-200-v2",
+    "datasetUrl": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/c62c1460-3673-447a-8eba-454628212369",
+    "versionTag": "v2.0.0",
+    "versionStrategy": "immutable_dataset_name_and_metadata",
+    "verifiedExampleCount": 200
+  },
+  "total": 200,
+  "distribution": {
+    "happy_path": 100,
+    "edge_case": 60,
+    "known_failure": 30,
+    "adversarial": 10
+  },
+  "cohorts": {
+    "providerBenchmarkCore": 40,
+    "goldenExtension": 160
+  },
+  "dispositions": {
+    "answer": 139,
+    "abstain": 28,
+    "refuse": 20,
+    "privacy_block": 13
+  },
+  "criticalCases": 87,
+  "referenceLabels": "Manually specified, human-readable reference labels; independent reviewer calibration remains required before operational use.",
+  "privacy": "Synthetic and de-identified. Fictional identifiers appear only in privacy-gate test cases.",
+  "publicEvidence": "The public evaluation scorecard reads this manifest directly and separates deterministic 200-case validation from 40-case provider-backed results.",
+  "evaluationStatus": {
+    "providerBackedCore": 40,
+    "deterministicValidation": 200,
+    "fullProviderRun": "not_run",
+    "note": "The existing 40-case core has frozen provider-backed baseline and improved experiments. The full 200-case provider run is intentionally separate to control cost and preserve honest reporting."
+  }
+}

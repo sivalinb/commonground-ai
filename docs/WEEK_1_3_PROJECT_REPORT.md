@@ -10,7 +10,7 @@ Source code: https://github.com/sivalinb/commonground-ai
 
 ### Verification snapshot
 
-Documentation and provider behavior were rechecked on September 2, 2026. The public demo, GitHub source, submission documents, and executable evaluation reports agree on the current system scope and measured results. The quality workflow covers type checking, linting, 36 deterministic unit tests, the 48-case safety suite, 24-query retrieval preflight, the 40-case Week 4 dataset validator, and the production build.
+Documentation and provider behavior were rechecked on September 2, 2026. The public demo, GitHub source, submission documents, and executable evaluation reports agree on the current system scope and measured results. The quality workflow covers type checking, linting, 36 deterministic unit tests, the 48-case safety suite, 24-query retrieval preflight, the 40-case provider-experiment validator, the 200-case v2 golden-dataset validator, and the production build.
 
 ## Week 1 — Data application with vibe coding
 
@@ -104,9 +104,9 @@ All provider actions are reads or draft generation. The application does not sen
 
 ## Week 4 — Agent evaluation and improvement
 
-The CommonGround Guidance Agent is evaluated as a single defined system. A versioned 40-case LangSmith golden dataset contains 20 happy paths, 12 edge cases, six known failures, and two adversarial cases. Each case includes an expected disposition, expected sources, critical-safety flag, tags, reference rationale, and autonomy/trauma/handoff labels.
+The CommonGround Guidance Agent is evaluated as a single defined system. The immutable `commonground-rj-week4-200-v2` LangSmith golden dataset contains 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. It includes the original 40-case provider-tested benchmark core plus a 160-case coverage extension. Every case includes an expected disposition, expected sources, critical-safety flag, tags, reference rationale, and autonomy/trauma/handoff labels.
 
-The frozen baseline uses hybrid retrieval, five candidates, top-three reranking, no graph expansion, and the prior prompt. The improved agent adds Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, explicit unsupported-request abstention, autonomy-focused examples, and stronger retry recovery. Both experiments use the same dataset and evaluators.
+The frozen baseline uses hybrid retrieval, five candidates, top-three reranking, no graph expansion, and the prior prompt. The improved agent adds Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, explicit unsupported-request abstention, autonomy-focused examples, and stronger retry recovery. Both measured experiments use the same 40-case core and evaluator schema; the full 200-case provider run is intentionally reported as not yet run.
 
 The provider-backed September 2 run records safe task completion, critical guardrail compliance, Recall@5, full expected-source coverage, citation validity, independent Mistral faithfulness/autonomy/trauma/handoff scores, trajectory correctness, p50/p95 latency, tokens, normalized cost, case-level trace IDs, and failure clusters. The detailed baseline/post-improvement results are generated in `docs/WEEK_4_EVALUATION_REPORT.md`.
 
@@ -115,7 +115,7 @@ The provider-backed September 2 run records safe task completion, critical guard
 - Deterministic code checks disposition, privacy/prohibited gates, source IDs, citations, handoff state, and release thresholds.
 - Mistral independently judges claim faithfulness, autonomy, trauma-aware language, and human handoff.
 - A trajectory evaluator checks required LangGraph stages and correct early stops.
-- Human-authored references define expected behavior; an independent blinded review guide is included for agency-grade calibration.
+- Manually specified reference labels define expected behavior; an independent blinded review guide is included for agency-grade calibration.
 
 ### Production monitoring
 
@@ -133,7 +133,8 @@ The monitoring contract alerts on quality drift below safe completion, guardrail
 8. Added Neo4j GraphRAG, Mistral cross-provider review, and Deepgram voice.
 9. Added Cloudflare Turnstile, D1 rate records, and production quality gates.
 10. Added durable LangGraph checkpoint/resume, signed reviewer sessions, retrieval metrics, provider-backed faithfulness evaluation, and course-evidence documentation.
-11. Added the versioned 40-case LangSmith dataset, frozen baseline, four targeted improvements, case-linked evaluators, failure clustering, cost/latency measurements, and post-improvement comparison.
+11. Added the 40-case provider-tested benchmark core, frozen baseline, four targeted improvements, case-linked evaluators, failure clustering, cost/latency measurements, and post-improvement comparison.
+12. Expanded the immutable LangSmith golden corpus to 200 cases with exact 50/30/15/5 split coverage, 87 critical cases, source-integrity checks, deterministic safety-trigger validation, and a reviewer-calibration boundary.
 
 ## What was learned
 

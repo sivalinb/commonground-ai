@@ -32,6 +32,12 @@ Forty end-to-end cases stored in the repository and as a versioned LangSmith dat
 
 The primary experiment evaluates the CommonGround Guidance Agent, not the entire website. Its user outcome is a safe, cited, autonomy-preserving practice brief—or a correct privacy block, refusal, abstention, or human handoff.
 
+### `commonground-rj-week4-200-v2`
+
+Two hundred synthetic, de-identified, uniquely identified end-to-end cases stored in the repository and LangSmith: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. The immutable v2 corpus contains the 40-case provider-tested core and a 160-case coverage extension. It has 139 answer, 28 abstention, 20 refusal, and 13 privacy-block reference outcomes; 87 cases are marked critical. CI verifies exact distribution, uniqueness, required labels, source-ID integrity, and activation of privacy/refusal rules.
+
+Reference outcomes are manually specified and human-readable. They have not yet completed independent multi-reviewer calibration, so the 200-case dataset is a reproducible golden corpus for development—not evidence of agency approval or field effectiveness.
+
 ## Evaluation modes
 
 ### Deterministic preflight
@@ -54,12 +60,12 @@ Recall@5, mean reciprocal rank, and task success are compared using identical ex
 
 ### End-to-end baseline and improvement experiment
 
-The Week 4 runner evaluates the same 40 LangSmith examples twice:
+The current provider-backed Week 4 runner evaluates the same 40-case benchmark core twice:
 
 1. Frozen baseline: Pinecone + BM25 hybrid retrieval, five candidates, top-three reranking, no graph expansion, baseline prompt.
 2. Improved: Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, unsupported-request abstention, autonomy-focused prompt examples, and stronger provider retries.
 
-Code evaluators score disposition, citation structure, retrieval, critical guardrails, trajectory, and human-handoff state. Mistral independently scores faithfulness, autonomy preservation, trauma-aware quality, and handoff appropriateness. Human-authored reference outcomes provide expected behavior and rationale. The independent human calibration procedure is documented separately and must be completed before any agency-use claim.
+Code evaluators score disposition, citation structure, retrieval, critical guardrails, trajectory, and human-handoff state. Mistral independently scores faithfulness, autonomy preservation, trauma-aware quality, and handoff appropriateness. Manually specified reference outcomes provide expected behavior and rationale. The independent human calibration procedure is documented separately and must be completed before any agency-use claim.
 
 ## Latest measured result
 
@@ -95,5 +101,7 @@ Evaluation data is synthetic. LangSmith receives counts, scores, versions, durat
 - `pnpm eval:live` runs the provider-backed safety suite against an authorized environment.
 - `pnpm eval:retrieval:live` runs provider-backed retrieval, faithfulness judging, and the 10-query ablation.
 - `pnpm eval:week4` validates the 40-case dataset, labels, and exact scenario distribution without credentials.
+- `pnpm eval:week4:dataset` validates all 200 v2 cases, source IDs, safety triggers, labels, uniqueness, cohorts, and exact distribution without credentials.
+- `pnpm eval:week4:dataset:sync` creates or verifies the immutable v2 dataset in LangSmith when `LANGSMITH_API_KEY` is configured.
 - `pnpm eval:week4:live` runs both configurations through an authorized HTTP deployment.
 - `pnpm eval:week4:direct` runs the provider-backed workflow directly, uploads/version-controls the LangSmith dataset, creates baseline and improved experiments, and regenerates the JSON and Markdown reports.

@@ -161,6 +161,33 @@ type EvalReport = {
       graph: Record<string, number | null>;
     };
   };
+  week4Dataset: {
+    dataset: string;
+    datasetVersion: string;
+    total: number;
+    distribution: Record<string, number>;
+    cohorts: {
+      providerBenchmarkCore: number;
+      goldenExtension: number;
+    };
+    dispositions: Record<string, number>;
+    criticalCases: number;
+    referenceLabels: string;
+    privacy: string;
+    langsmith: {
+      datasetId: string;
+      datasetName: string;
+      datasetUrl: string;
+      versionTag: string;
+      verifiedExampleCount: number;
+    };
+    evaluationStatus: {
+      providerBackedCore: number;
+      deterministicValidation: number;
+      fullProviderRun: string;
+      note: string;
+    };
+  };
   week4: {
     dataset: string;
     datasetVersion: string;
@@ -1377,17 +1404,100 @@ export default function Home() {
           <section aria-label="Evaluation lab">
             <SectionHeading
               eyebrow="Versioned evaluation laboratory"
-              title="One dataset. Two experiments. Every result traceable."
-              description="A 40-case end-to-end golden dataset is run against a frozen baseline and the improved agent. Code evaluators, an independent Mistral judge, trajectory checks, manually specified reference labels, latency, token use, and cost are compared in LangSmith."
+              title="200 golden cases. A provider-tested core. Every result scoped."
+              description="LangSmith v2 contains 200 synthetic, de-identified cases with manually specified reference labels. Its 40-case benchmark core retains the frozen baseline-versus-improved provider experiments; all 200 cases pass deterministic schema, safety-trigger, source-ID, uniqueness, and distribution validation."
             />
-            {evalReport?.week4 && (
+            {evalReport?.week4 && evalReport.week4Dataset && (
               <div className="mb-6 space-y-5">
+                <Card className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-background to-sky-50">
+                  <CardHeader>
+                    <div>
+                      <div className="mb-2 flex flex-wrap gap-2">
+                        <Badge className="bg-teal-700 text-white">
+                          LangSmith v{evalReport.week4Dataset.datasetVersion}
+                        </Badge>
+                        <Badge variant="outline">
+                          {
+                            evalReport.week4Dataset.langsmith
+                              .verifiedExampleCount
+                          }{' '}
+                          examples verified
+                        </Badge>
+                      </div>
+                      <CardTitle>200-case golden evaluation corpus</CardTitle>
+                      <CardDescription className="mt-1 max-w-3xl">
+                        {evalReport.week4Dataset.dataset} is an immutable v2
+                        dataset:{' '}
+                        {evalReport.week4Dataset.cohorts.providerBenchmarkCore}{' '}
+                        provider-tested core cases plus{' '}
+                        {evalReport.week4Dataset.cohorts.goldenExtension}{' '}
+                        expanded coverage cases.
+                      </CardDescription>
+                    </div>
+                    <CardAction>
+                      <a
+                        href={evalReport.week4Dataset.langsmith.datasetUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <Button size="sm">
+                          Open 200 cases <ExternalLink />
+                        </Button>
+                      </a>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    {Object.entries(evalReport.week4Dataset.distribution).map(
+                      ([split, count]) => (
+                        <div
+                          key={split}
+                          className="rounded-2xl border bg-background/80 p-4 shadow-sm"
+                        >
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="font-mono text-2xl font-semibold">
+                              {count}
+                            </span>
+                            <span className="text-xs font-semibold text-teal-700">
+                              {Math.round(
+                                (count / evalReport.week4Dataset.total) * 100,
+                              )}
+                              %
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs capitalize text-muted-foreground">
+                            {split.replaceAll('_', ' ')}
+                          </p>
+                          <Progress
+                            className="mt-3"
+                            value={
+                              (count / evalReport.week4Dataset.total) * 100
+                            }
+                          />
+                        </div>
+                      ),
+                    )}
+                    <div className="sm:col-span-2 xl:col-span-4 rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs leading-5 text-sky-950">
+                      <strong>Evidence boundary:</strong>{' '}
+                      {
+                        evalReport.week4Dataset.evaluationStatus
+                          .providerBackedCore
+                      }{' '}
+                      cases have frozen provider-backed results; all{' '}
+                      {
+                        evalReport.week4Dataset.evaluationStatus
+                          .deterministicValidation
+                      }{' '}
+                      are validated and versioned. The full 200-case provider
+                      run remains a separate, explicitly reported experiment.
+                    </div>
+                  </CardContent>
+                </Card>
                 <Card className="overflow-hidden border-slate-800 bg-slate-950 text-white">
                   <CardHeader className="border-b border-white/10">
                     <div>
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100">
-                          Golden dataset v{evalReport.week4.datasetVersion}
+                          Evaluated core v{evalReport.week4.datasetVersion}
                         </Badge>
                         <Badge className="border border-sky-300/25 bg-sky-300/10 text-sky-100">
                           {evalReport.week4.mode}
@@ -1430,7 +1540,7 @@ export default function Home() {
                             rel="noreferrer"
                             className="text-[10px] font-semibold text-sky-200 hover:text-white"
                           >
-                            LangSmith dataset ↗
+                            40-case experiment dataset ↗
                           </a>
                         )}
                       </div>
@@ -1520,9 +1630,10 @@ export default function Home() {
                   </Card>
                   <Card>
                     <CardHeader>
-                      <CardTitle>Golden-dataset composition</CardTitle>
+                      <CardTitle>Provider-tested core composition</CardTitle>
                       <CardDescription>
-                        Synthetic, de-identified, labeled, and versioned.
+                        The original 40 cases remain the controlled comparison
+                        set.
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -2116,7 +2227,7 @@ export default function Home() {
                   title: 'Assurance',
                   icon: ShieldCheck,
                   items: [
-                    '48 safety + 24 retrieval evals',
+                    '200-case golden + 40-case tested core',
                     'Fairness + attack tests',
                     'LangSmith child spans',
                   ],
@@ -2266,7 +2377,7 @@ export default function Home() {
                   score: 'Complete',
                   icon: BarChart3,
                   items: [
-                    '40-case versioned LangSmith golden dataset',
+                    '200-case versioned LangSmith golden dataset',
                     'Code, LLM-judge, trajectory, and reference evaluators',
                     'Frozen baseline and identical post-improvement rerun',
                     'Failure clusters, trace IDs, latency, tokens, cost, and deltas',

@@ -28,4 +28,5 @@ jobs:
       - run: pnpm eval
       - run: pnpm eval:retrieval
       - run: pnpm eval:week4
+      - run: pnpm eval:week4:dataset
       - run: pnpm build

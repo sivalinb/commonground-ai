@@ -1,5 +1,6 @@
 import report from '@/data/eval-report.json';
 import retrieval from '@/data/retrieval-eval-report.json';
+import week4Dataset from '@/data/week4-dataset-manifest.json';
 import week4 from '@/data/week4-eval-report.json';
 import { secureJson } from '@/lib/http';
 
@@ -20,6 +21,7 @@ export async function GET() {
       counterfactualConsistency: 100,
     },
     retrieval,
+    week4Dataset,
     week4,
   });
 }
