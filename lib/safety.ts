@@ -1,6 +1,10 @@
 import type { Evidence, PracticeBrief } from './contracts';
 
 const sensitiveRules = [
+  [
+    'person name',
+    /\b(?:my name is|victim name|student name|participant name|responsible person(?:'s)? name)\s*[:#-]?\s*[A-Z][A-Za-z'’-]+(?:\s+[A-Z][A-Za-z'’-]+){1,3}\b/i,
+  ],
   ['email address', /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i],
   ['phone number', /(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}/],
   [
@@ -12,6 +16,14 @@ const sensitiveRules = [
     /\b\d{1,6}\s+[A-Za-z0-9.' -]+\s(?:Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Lane|Ln|Court|Ct|Boulevard|Blvd)\b/i,
   ],
   ['social security number', /\b\d{3}-\d{2}-\d{4}\b/],
+  [
+    'medical or client identifier',
+    /\b(?:medical record|mrn|client id|patient id)\s*[:#-]?\s*[A-Z0-9-]{4,}\b/i,
+  ],
+  [
+    'driver license number',
+    /\b(?:driver'?s? license|dl number|dl#)\s*[:#-]?\s*[A-Z0-9-]{5,}\b/i,
+  ],
   [
     'date of birth',
     /\b(?:dob|date of birth|born)\s*[:#-]?\s*(?:0?[1-9]|1[0-2])[/-](?:0?[1-9]|[12]\d|3[01])[/-](?:19|20)\d{2}\b/i,

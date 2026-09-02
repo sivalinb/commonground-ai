@@ -42,7 +42,11 @@ export async function POST(request: Request) {
     if (!runtime)
       return secureJson({ error: 'The workflow runtime is unavailable.' }, 503);
     const stored = await recordApproval(parsed.data);
-    if (stored.persisted && stored.changed === false) {
+    if (
+      stored.persisted &&
+      'changed' in stored &&
+      stored.changed === false
+    ) {
       return secureJson(
         { error: 'This approval has already been completed.' },
         409,

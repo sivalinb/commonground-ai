@@ -26,7 +26,7 @@
     "eval:week4:direct": "node --import tsx scripts/run-week4-evals.ts --live --direct --langsmith",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm eval && pnpm eval:retrieval && pnpm eval:week4 && pnpm eval:week4:dataset && pnpm build",
     "db:generate": "drizzle-kit generate",
-    "lint": "oxlint app lib db tests scripts components/turnstile-gate.tsx components/practice-lab.tsx components/policy-monitor.tsx components/knowledge-map.tsx",
+    "lint": "oxlint app lib db tests scripts components/turnstile-gate.tsx components/practice-lab.tsx components/policy-monitor.tsx components/knowledge-map.tsx components/trust-shell.tsx components/system-status.tsx",
     "format": "oxfmt"
   },
   "dependencies": {

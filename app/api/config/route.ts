@@ -3,6 +3,13 @@ import { secureJson } from '@/lib/http';
 export async function GET() {
   return secureJson({
     turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || undefined,
+    deployment: {
+      mode: 'public-training-demo',
+      dataBoundary: 'fictional-or-de-identified-only',
+      externalActionsEnabled: false,
+      agencyAuthorization: false,
+      release: process.env.RELEASE_VERSION || 'pilot-v6',
+    },
     capabilities: {
       turnstile: Boolean(
         process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY &&

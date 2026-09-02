@@ -11,6 +11,7 @@ import { z } from 'zod';
 
 import type {
   Evidence,
+  HumanDecision,
   PracticeBrief,
   PublicResult,
   SafetyReview,
@@ -114,7 +115,13 @@ const graphStateSchema = z.object({
   graphConnectedIds: z.array(z.string()).default([]),
   abstainReason: z.string().default(''),
   approvalStatus: z
-    .enum(['pending', 'approved', 'revision_requested'])
+    .enum([
+      'pending',
+      'approved',
+      'revision_requested',
+      'rejected',
+      'escalated',
+    ])
     .default('pending'),
   approvalRequired: z.boolean().default(false),
   embeddingTokens: z.number().nullable().default(null),
@@ -877,14 +884,24 @@ function createWorkflow(checkpointer: BaseCheckpointSaver) {
         {
           approvalId: string;
           action: 'review_training_brief';
-          allowedDecisions: ['approved', 'revision_requested'];
+          allowedDecisions: [
+            'approved',
+            'revision_requested',
+            'rejected',
+            'escalated',
+          ];
         },
-        'approved' | 'revision_requested'
+        HumanDecision
       >(
         {
           approvalId: state.approvalId,
           action: 'review_training_brief',
-          allowedDecisions: ['approved', 'revision_requested'],
+          allowedDecisions: [
+            'approved',
+            'revision_requested',
+            'rejected',
+            'escalated',
+          ],
         },
         config,
       );
@@ -1129,7 +1146,7 @@ export async function executeWorkflow(input: {
 
 export async function resumeWorkflow(
   approvalId: string,
-  decision: 'approved' | 'revision_requested',
+  decision: HumanDecision,
   runtime: WorkflowRuntimeInput,
   checkpointer?: BaseCheckpointSaver,
 ) {

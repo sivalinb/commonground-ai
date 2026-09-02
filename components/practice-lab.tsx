@@ -142,6 +142,8 @@ export function PracticeLab() {
   const [transcribeReset, setTranscribeReset] = useState(0);
   const [speakToken, setSpeakToken] = useState('');
   const [speakReset, setSpeakReset] = useState(0);
+  const [trainingUseAcknowledged, setTrainingUseAcknowledged] =
+    useState(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -191,6 +193,7 @@ export function PracticeLab() {
           'Content-Type': recording.type || 'audio/webm',
           'X-Turnstile-Token': transcribeToken,
           'X-Practice-Language': language,
+          'X-Training-Use-Acknowledged': String(trainingUseAcknowledged),
         },
         body: recording,
       });
@@ -288,6 +291,7 @@ export function PracticeLab() {
         body: JSON.stringify({
           text: result.participant.reply,
           language,
+          trainingUseAcknowledged,
           turnstileToken: speakToken,
         }),
       });
@@ -327,6 +331,7 @@ export function PracticeLab() {
           role,
           jurisdiction: 'colorado',
           language,
+          trainingUseAcknowledged,
           turnstileToken: turnstileToken || undefined,
         }),
       });
@@ -351,19 +356,22 @@ export function PracticeLab() {
 
   return (
     <section aria-label="Multi-agent practice lab">
-      <div className="mb-5 max-w-4xl">
-        <p className="mb-1.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.17em] text-primary">
-          <Sparkles className="size-3.5" /> Multi-agent simulation
-        </p>
-        <h2 className="font-heading text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
-          Practice a response. Watch five AI roles examine it.
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          A fictional participant, evidence retriever, facilitator coach,
-          victim-services reviewer, and rubric evaluator collaborate through
-          LangGraph. This is communication training—not a simulation of any real
-          person.
-        </p>
+      <div className="relative mb-7 overflow-hidden rounded-[1.75rem] border border-white/70 bg-card/85 p-6 shadow-[0_18px_60px_-36px_rgba(15,23,42,0.45)] backdrop-blur sm:p-8">
+        <div className="absolute -right-10 -top-16 size-48 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative max-w-4xl">
+          <p className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
+            <Sparkles className="size-3.5" /> Multi-agent simulation
+          </p>
+          <h2 className="font-heading text-2xl font-semibold tracking-[-0.035em] sm:text-4xl">
+            Practice a response. Watch five AI roles examine it.
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
+            A fictional participant, evidence retriever, facilitator coach,
+            victim-services reviewer, and rubric evaluator collaborate through
+            LangGraph. This is communication training—not a simulation of any
+            real person.
+          </p>
+        </div>
       </div>
 
       <div className="mb-5 grid gap-3 md:grid-cols-5">
@@ -377,7 +385,7 @@ export function PracticeLab() {
           <Card
             key={label as string}
             size="sm"
-            className="relative overflow-hidden border border-border/70"
+            className="relative overflow-hidden border border-border/70 shadow-[0_12px_36px_-28px_rgba(15,23,42,0.5)] transition-all hover:-translate-y-0.5 hover:border-primary/30"
           >
             <CardContent className="space-y-3">
               <span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -397,7 +405,7 @@ export function PracticeLab() {
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
-        <Card className="border border-border/70 shadow-xl shadow-slate-900/5">
+        <Card className="border border-border/70 shadow-[0_20px_60px_-38px_rgba(15,23,42,0.55)]">
           <CardHeader>
             <CardTitle>Your practice turn</CardTitle>
             <CardDescription>
@@ -411,7 +419,7 @@ export function PracticeLab() {
                 <Button
                   key={key}
                   variant={scenarioKey === key ? 'default' : 'outline'}
-                  className="h-auto whitespace-normal py-3 text-left text-xs"
+                  className="h-auto rounded-xl whitespace-normal py-3 text-left text-xs"
                   onClick={() => chooseScenario(key)}
                 >
                   {practiceScenarios[key].label}
@@ -476,6 +484,21 @@ export function PracticeLab() {
                 </select>
               </label>
             </div>
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs leading-5 text-amber-950">
+              <input
+                type="checkbox"
+                checked={trainingUseAcknowledged}
+                onChange={(event) =>
+                  setTrainingUseAcknowledged(event.target.checked)
+                }
+                className="mt-1 size-4 shrink-0 accent-teal-700"
+              />
+              <span>
+                I confirm both fields and any recording are fictional or
+                properly de-identified training content. I will not include
+                names, case numbers, contact details, or confidential records.
+              </span>
+            </label>
             <div className="rounded-2xl border border-sky-200 bg-sky-50/60 p-3">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
@@ -493,7 +516,7 @@ export function PracticeLab() {
                 <Button
                   variant="outline"
                   onClick={dictate}
-                  disabled={transcribing}
+                  disabled={transcribing || !trainingUseAcknowledged}
                 >
                   {listening ? <Square /> : <Mic />}
                   {transcribing
@@ -528,7 +551,9 @@ export function PracticeLab() {
                 running ||
                 scenario.trim().length < 20 ||
                 learnerResponse.trim().length < 10
+                || !trainingUseAcknowledged
               }
+              className="rounded-full"
             >
               {running ? <RefreshCw className="animate-spin" /> : <Play />}
               {running ? 'Agents are reviewing…' : 'Run multi-agent practice'}
@@ -638,7 +663,7 @@ export function PracticeLab() {
                   variant="outline"
                   size="sm"
                   onClick={speak}
-                  disabled={speaking}
+                  disabled={speaking || !trainingUseAcknowledged}
                 >
                   <Volume2 />{' '}
                   {speaking ? 'Generating voice…' : 'Deepgram read aloud'}

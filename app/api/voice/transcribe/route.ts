@@ -22,6 +22,11 @@ export async function POST(request: Request) {
   const contentType = request.headers.get('content-type') || '';
   if (!contentType.startsWith('audio/'))
     return secureJson({ error: 'An audio recording is required.' }, 415);
+  if (request.headers.get('x-training-use-acknowledged') !== 'true')
+    return secureJson(
+      { error: 'Confirm fictional training-only use before recording.' },
+      400,
+    );
   const contentLength = Number(request.headers.get('content-length') || 0);
   if (contentLength > MAX_AUDIO_BYTES)
     return secureJson({ error: 'Keep recordings under five megabytes.' }, 413);

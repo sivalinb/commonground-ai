@@ -1,5 +1,7 @@
 'use client';
 
+/* oxlint-disable next/no-html-link-for-pages */
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import {
@@ -102,7 +104,9 @@ type LiveResult = {
     | 'not_required'
     | 'pending'
     | 'approved'
-    | 'revision_requested';
+    | 'revision_requested'
+    | 'rejected'
+    | 'escalated';
   awaitingApproval: boolean;
   finding: CitedText;
   options: CitedText[];
@@ -466,6 +470,8 @@ export default function Home() {
   const [researchResults, setResearchResults] = useState<
     Array<{ title: string; url: string; description: string }>
   >([]);
+  const [trainingUseAcknowledged, setTrainingUseAcknowledged] =
+    useState(false);
 
   useEffect(() => {
     fetch('/api/evals')
@@ -511,6 +517,7 @@ export default function Home() {
         body: JSON.stringify({
           caseText,
           jurisdiction,
+          trainingUseAcknowledged,
           turnstileToken: turnstileToken || undefined,
         }),
       });
@@ -530,7 +537,13 @@ export default function Home() {
     }
   }
 
-  async function submitApproval(decision: 'approved' | 'revision_requested') {
+  async function submitApproval(
+    decision:
+      | 'approved'
+      | 'revision_requested'
+      | 'rejected'
+      | 'escalated',
+  ) {
     if (!liveResult?.approvalId || !liveResult.approvalToken) return;
     setSavingApproval(true);
     try {
@@ -570,6 +583,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: caseText,
+          trainingUseAcknowledged,
           turnstileToken: turnstileToken || undefined,
         }),
       });
@@ -621,6 +635,12 @@ export default function Home() {
             <Badge className="hidden border border-emerald-300/25 bg-emerald-300/10 text-emerald-100 md:inline-flex">
               <CircleDot className="animate-pulse" /> Live AI system
             </Badge>
+            <a
+              href="/trust"
+              className="hidden rounded-full border border-teal-300/25 bg-teal-300/10 px-3 py-2 text-xs font-semibold text-teal-100 transition hover:bg-teal-300/20 sm:inline-flex"
+            >
+              <ShieldCheck className="mr-1.5 size-3.5" /> Trust center
+            </a>
             <a
               href="https://github.com/sivalinb/commonground-ai"
               target="_blank"
@@ -703,6 +723,13 @@ export default function Home() {
             </div>
           )}
         </nav>
+        <div className="border-t border-amber-300/20 bg-amber-200 text-amber-950">
+          <div className="mx-auto flex max-w-[1480px] items-center justify-center gap-2 px-4 py-1.5 text-center text-[10px] font-semibold sm:px-6">
+            <LockKeyhole className="size-3 shrink-0" /> Controlled training
+            pilot · fictional or de-identified information only · no automated
+            decisions or agency actions
+          </div>
+        </div>
       </header>
 
       <div
@@ -1303,6 +1330,22 @@ export default function Home() {
                       aria-label="Fictional case description"
                       className="min-h-44 resize-y bg-muted/20 p-4 leading-6"
                     />
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs leading-5 text-amber-950">
+                      <input
+                        type="checkbox"
+                        checked={trainingUseAcknowledged}
+                        onChange={(event) =>
+                          setTrainingUseAcknowledged(event.target.checked)
+                        }
+                        className="mt-1 size-4 shrink-0 accent-teal-700"
+                      />
+                      <span>
+                        I confirm this contains only fictional or properly
+                        de-identified training information—no names, case
+                        numbers, contact details, criminal-history data, or
+                        confidential records.
+                      </span>
+                    </label>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <label className="text-xs font-semibold">
                         Evidence jurisdiction
@@ -1338,7 +1381,11 @@ export default function Home() {
                     <Button
                       size="lg"
                       onClick={runAnalysis}
-                      disabled={running || caseText.trim().length < 20}
+                      disabled={
+                        running ||
+                        caseText.trim().length < 20 ||
+                        !trainingUseAcknowledged
+                      }
                       className="min-w-48 rounded-full"
                     >
                       {running ? (
@@ -1586,13 +1633,41 @@ export default function Home() {
                             placeholder="Optional training feedback; do not enter case information."
                           />
                         </label>
+                        <p className="text-[10px] leading-4 text-muted-foreground">
+                          A rationale is required for revision, rejection, or
+                          escalation. Decisions are recorded as metadata-only
+                          audit events.
+                        </p>
                         <div className="grid gap-2 sm:grid-cols-2">
                           <Button
                             variant="outline"
-                            disabled={savingApproval}
+                            disabled={
+                              savingApproval ||
+                              approvalComment.trim().length < 8
+                            }
                             onClick={() => submitApproval('revision_requested')}
                           >
                             Request revision
+                          </Button>
+                          <Button
+                            variant="outline"
+                            disabled={
+                              savingApproval ||
+                              approvalComment.trim().length < 8
+                            }
+                            onClick={() => submitApproval('rejected')}
+                          >
+                            Reject brief
+                          </Button>
+                          <Button
+                            variant="outline"
+                            disabled={
+                              savingApproval ||
+                              approvalComment.trim().length < 8
+                            }
+                            onClick={() => submitApproval('escalated')}
+                          >
+                            Escalate to supervisor
                           </Button>
                           <Button
                             disabled={savingApproval}
@@ -1616,7 +1691,11 @@ export default function Home() {
                             ? 'Training brief approved'
                             : liveResult.abstained
                               ? 'No approval required for withheld output'
-                              : 'Revision requested'}
+                              : approvalStatus === 'rejected'
+                                ? 'Training brief rejected'
+                                : approvalStatus === 'escalated'
+                                  ? 'Escalated for supervisor review'
+                                  : 'Revision requested'}
                         </p>
                         <p className="mt-2 text-xs leading-5 text-muted-foreground">
                           No external action was taken. Trace{' '}
@@ -2431,6 +2510,18 @@ export default function Home() {
               </CardHeader>
               <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,0.65fr)_minmax(0,1.35fr)]">
                 <div className="space-y-3">
+                  <label className="flex items-start gap-2 rounded-xl border border-sky-200 bg-white p-3 text-[11px] leading-4 text-sky-950">
+                    <input
+                      type="checkbox"
+                      checked={trainingUseAcknowledged}
+                      onChange={(event) =>
+                        setTrainingUseAcknowledged(event.target.checked)
+                      }
+                      className="mt-0.5 size-4 shrink-0 accent-teal-700"
+                    />
+                    Search policy topics only; no real case or identifying
+                    information.
+                  </label>
                   <TurnstileGate
                     onToken={handleTurnstile}
                     resetKey={turnstileReset}
@@ -2439,7 +2530,7 @@ export default function Home() {
                   <Button
                     variant="outline"
                     onClick={runFreshnessResearch}
-                    disabled={researching}
+                    disabled={researching || !trainingUseAcknowledged}
                     className="w-full"
                   >
                     {researching ? (
@@ -2817,6 +2908,18 @@ export default function Home() {
               Continue exploring
             </p>
             <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-1">
+              <a
+                href="/trust"
+                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2.5 transition-colors hover:border-teal-300/40 hover:bg-white/5 hover:text-white"
+              >
+                Trust center <ChevronRight className="size-3.5" />
+              </a>
+              <a
+                href="/status"
+                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2.5 transition-colors hover:border-teal-300/40 hover:bg-white/5 hover:text-white"
+              >
+                System status <ChevronRight className="size-3.5" />
+              </a>
               <button
                 onClick={() => setActiveView('sources')}
                 className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2.5 text-left transition-colors hover:border-teal-300/40 hover:bg-white/5 hover:text-white"
@@ -2843,7 +2946,12 @@ export default function Home() {
         <div className="border-t border-white/[0.07]">
           <div className="mx-auto flex max-w-[1480px] flex-col gap-2 px-4 py-4 text-[10px] text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
             <span>Training demonstration · Fictional scenarios only</span>
-            <span>Restorative practice stays human-led</span>
+            <span className="flex flex-wrap gap-x-3 gap-y-1">
+              <a href="/privacy" className="hover:text-white">Privacy</a>
+              <a href="/security" className="hover:text-white">Security</a>
+              <a href="/accessibility" className="hover:text-white">Accessibility</a>
+              <a href="/limitations" className="hover:text-white">AI limitations</a>
+            </span>
           </div>
         </div>
       </footer>

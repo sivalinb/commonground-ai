@@ -1,9 +1,17 @@
 import { env } from 'cloudflare:workers';
 
 import type { PublicResult } from './contracts';
+import type { HumanDecision } from './contracts';
 import type { PracticeResult } from './practice';
 
 type DatabaseEnv = { DB?: D1Database; RATE_LIMIT_SALT?: string };
+
+export type AuditEventType =
+  | 'privacy_blocked'
+  | 'workflow_awaiting_review'
+  | 'human_review_recorded'
+  | 'practice_completed'
+  | 'policy_monitor_completed';
 
 export function getDatabase() {
   return (env as unknown as DatabaseEnv).DB;
@@ -71,6 +79,22 @@ async function ensureSchema(db: D1Database) {
     db.prepare(
       'CREATE INDEX IF NOT EXISTS idx_policy_monitor_runs_created_at ON policy_monitor_runs (created_at)',
     ),
+    db.prepare(`CREATE TABLE IF NOT EXISTS audit_events (
+      id TEXT PRIMARY KEY NOT NULL,
+      event_type TEXT NOT NULL,
+      trace_id TEXT,
+      resource_id TEXT,
+      actor_role TEXT,
+      outcome TEXT NOT NULL,
+      details TEXT DEFAULT '{}' NOT NULL,
+      created_at INTEGER NOT NULL
+    )`),
+    db.prepare(
+      'CREATE INDEX IF NOT EXISTS idx_audit_events_type_created ON audit_events (event_type, created_at)',
+    ),
+    db.prepare(
+      'CREATE INDEX IF NOT EXISTS idx_audit_events_trace_id ON audit_events (trace_id)',
+    ),
   ]);
   initialized = true;
 }
@@ -98,6 +122,12 @@ export async function savePracticeRun(result: PracticeResult) {
       Date.now(),
     )
     .run();
+  await recordAuditEvent({
+    eventType: 'practice_completed',
+    traceId: result.traceId,
+    outcome: result.advocate.approved ? 'review_passed' : 'paused',
+    details: { role: result.role, language: result.language },
+  });
   return true;
 }
 
@@ -122,6 +152,15 @@ export async function savePolicyMonitorRun(input: {
       Date.now(),
     )
     .run();
+  await recordAuditEvent({
+    eventType: 'policy_monitor_completed',
+    traceId: input.traceId,
+    outcome: input.highMaterialityCount ? 'curator_review_required' : 'monitor',
+    details: {
+      candidateCount: input.candidateCount,
+      highMaterialityCount: input.highMaterialityCount,
+    },
+  });
   return true;
 }
 
@@ -147,12 +186,24 @@ export async function savePendingApproval(result: PublicResult) {
       now,
     )
     .run();
+  await recordAuditEvent({
+    eventType: 'workflow_awaiting_review',
+    traceId: result.traceId,
+    resourceId: result.approvalId,
+    outcome: 'pending',
+    details: {
+      citationCount: result.citations.length,
+      groundingScore: result.groundingScore,
+      promptVersion: result.promptVersion,
+      corpusVersion: result.corpusVersion,
+    },
+  });
   return true;
 }
 
 export async function recordApproval(input: {
   approvalId: string;
-  decision: 'approved' | 'revision_requested';
+  decision: HumanDecision;
   reviewerRole: string;
   comment: string;
 }) {
@@ -172,16 +223,26 @@ export async function recordApproval(input: {
       input.approvalId,
     )
     .run();
-  return {
+  const recorded = {
     persisted: true,
     status: input.decision,
     changed: Number(result.meta.changes || 0) > 0,
   };
+  if (recorded.changed) {
+    await recordAuditEvent({
+      eventType: 'human_review_recorded',
+      resourceId: input.approvalId,
+      actorRole: input.reviewerRole,
+      outcome: input.decision,
+      details: { commentProvided: Boolean(input.comment) },
+    });
+  }
+  return recorded;
 }
 
 export async function resetApprovalAfterResumeFailure(
   approvalId: string,
-  decision: 'approved' | 'revision_requested',
+  decision: HumanDecision,
 ) {
   const db = getDatabase();
   if (!db) return false;
@@ -193,6 +254,35 @@ export async function resetApprovalAfterResumeFailure(
     .bind(Date.now(), approvalId, decision)
     .run();
   return Number(result.meta.changes || 0) > 0;
+}
+
+export async function recordAuditEvent(input: {
+  eventType: AuditEventType;
+  traceId?: string;
+  resourceId?: string;
+  actorRole?: string;
+  outcome: string;
+  details?: Record<string, string | number | boolean | null>;
+}) {
+  const db = getDatabase();
+  if (!db) return false;
+  await ensureSchema(db);
+  await db
+    .prepare(`INSERT INTO audit_events (
+      id, event_type, trace_id, resource_id, actor_role, outcome, details, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(
+      crypto.randomUUID(),
+      input.eventType,
+      input.traceId || null,
+      input.resourceId || null,
+      input.actorRole || null,
+      input.outcome,
+      JSON.stringify(input.details || {}),
+      Date.now(),
+    )
+    .run();
+  return true;
 }
 
 async function hashRateKey(value: string) {

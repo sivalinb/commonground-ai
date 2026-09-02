@@ -1,6 +1,11 @@
 import { analyzeRequestSchema } from '@/lib/contracts';
 import { issueApprovalToken } from '@/lib/approval';
-import { consumeRateLimit, getDatabase, savePendingApproval } from '@/lib/db';
+import {
+  consumeRateLimit,
+  getDatabase,
+  recordAuditEvent,
+  savePendingApproval,
+} from '@/lib/db';
 import { D1CheckpointSaver } from '@/lib/d1-checkpointer';
 import { hasEvaluationAccess } from '@/lib/evaluation-access';
 import { requireSameOrigin, secureJson } from '@/lib/http';
@@ -62,7 +67,8 @@ export async function POST(request: Request) {
     if (!parsed.success)
       return secureJson(
         {
-          error: 'Use a fictional scenario between 20 and 3,000 characters.',
+          error:
+            'Confirm training-only use and provide a fictional scenario between 20 and 3,000 characters.',
           traceId,
         },
         400,
@@ -77,6 +83,12 @@ export async function POST(request: Request) {
     } = parsed.data;
     const sensitive = detectSensitiveData(caseText);
     if (sensitive.length) {
+      await recordAuditEvent({
+        eventType: 'privacy_blocked',
+        traceId,
+        outcome: 'blocked_before_provider',
+        details: { detectorCount: sensitive.length, route: 'analysis' },
+      }).catch(() => undefined);
       return secureJson(
         {
           error: `Privacy screen stopped this request because it may contain: ${sensitive.join(', ')}. Remove identifying details and try again.`,

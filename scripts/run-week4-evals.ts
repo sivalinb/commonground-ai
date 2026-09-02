@@ -401,6 +401,7 @@ async function runCase(item: GoldenCase, profile: Profile) {
       },
       body: JSON.stringify({
         caseText: item.caseText,
+        trainingUseAcknowledged: true,
         jurisdiction: item.jurisdiction,
         retrievalMode: profile === 'baseline' ? 'hybrid' : 'graph',
         evaluationProfile: profile,

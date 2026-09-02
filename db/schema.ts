@@ -89,6 +89,27 @@ export const policyMonitorRuns = sqliteTable(
   (table) => [index('idx_policy_monitor_runs_created_at').on(table.createdAt)],
 );
 
+export const auditEvents = sqliteTable(
+  'audit_events',
+  {
+    id: text('id').primaryKey(),
+    eventType: text('event_type').notNull(),
+    traceId: text('trace_id'),
+    resourceId: text('resource_id'),
+    actorRole: text('actor_role'),
+    outcome: text('outcome').notNull(),
+    details: text('details').notNull().default('{}'),
+    createdAt: integer('created_at').notNull(),
+  },
+  (table) => [
+    index('idx_audit_events_type_created').on(
+      table.eventType,
+      table.createdAt,
+    ),
+    index('idx_audit_events_trace_id').on(table.traceId),
+  ],
+);
+
 export const workflowCheckpoints = sqliteTable(
   'workflow_checkpoints',
   {

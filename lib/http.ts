@@ -38,7 +38,12 @@ export function secureJson(body: unknown, status = 200) {
       'Cache-Control': 'no-store',
       'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
       'Cross-Origin-Resource-Policy': 'same-origin',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Permissions-Policy':
+        'camera=(), geolocation=(), payment=(), usb=(), microphone=(self)',
       'Referrer-Policy': 'no-referrer',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'X-Frame-Options': 'DENY',
       'X-Content-Type-Options': 'nosniff',
     },
   });

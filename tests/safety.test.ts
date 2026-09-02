@@ -48,10 +48,13 @@ const brief: PracticeBrief = {
 describe('privacy screening', () => {
   it.each([
     ['email', 'Reach me at volunteer@example.com'],
+    ['name', 'Victim name: Jordan Martinez'],
     ['phone', 'Call 303-555-0184'],
     ['case number', 'Case number ERI-2026-44991'],
     ['address', 'Meet at 1420 Main Street'],
     ['SSN', 'The value is 123-45-6789'],
+    ['medical identifier', 'MRN: A992031'],
+    ['driver license', 'Driver license: CO-882991'],
     ['DOB', 'DOB: 04/17/2010'],
     ['plate', 'License plate ABC1234'],
     ['student identifier', 'Student ID 884211'],

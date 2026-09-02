@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { issueApprovalToken, verifyApprovalToken } from '@/lib/approval';
+import {
+  analyzeRequestSchema,
+  approvalRequestSchema,
+  humanDecisionSchema,
+} from '@/lib/contracts';
 import { privacyMinimizedCheckpoint } from '@/lib/d1-checkpointer';
 import { fetchWithPolicy } from '@/lib/http';
 import { portableInterrupt } from '@/lib/workflow';
@@ -26,6 +31,54 @@ describe('signed reviewer sessions', () => {
     await expect(
       verifyApprovalToken('approval-a', token, 'test-secret', 2_000_000),
     ).resolves.toBe(false);
+  });
+});
+
+describe('production-style workflow boundaries', () => {
+  it('requires an explicit training-only attestation', () => {
+    expect(
+      analyzeRequestSchema.safeParse({
+        caseText: 'A fictional participant wants time before choosing.',
+        jurisdiction: 'colorado',
+      }).success,
+    ).toBe(false);
+    expect(
+      analyzeRequestSchema.safeParse({
+        caseText: 'A fictional participant wants time before choosing.',
+        jurisdiction: 'colorado',
+        trainingUseAcknowledged: true,
+      }).success,
+    ).toBe(true);
+  });
+
+  it('supports approve, revise, reject, and escalate decisions', () => {
+    expect(
+      ['approved', 'revision_requested', 'rejected', 'escalated'].every(
+        (decision) => humanDecisionSchema.safeParse(decision).success,
+      ),
+    ).toBe(true);
+  });
+
+  it('requires a rationale for non-approval decisions', () => {
+    const base = {
+      approvalId: 'a305250b-e72f-4c54-a5bb-700591329d6a',
+      approvalToken: 'x'.repeat(48),
+      reviewerRole: 'supervisor' as const,
+    };
+    expect(
+      approvalRequestSchema.safeParse({
+        ...base,
+        decision: 'rejected',
+        comment: '',
+      }).success,
+    ).toBe(false);
+    expect(
+      approvalRequestSchema.safeParse({
+        ...base,
+        decision: 'escalated',
+        comment: 'Requires supervisor policy review.',
+      }).success,
+    ).toBe(true);
   });
 });
 

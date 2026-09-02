@@ -117,6 +117,7 @@ async function runLive(item: RetrievalCase, mode: Mode, withJudge: boolean) {
     },
     body: JSON.stringify({
       caseText: item.query,
+      trainingUseAcknowledged: true,
       jurisdiction: item.jurisdiction,
       retrievalMode: mode,
     }),

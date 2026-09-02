@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { consumeRateLimit, savePolicyMonitorRun } from '@/lib/db';
+import {
+  consumeRateLimit,
+  recordAuditEvent,
+  savePolicyMonitorRun,
+} from '@/lib/db';
 import { fetchWithPolicy, requireSameOrigin, secureJson } from '@/lib/http';
 import { MetadataTracer } from '@/lib/langsmith';
 import { detectSensitiveData } from '@/lib/safety';
@@ -21,6 +25,7 @@ const ALLOWED_DOMAINS = [
 const requestSchema = z.object({
   query: z.string().trim().min(10).max(500),
   turnstileToken: z.string().max(2048).optional(),
+  trainingUseAcknowledged: z.literal(true),
 });
 
 const searchItemSchema = z.object({
@@ -102,7 +107,14 @@ export async function POST(request: Request) {
         400,
       );
     const { query, turnstileToken } = parsed.data;
-    if (detectSensitiveData(query).length)
+    const sensitive = detectSensitiveData(query);
+    if (sensitive.length) {
+      await recordAuditEvent({
+        eventType: 'privacy_blocked',
+        traceId,
+        outcome: 'blocked_before_provider',
+        details: { detectorCount: sensitive.length, route: 'research' },
+      }).catch(() => undefined);
       return secureJson(
         {
           error:
@@ -110,6 +122,7 @@ export async function POST(request: Request) {
         },
         422,
       );
+    }
     const turnstile = await verifyTurnstile(
       turnstileToken,
       request,

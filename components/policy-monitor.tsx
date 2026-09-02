@@ -62,6 +62,8 @@ export function PolicyMonitor() {
   const [traceId, setTraceId] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
   const [turnstileReset, setTurnstileReset] = useState(0);
+  const [trainingUseAcknowledged, setTrainingUseAcknowledged] =
+    useState(false);
   const handleTurnstile = useCallback(
     (token: string) => setTurnstileToken(token),
     [],
@@ -79,6 +81,7 @@ export function PolicyMonitor() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query,
+          trainingUseAcknowledged,
           turnstileToken: turnstileToken || undefined,
         }),
       });
@@ -110,24 +113,27 @@ export function PolicyMonitor() {
 
   return (
     <section aria-label="Policy change monitor">
-      <div className="mb-5 max-w-4xl">
-        <p className="mb-1.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.17em] text-primary">
-          <Sparkles className="size-3.5" /> Agentic corpus governance
-        </p>
-        <h2 className="font-heading text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
-          Find possible public-guidance changes before they become stale
-          answers.
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          You.com searches only approved public domains. A Fireworks triage
-          agent compares result metadata with the current corpus catalog. Every
-          result remains advisory until a curator opens and verifies the full
-          source.
-        </p>
+      <div className="relative mb-7 overflow-hidden rounded-[1.75rem] border border-white/70 bg-card/85 p-6 shadow-[0_18px_60px_-36px_rgba(15,23,42,0.45)] backdrop-blur sm:p-8">
+        <div className="absolute -right-10 -top-16 size-48 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative max-w-4xl">
+          <p className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
+            <Sparkles className="size-3.5" /> Agentic corpus governance
+          </p>
+          <h2 className="font-heading text-2xl font-semibold tracking-[-0.035em] sm:text-4xl">
+            Find possible public-guidance changes before they become stale
+            answers.
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
+            You.com searches only approved public domains. A Fireworks triage
+            agent compares result metadata with the current corpus catalog.
+            Every result remains advisory until a curator opens and verifies the
+            full source.
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
-        <Card className="border border-border/70">
+        <Card className="border border-border/70 shadow-[0_20px_60px_-38px_rgba(15,23,42,0.55)]">
           <CardHeader>
             <CardTitle>Monitor topic</CardTitle>
             <CardDescription>
@@ -141,6 +147,20 @@ export function PolicyMonitor() {
               onChange={(event) => setQuery(event.target.value)}
               className="min-h-32 bg-muted/20 leading-6"
             />
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs leading-5 text-amber-950">
+              <input
+                type="checkbox"
+                checked={trainingUseAcknowledged}
+                onChange={(event) =>
+                  setTrainingUseAcknowledged(event.target.checked)
+                }
+                className="mt-1 size-4 shrink-0 accent-teal-700"
+              />
+              <span>
+                I confirm this is a general policy topic without real case or
+                identifying information.
+              </span>
+            </label>
             <TurnstileGate
               onToken={handleTurnstile}
               resetKey={turnstileReset}
@@ -149,10 +169,12 @@ export function PolicyMonitor() {
           </CardContent>
           <CardFooter>
             <Button
-              className="w-full"
+              className="w-full rounded-full"
               size="lg"
               onClick={runMonitor}
-              disabled={running || query.trim().length < 10}
+              disabled={
+                running || query.trim().length < 10 || !trainingUseAcknowledged
+              }
             >
               {running ? <RefreshCw className="animate-spin" /> : <Globe2 />}
               {running

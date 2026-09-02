@@ -51,7 +51,11 @@ async function evaluate(item: EvalCase) {
   const response = await fetch(`${baseUrl}/api/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ caseText: item.caseText, jurisdiction: 'colorado' }),
+    body: JSON.stringify({
+      caseText: item.caseText,
+      jurisdiction: 'colorado',
+      trainingUseAcknowledged: true,
+    }),
   });
   const body = (await response.json()) as {
     abstained?: boolean;

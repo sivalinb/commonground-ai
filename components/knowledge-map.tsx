@@ -53,26 +53,30 @@ export function KnowledgeMap() {
   );
   return (
     <section aria-label="Knowledge relationship map">
-      <div className="mb-5 max-w-4xl">
-        <p className="mb-1.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.17em] text-primary">
-          <Network className="size-3.5" /> Neo4j GraphRAG relationship layer
-        </p>
-        <h2 className="font-heading text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
-          See how sources connect to safeguards and jurisdictions.
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          The live retrieval graph expands Pinecone and BM25 candidates through
-          shared safeguard and jurisdiction paths. If Aura is unavailable, the
-          approved local metadata remains a deterministic fallback.
-        </p>
-        <Badge
-          className={`mt-3 ${graph.provider === 'neo4j' ? 'bg-emerald-700 text-white' : 'bg-slate-700 text-white'}`}
-        >
-          <CircleDotIcon />{' '}
-          {graph.provider === 'neo4j'
-            ? `Neo4j Aura live · ${graph.nodes.length} source paths`
-            : 'Metadata fallback active'}
-        </Badge>
+      <div className="relative mb-7 overflow-hidden rounded-[1.75rem] border border-white/70 bg-card/85 p-6 shadow-[0_18px_60px_-36px_rgba(15,23,42,0.45)] backdrop-blur sm:p-8">
+        <div className="absolute -right-10 -top-16 size-48 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative max-w-4xl">
+          <p className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
+            <Network className="size-3.5" /> Neo4j GraphRAG relationship layer
+          </p>
+          <h2 className="font-heading text-2xl font-semibold tracking-[-0.035em] sm:text-4xl">
+            See how sources connect to safeguards and jurisdictions.
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
+            The live retrieval graph expands Pinecone and BM25 candidates
+            through shared safeguard and jurisdiction paths. If Aura is
+            unavailable, the approved local metadata remains a deterministic
+            fallback.
+          </p>
+          <Badge
+            className={`mt-4 ${graph.provider === 'neo4j' ? 'bg-emerald-700 text-white' : 'bg-slate-700 text-white'}`}
+          >
+            <CircleDotIcon />{' '}
+            {graph.provider === 'neo4j'
+              ? `Neo4j Aura live · ${graph.nodes.length} source paths`
+              : 'Metadata fallback active'}
+          </Badge>
+        </div>
       </div>
       <div className="mb-5 grid gap-3 md:grid-cols-3">
         <Card className="border-sky-200 bg-sky-50">
@@ -117,7 +121,7 @@ export function KnowledgeMap() {
           </CardContent>
         </Card>
       </div>
-      <div className="relative rounded-3xl border border-slate-800 bg-slate-950 p-5 text-white sm:p-7">
+      <div className="relative rounded-[1.75rem] border border-slate-800 bg-slate-950 p-5 text-white shadow-[0_24px_70px_-38px_rgba(15,23,42,0.85)] sm:p-7">
         <div
           className="absolute left-1/2 top-20 hidden h-[calc(100%-8rem)] w-px bg-gradient-to-b from-teal-300/60 to-transparent lg:block"
           aria-hidden="true"

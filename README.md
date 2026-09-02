@@ -11,6 +11,8 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 ## What the demo shows
 
 - A public, accessible case workspace with three fictional scenarios
+- A public Trust Center with security, privacy, accessibility, AI-limitations, and live configuration-status pages
+- Server-enforced training-only attestation before generative text or voice processing
 - A five-agent practice lab with a fictional participant, evidence agent, facilitator coach, victim-services reviewer, and structured evaluator
 - Browser-native voice dictation and read-aloud with English and Spanish practice output
 - Deterministic privacy screening before external AI calls
@@ -27,8 +29,9 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
 - Role-based Fireworks model routing with safe fallback to the primary configured model
 - Deepgram Nova-3 transcription and Aura-2 bilingual read-aloud with no application audio retention
-- A versioned 48-case safety suite, a 24-query retrieval suite, a 200-case LangSmith golden dataset with a 40-case frozen baseline/post-improvement core, and 36 deterministic unit tests
+- A versioned 48-case safety suite, a 24-query retrieval suite, a 200-case LangSmith golden dataset with a 40-case frozen baseline/post-improvement core, and 42 deterministic unit tests
 - Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
+- Append-only, narrative-free D1 audit events for privacy blocks, workflow handoffs, reviewer decisions, practice runs, and corpus monitoring
 
 ## Architecture
 
@@ -110,9 +113,10 @@ The application is designed to fail closed:
 5. Weak evidence triggers abstention rather than unsupported generation.
 6. JSON-schema output and a deterministic claim-level citation gate reject malformed or unsupported briefs.
 7. Fireworks and Mistral independently audit autonomy, coercion, evidence support, and policy conflicts against release thresholds.
-8. LangGraph durably interrupts before human review; D1 stores approval/rate metadata and a privacy-minimized control checkpoint with narratives, vectors, evidence excerpts, and generated briefs removed.
-9. No message, referral, eligibility decision, or record update is performed automatically.
-10. LangSmith receives counts, latency, scores, status, and version IDs—not raw narratives or generated briefs.
+8. LangGraph durably interrupts before human review; reviewers can approve, revise, reject, or escalate, and non-approval decisions require a rationale.
+9. D1 stores approval/rate/audit metadata and a privacy-minimized control checkpoint with narratives, vectors, evidence excerpts, and generated briefs removed.
+10. No message, referral, eligibility decision, or record update is performed automatically.
+11. LangSmith receives counts, latency, scores, status, and version IDs—not raw narratives or generated briefs.
 
 This is not a substitute for local law, agency policy, trained facilitators, victim advocates, legal counsel, mental-health professionals, or emergency services.
 
@@ -233,6 +237,13 @@ Before deployment, also verify:
 - LangSmith traces contain metadata only.
 - The 200-case v2 dataset validates exactly, and the frozen provider-backed experiments remain scoped to its 40-case benchmark core.
 - Public API abuse controls and spending limits are appropriate for the audience.
+
+## Production-readiness evidence
+
+- [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md) — current classification, implemented controls, agency gates, and rollout plan
+- [`docs/DATA_GOVERNANCE.md`](docs/DATA_GOVERNANCE.md) — data inventory and governed evidence lifecycle
+- [`docs/INCIDENT_RESPONSE.md`](docs/INCIDENT_RESPONSE.md) — containment, severity, recovery, and learning playbook
+- [`docs/ACCESSIBILITY_CONFORMANCE.md`](docs/ACCESSIBILITY_CONFORMANCE.md) — WCAG 2.2 AA target, implemented controls, and audit scope
 
 ## Operational boundary
 

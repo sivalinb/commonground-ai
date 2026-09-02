@@ -9,6 +9,7 @@ const requestSchema = z.object({
   text: z.string().trim().min(1).max(1200),
   language: z.enum(['english', 'spanish']).default('english'),
   turnstileToken: z.string().max(2048).optional(),
+  trainingUseAcknowledged: z.literal(true),
 });
 
 export async function POST(request: Request) {

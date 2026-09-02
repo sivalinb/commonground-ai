@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { consumeRateLimit, savePracticeRun } from '@/lib/db';
+import { consumeRateLimit, recordAuditEvent, savePracticeRun } from '@/lib/db';
 import { requireSameOrigin, secureJson } from '@/lib/http';
 import { executePractice } from '@/lib/practice';
 import { detectProhibitedRequest, detectSensitiveData } from '@/lib/safety';
@@ -15,6 +15,7 @@ const requestSchema = z.object({
   jurisdiction: z.enum(['colorado', 'national']).default('colorado'),
   language: z.enum(['english', 'spanish']).default('english'),
   turnstileToken: z.string().max(2048).optional(),
+  trainingUseAcknowledged: z.literal(true),
 });
 
 export async function POST(request: Request) {
@@ -50,6 +51,13 @@ export async function POST(request: Request) {
       );
     const combined = `${parsed.data.scenario}\n${parsed.data.learnerResponse}`;
     const sensitive = detectSensitiveData(combined);
+    if (sensitive.length)
+      await recordAuditEvent({
+        eventType: 'privacy_blocked',
+        traceId,
+        outcome: 'blocked_before_provider',
+        details: { detectorCount: sensitive.length, route: 'practice' },
+      }).catch(() => undefined);
     if (sensitive.length)
       return secureJson(
         {

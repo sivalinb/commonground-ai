@@ -41,6 +41,7 @@ export const safetyReviewSchema = z.object({
 export const analyzeRequestSchema = z.object({
   caseText: z.string().trim().min(20).max(3000),
   jurisdiction: z.enum(['colorado', 'national']).default('colorado'),
+  trainingUseAcknowledged: z.literal(true),
   turnstileToken: z.string().max(2048).optional(),
   retrievalMode: z.enum(['vector', 'hybrid', 'graph']).optional(),
   evaluationProfile: z.enum(['baseline', 'improved']).optional(),
@@ -57,10 +58,17 @@ export const analyzeRequestSchema = z.object({
     .optional(),
 });
 
+export const humanDecisionSchema = z.enum([
+  'approved',
+  'revision_requested',
+  'rejected',
+  'escalated',
+]);
+
 export const approvalRequestSchema = z.object({
   approvalId: z.uuid(),
   approvalToken: z.string().min(32).max(256),
-  decision: z.enum(['approved', 'revision_requested']),
+  decision: humanDecisionSchema,
   reviewerRole: z.enum([
     'volunteer',
     'facilitator',
@@ -69,12 +77,21 @@ export const approvalRequestSchema = z.object({
     'instructor',
   ]),
   comment: z.string().trim().max(500).default(''),
+}).superRefine((value, context) => {
+  if (value.decision !== 'approved' && value.comment.length < 8) {
+    context.addIssue({
+      code: 'custom',
+      path: ['comment'],
+      message: 'A short rationale is required for this decision.',
+    });
+  }
 });
 
 export type Evidence = z.infer<typeof evidenceSchema>;
 export type CitedText = z.infer<typeof citedTextSchema>;
 export type PracticeBrief = z.infer<typeof practiceBriefSchema>;
 export type SafetyReview = z.infer<typeof safetyReviewSchema>;
+export type HumanDecision = z.infer<typeof humanDecisionSchema>;
 
 export type TimelineEvent = {
   stage: string;
@@ -92,7 +109,9 @@ export type PublicResult = {
     | 'not_required'
     | 'pending'
     | 'approved'
-    | 'revision_requested';
+    | 'revision_requested'
+    | 'rejected'
+    | 'escalated';
   awaitingApproval: boolean;
   finding: CitedText;
   options: CitedText[];
