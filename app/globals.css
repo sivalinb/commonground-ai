@@ -32,23 +32,23 @@
 }
 
 :root {
-  --background: oklch(0.975 0.008 196);
-  --foreground: oklch(0.21 0.035 211);
-  --card: oklch(0.995 0.003 196);
+  --background: oklch(0.978 0.009 178);
+  --foreground: oklch(0.205 0.037 211);
+  --card: oklch(0.996 0.003 174);
   --card-foreground: oklch(0.21 0.035 211);
-  --primary: oklch(0.43 0.095 207);
+  --primary: oklch(0.425 0.099 192);
   --primary-foreground: oklch(0.99 0.005 196);
-  --secondary: oklch(0.92 0.026 190);
+  --secondary: oklch(0.928 0.032 174);
   --secondary-foreground: oklch(0.28 0.055 207);
-  --muted: oklch(0.945 0.012 197);
+  --muted: oklch(0.948 0.014 183);
   --muted-foreground: oklch(0.5 0.025 211);
-  --accent: oklch(0.91 0.04 172);
+  --accent: oklch(0.914 0.05 166);
   --accent-foreground: oklch(0.26 0.055 177);
   --destructive: oklch(0.57 0.21 27);
-  --border: oklch(0.88 0.018 199);
-  --input: oklch(0.84 0.022 199);
-  --ring: oklch(0.56 0.09 201);
-  --radius: 0.75rem;
+  --border: oklch(0.885 0.02 186);
+  --input: oklch(0.84 0.025 188);
+  --ring: oklch(0.55 0.1 190);
+  --radius: 0.9rem;
 }
 
 .dark {
@@ -76,6 +76,7 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -89,9 +90,90 @@
 body {
   background-image:
     radial-gradient(
-      circle at 7% 4%,
-      oklch(0.91 0.045 174 / 55%),
-      transparent 24rem
+      circle at 4% 3%,
+      oklch(0.9 0.052 170 / 52%),
+      transparent 28rem
     ),
-    linear-gradient(to bottom, transparent, oklch(0.96 0.01 198));
+    radial-gradient(
+      circle at 96% 20%,
+      oklch(0.94 0.04 78 / 42%),
+      transparent 25rem
+    ),
+    linear-gradient(to bottom, transparent, oklch(0.955 0.014 184));
+  background-attachment: fixed;
+}
+
+::selection {
+  background: oklch(0.78 0.11 181 / 55%);
+  color: oklch(0.18 0.035 211);
+}
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.cg-grid {
+  background-image:
+    linear-gradient(oklch(0.8 0.09 183 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.8 0.09 183 / 7%) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom right, black, transparent 82%);
+}
+
+.cg-hero::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 8%);
+}
+
+.app-shell::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+  opacity: 0.3;
+  background-image: radial-gradient(
+    circle at center,
+    oklch(0.5 0.035 190 / 25%) 0.7px,
+    transparent 0.8px
+  );
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to bottom, black, transparent 82%);
+}
+
+[data-slot='card'] {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.scrollbar-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(1 0 0 / 22%) transparent;
+}
+
+.scrollbar-subtle::-webkit-scrollbar {
+  height: 5px;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: oklch(1 0 0 / 22%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -60,6 +60,7 @@ import { Textarea } from '@/components/ui/textarea';
 import knowledge from '@/data/knowledge.json';
 
 type View =
+  | 'home'
   | 'workspace'
   | 'practice'
   | 'evidence'
@@ -443,7 +444,7 @@ function SourceLinks({
 }
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<View>('workspace');
+  const [activeView, setActiveView] = useState<View>('home');
   const [scenarioKey, setScenarioKey] = useState<ScenarioKey>('autonomy');
   const [caseText, setCaseText] = useState(scenarios.autonomy.prompt);
   const [jurisdiction, setJurisdiction] = useState<'colorado' | 'national'>(
@@ -473,6 +474,10 @@ export default function Home() {
       .catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [activeView]);
+
   const handleTurnstile = useCallback(
     (token: string) => setTurnstileToken(token),
     [],
@@ -482,10 +487,9 @@ export default function Home() {
       new Map(liveResult?.timeline.map((event) => [event.stage, event]) || []),
     [liveResult],
   );
-  const activeTabGroup =
-    tabGroups.find((group) =>
-      group.items.some(([value]) => value === activeView),
-    ) || tabGroups[0];
+  const activeTabGroup = tabGroups.find((group) =>
+    group.items.some(([value]) => value === activeView),
+  );
 
   function chooseScenario(key: ScenarioKey) {
     setScenarioKey(key);
@@ -598,7 +602,7 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/[0.97] text-white shadow-[0_12px_40px_-24px_rgba(15,23,42,0.8)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <button
-            onClick={() => setActiveView('workspace')}
+            onClick={() => setActiveView('home')}
             className="group flex items-center gap-3 rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"
           >
             <span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-teal-300 to-emerald-400 text-slate-950 shadow-[0_8px_24px_-10px_rgba(45,212,191,0.9)] transition-transform group-hover:-rotate-3 group-hover:scale-105">
@@ -635,7 +639,7 @@ export default function Home() {
           className="border-t border-white/[0.07]"
           aria-label="Application sections"
         >
-          <div className="mx-auto grid max-w-4xl grid-cols-3 gap-2 px-3 py-2 sm:px-6">
+          <div className="mx-auto grid max-w-3xl grid-cols-3 gap-1.5 px-3 py-1.5 sm:px-6">
             {tabGroups.map((group) => {
               const GroupIcon = group.icon;
               const isActive = group === activeTabGroup;
@@ -644,7 +648,7 @@ export default function Home() {
                   key={group.label}
                   type="button"
                   onClick={() => setActiveView(group.items[0][0])}
-                  className={`group/category relative min-h-14 rounded-xl border px-2 py-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-3 ${
+                  className={`group/category relative h-10 rounded-xl border px-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-3 ${
                     isActive
                       ? group.activeClass
                       : 'border-white/[0.07] bg-white/[0.025] text-slate-300 hover:border-white/15 hover:bg-white/[0.055] hover:text-white'
@@ -657,12 +661,9 @@ export default function Home() {
                     >
                       <GroupIcon className="size-3.5" />
                     </span>
-                    <span className="text-[10px] font-semibold leading-tight sm:text-xs">
+                    <span className="text-[10px] font-semibold leading-tight sm:text-[11px]">
                       {group.label}
                     </span>
-                  </span>
-                  <span className="mt-1.5 hidden pl-9 text-[9px] leading-3.5 text-slate-400 lg:block">
-                    {group.description}
                   </span>
                   {isActive && (
                     <span
@@ -674,31 +675,33 @@ export default function Home() {
               );
             })}
           </div>
-          <div className="border-t border-white/[0.07] bg-black/20">
-            <div className="mx-auto flex max-w-[1480px] flex-wrap items-center justify-center gap-1.5 px-3 py-2 sm:px-6">
-              <span className="mr-1 hidden items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.13em] text-slate-500 lg:flex">
-                <span
-                  className={`size-1.5 rounded-full ${activeTabGroup.marker}`}
-                />
-                {activeTabGroup.label}
-              </span>
-              {activeTabGroup.items.map(([value, label, Icon]) => (
-                <Button
-                  key={value}
-                  variant="ghost"
-                  onClick={() => setActiveView(value)}
-                  className={`h-7 rounded-full px-2.5 text-[11px] sm:text-xs ${
-                    activeView === value
-                      ? 'bg-white text-slate-950 shadow-sm hover:bg-white hover:text-slate-950'
-                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                  }`}
-                  aria-current={activeView === value ? 'page' : undefined}
-                >
-                  <Icon /> {label}
-                </Button>
-              ))}
+          {activeTabGroup && (
+            <div className="border-t border-white/[0.07] bg-black/20">
+              <div className="mx-auto flex max-w-[1480px] flex-wrap items-center justify-center gap-1.5 px-3 py-2 sm:px-6">
+                <span className="mr-1 hidden items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.13em] text-slate-500 lg:flex">
+                  <span
+                    className={`size-1.5 rounded-full ${activeTabGroup.marker}`}
+                  />
+                  {activeTabGroup.label}
+                </span>
+                {activeTabGroup.items.map(([value, label, Icon]) => (
+                  <Button
+                    key={value}
+                    variant="ghost"
+                    onClick={() => setActiveView(value)}
+                    className={`h-7 rounded-full px-2.5 text-[11px] sm:text-xs ${
+                      activeView === value
+                        ? 'bg-white text-slate-950 shadow-sm hover:bg-white hover:text-slate-950'
+                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                    aria-current={activeView === value ? 'page' : undefined}
+                  >
+                    <Icon /> {label}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </nav>
       </header>
 
@@ -706,234 +709,552 @@ export default function Home() {
         id="main-content"
         className="mx-auto max-w-[1480px] scroll-mt-32 px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pt-8"
       >
-        {activeView === 'workspace' && (
-          <section aria-label="Live restorative justice workflow">
-            <div className="mb-6 overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 text-white shadow-[0_28px_90px_-38px_rgba(15,23,42,0.8)]">
-              <div className="grid xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-                <div className="relative flex flex-col justify-center px-6 py-9 sm:px-9 sm:py-12 xl:px-12 xl:py-14">
-                  <div
-                    className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(45,212,191,0.18),transparent_30rem),radial-gradient(circle_at_90%_85%,rgba(251,191,36,0.08),transparent_22rem)]"
-                    aria-hidden="true"
-                  />
-                  <div className="relative">
-                    <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.19em] text-teal-300">
-                      <Sparkles className="size-3.5" /> Evidence before advice
-                    </p>
-                    <h1 className="max-w-2xl font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.05em] sm:text-5xl lg:text-[3.4rem]">
-                      Repair harm. Protect choice. Keep people in charge.
-                    </h1>
-                    <p className="mt-5 max-w-xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
-                      CommonGround AI helps restorative-justice and
-                      victim-services practitioners explore safer options using
-                      public evidence, visible safeguards, and required human
-                      review.
-                    </p>
-                    <div className="mt-6 flex flex-wrap gap-2.5">
-                      <Button
-                        size="lg"
-                        onClick={() =>
-                          document
-                            .getElementById('workflow-start')
-                            ?.scrollIntoView({ behavior: 'smooth' })
-                        }
-                        className="h-10 rounded-full bg-teal-300 px-5 font-semibold text-slate-950 shadow-lg shadow-teal-950/20 hover:bg-teal-200"
-                      >
-                        <Play /> Try a guided scenario
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        onClick={() => setActiveView('architecture')}
-                        className="h-10 rounded-full border-white/20 bg-white/[0.06] px-5 text-white hover:bg-white/10 hover:text-white"
-                      >
-                        See how the AI works <ChevronRight />
-                      </Button>
-                    </div>
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100">
-                        <HeartHandshake /> Voluntary participation
-                      </Badge>
-                      <Badge className="border border-sky-300/25 bg-sky-300/10 text-sky-100">
-                        <ShieldCheck /> Safety and support
-                      </Badge>
-                      <Badge className="border border-amber-300/25 bg-amber-300/10 text-amber-100">
-                        <UserCheck /> Human-approved guidance
-                      </Badge>
-                    </div>
+        {activeView === 'home' && (
+          <section aria-label="CommonGround AI overview" className="space-y-6">
+            <div className="cg-hero relative overflow-hidden rounded-[2rem] border border-emerald-200/10 bg-[#06100f] text-white shadow-[0_34px_110px_-44px_rgba(6,78,70,0.72)]">
+              <div
+                className="cg-grid absolute inset-0 opacity-35"
+                aria-hidden="true"
+              />
+              <div
+                className="absolute -left-24 top-0 size-80 rounded-full bg-teal-400/15 blur-[90px]"
+                aria-hidden="true"
+              />
+              <div
+                className="absolute -right-24 bottom-0 size-96 rounded-full bg-amber-300/10 blur-[110px]"
+                aria-hidden="true"
+              />
+              <div className="relative grid lg:min-h-[610px] lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+                <div className="flex flex-col justify-center px-6 py-10 sm:px-10 sm:py-14 lg:px-14 xl:px-16">
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    <Badge className="border border-teal-300/20 bg-teal-300/10 text-teal-100">
+                      Human-led restorative practice
+                    </Badge>
+                    <Badge className="border border-white/10 bg-white/[0.05] text-slate-300">
+                      Public evidence · visible safeguards
+                    </Badge>
+                  </div>
+                  <p className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-teal-300">
+                    <Sparkles className="size-3.5" /> AI that knows where to
+                    stop
+                  </p>
+                  <h1 className="max-w-3xl font-heading text-[2.65rem] font-semibold leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-[4.25rem]">
+                    Safer options.
+                    <span className="block bg-gradient-to-r from-teal-200 via-emerald-300 to-amber-200 bg-clip-text text-transparent">
+                      Clear evidence.
+                    </span>
+                    Human control.
+                  </h1>
+                  <p className="mt-6 max-w-xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                    Turn a fictional restorative-justice question into a cited,
+                    trauma-aware practice brief—while participant choice and
+                    every consequential decision stay with people.
+                  </p>
+                  <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <Button
+                      size="lg"
+                      onClick={() => setActiveView('workspace')}
+                      className="h-12 rounded-full bg-teal-300 px-6 font-semibold text-slate-950 shadow-[0_12px_32px_-12px_rgba(45,212,191,0.75)] hover:bg-teal-200"
+                    >
+                      <Play /> Try the guided case
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() =>
+                        document
+                          .getElementById('how-it-works')
+                          ?.scrollIntoView({ behavior: 'smooth' })
+                      }
+                      className="h-12 rounded-full border-white/15 bg-white/[0.05] px-6 text-white hover:bg-white/10 hover:text-white"
+                    >
+                      See the human journey <ChevronRight />
+                    </Button>
+                  </div>
+                  <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-slate-400">
+                    <span className="flex items-center gap-1.5">
+                      <Check className="size-3 text-teal-300" /> Fictional
+                      scenarios only
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Check className="size-3 text-teal-300" /> No automated
+                      case decisions
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Check className="size-3 text-teal-300" /> Human approval
+                      required
+                    </span>
                   </div>
                 </div>
-                <figure className="relative min-h-80 overflow-hidden border-t border-white/10 xl:min-h-[500px] xl:border-l xl:border-t-0">
+
+                <figure className="relative mx-4 mb-4 min-h-[360px] overflow-hidden rounded-[1.5rem] border border-white/10 sm:mx-6 sm:mb-6 lg:m-5 lg:ml-0 lg:min-h-0">
                   <Image
                     src="/commonground-rj-hero-v4.jpg"
                     alt="A diverse, voluntary restorative-practice circle in a welcoming community room. A male facilitator with a clipboard and a victim-services advocate support participants while an open chair and pathway represent choice; a subtle evidence, privacy, and human-approval network illustrates CommonGround AI assisting the process."
                     fill
                     priority
-                    sizes="(min-width: 1280px) 55vw, 100vw"
-                    className="object-cover transition-transform duration-700 hover:scale-[1.015]"
+                    sizes="(min-width: 1024px) 54vw, 100vw"
+                    className="object-cover object-[center_72%]"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent px-6 pb-6 pt-24">
-                    <p className="max-w-2xl text-xs leading-5 text-white/90 sm:text-sm">
-                      <strong>
-                        AI supports the practice—it does not run it.
-                      </strong>{' '}
-                      The people, their safety, and their choices remain
-                      authoritative.
-                    </p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#06100f] via-transparent to-slate-950/10" />
+                  <div className="absolute inset-x-4 bottom-4 grid grid-cols-2 gap-2 sm:inset-x-6 sm:bottom-6 sm:grid-cols-4">
+                    {[
+                      ['01', 'Describe'],
+                      ['02', 'Retrieve'],
+                      ['03', 'Safeguard'],
+                      ['04', 'Review'],
+                    ].map(([number, label], index) => (
+                      <div
+                        key={number}
+                        className={`rounded-xl border px-3 py-2.5 backdrop-blur-md ${
+                          index === 3
+                            ? 'border-amber-200/25 bg-amber-200/15'
+                            : 'border-white/15 bg-slate-950/60'
+                        }`}
+                      >
+                        <p className="font-mono text-[9px] text-teal-200">
+                          {number}
+                        </p>
+                        <p className="mt-0.5 text-xs font-semibold">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/65 px-3 py-2 text-[10px] font-semibold backdrop-blur-md">
+                    <span className="relative flex size-2">
+                      <span className="absolute inline-flex size-full animate-ping rounded-full bg-teal-300 opacity-70" />
+                      <span className="relative inline-flex size-2 rounded-full bg-teal-300" />
+                    </span>
+                    People remain authoritative
                   </div>
                 </figure>
               </div>
-              <div className="grid border-t border-white/10 sm:grid-cols-3">
-                {[
-                  [
-                    'Restorative justice',
-                    'Repair harm through voluntary, accountable, community-centered options.',
-                    HeartHandshake,
-                  ],
-                  [
-                    'Victim services',
-                    'Prioritize safety, voice, privacy, advocacy, and continuing choice.',
-                    ShieldCheck,
-                  ],
-                  [
-                    'CommonGround AI',
-                    'Find cited public guidance, test safeguards, and wait for a trained reviewer.',
-                    BrainCircuit,
-                  ],
-                ].map(([label, description, Icon], index) => (
-                  <div
-                    key={label as string}
-                    className={`group flex gap-3 px-5 py-5 transition-colors hover:bg-white/[0.035] ${index ? 'border-t border-white/10 sm:border-l sm:border-t-0' : ''}`}
-                  >
-                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/10 text-teal-200 transition-transform group-hover:-translate-y-0.5">
-                      <Icon className="size-4" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-semibold text-white">
-                        {label as string}
-                      </p>
-                      <p className="mt-1 text-[11px] leading-4 text-slate-400">
-                        {description as string}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            <div className="mb-6 rounded-[1.75rem] border border-border/70 bg-card/85 p-5 shadow-[0_18px_60px_-42px_rgba(15,23,42,0.5)] backdrop-blur sm:p-6">
-              <div className="mb-5 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-primary">
-                    A transparent path
-                  </p>
-                  <h2 className="mt-1 font-heading text-xl font-semibold tracking-[-0.03em] sm:text-2xl">
-                    From a human question to a human decision
-                  </h2>
-                </div>
-                <p className="max-w-lg text-xs leading-5 text-muted-foreground">
-                  Every AI step is visible, evidence-backed, and bounded by
-                  safeguards designed for restorative practice.
-                </p>
-              </div>
-              <ol className="grid gap-3 md:grid-cols-4">
-                {[
-                  [
-                    '01',
-                    'Describe',
-                    'Start with a fictional, de-identified practice scenario.',
-                    MessageSquareText,
-                  ],
-                  [
-                    '02',
-                    'Find evidence',
-                    'Retrieve and rank approved public guidance.',
-                    FileSearch,
-                  ],
-                  [
-                    '03',
-                    'Test safeguards',
-                    'Check citations, autonomy, safety, and boundaries.',
-                    ShieldCheck,
-                  ],
-                  [
-                    '04',
-                    'Human review',
-                    'A trained person approves, revises, or withholds.',
-                    UserCheck,
-                  ],
-                ].map(([number, label, detail, Icon], index) => (
-                  <li
-                    key={label as string}
-                    className="group relative rounded-2xl border border-border/70 bg-background/75 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
-                  >
-                    {index < 3 && (
-                      <span
-                        className="absolute -right-2.5 top-8 z-10 hidden size-5 place-items-center rounded-full border bg-card text-muted-foreground md:grid"
-                        aria-hidden="true"
-                      >
-                        <ChevronRight className="size-3" />
-                      </span>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                        <Icon className="size-4" />
-                      </span>
-                      <span className="font-mono text-[10px] font-semibold text-muted-foreground">
-                        {number as string}
-                      </span>
-                    </div>
-                    <p className="mt-3 text-sm font-semibold">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ['200', 'golden evaluation cases', BarChart3],
+                ['10', 'reviewed public sources', BookOpenCheck],
+                ['0', 'automated case decisions', ShieldCheck],
+                ['1', 'required human checkpoint', UserCheck],
+              ].map(([value, label, Icon]) => (
+                <div
+                  key={label as string}
+                  className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
+                >
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-950 text-teal-200 shadow-lg">
+                    <Icon className="size-4" />
+                  </span>
+                  <div>
+                    <p className="font-mono text-2xl font-semibold tracking-tight">
+                      {value as string}
+                    </p>
+                    <p className="text-[11px] leading-4 text-muted-foreground">
                       {label as string}
                     </p>
-                    <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
-                      {detail as string}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            <Alert className="mb-6 border-amber-200/80 bg-gradient-to-r from-amber-50 via-white to-teal-50 text-slate-950 shadow-sm">
-              <Info className="text-amber-700" />
-              <AlertTitle>Before you begin · training demonstration</AlertTitle>
-              <AlertDescription className="max-w-5xl text-slate-600">
-                Use fictional or thoroughly de-identified scenarios only. This
-                system retrieves public guidance and drafts options for trained
-                human review; it never determines guilt, credibility, remorse,
-                mental health, risk, legal eligibility, or mandatory
-                participation.
-              </AlertDescription>
-            </Alert>
-
-            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                ['Graphs', '2 workflows · 15 nodes', Waypoints],
-                ['Corpus', '10 public sources', Database],
-                ['Evaluation', '48 safety · 24 retrieval', BarChart3],
-                ['Privacy', 'Metadata-only traces', LockKeyhole],
-              ].map(([label, value, Icon]) => (
-                <Card
-                  key={label as string}
-                  size="sm"
-                  className="border border-border/70 bg-card/90 shadow-[0_12px_36px_-28px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 hover:border-primary/25"
-                >
-                  <CardContent className="flex h-full items-start gap-3">
-                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                      <Icon className="size-4" />
-                    </span>
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        {label as string}
-                      </p>
-                      <p className="mt-1 text-xs font-semibold">
-                        {value as string}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
 
+            <div
+              id="how-it-works"
+              className="scroll-mt-32 rounded-[2rem] border border-border/70 bg-card/80 p-6 shadow-[0_24px_70px_-50px_rgba(15,23,42,0.6)] backdrop-blur sm:p-8 lg:p-10"
+            >
+              <div className="grid gap-8 lg:grid-cols-[minmax(260px,0.62fr)_minmax(0,1.38fr)] lg:items-end">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                    The real user flow
+                  </p>
+                  <h2 className="mt-3 font-heading text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+                    One question. Four visible boundaries.
+                  </h2>
+                  <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                    The interface reveals only what matters at each moment.
+                    Technical depth is available when the user chooses to
+                    inspect it.
+                  </p>
+                </div>
+                <ol className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  {[
+                    [
+                      '01',
+                      'Describe',
+                      'Use a fictional or de-identified scenario.',
+                      MessageSquareText,
+                    ],
+                    [
+                      '02',
+                      'Ground',
+                      'Find and rank approved public guidance.',
+                      FileSearch,
+                    ],
+                    [
+                      '03',
+                      'Protect',
+                      'Check privacy, citations, safety, and choice.',
+                      ShieldCheck,
+                    ],
+                    [
+                      '04',
+                      'Review',
+                      'A trained person approves, revises, or withholds.',
+                      UserCheck,
+                    ],
+                  ].map(([number, label, detail, Icon], index) => (
+                    <li
+                      key={label as string}
+                      className={`relative rounded-2xl border p-4 ${index === 3 ? 'border-amber-200 bg-amber-50/70' : 'border-border/70 bg-background/70'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                          <Icon className="size-4" />
+                        </span>
+                        <span className="font-mono text-[10px] font-semibold text-muted-foreground">
+                          {number as string}
+                        </span>
+                      </div>
+                      <p className="mt-4 text-sm font-semibold">
+                        {label as string}
+                      </p>
+                      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                        {detail as string}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              {[
+                {
+                  eyebrow: 'Start here',
+                  title: 'Try a protected practice case',
+                  detail:
+                    'Choose a scenario and watch evidence, safeguards, and human review unfold.',
+                  action: 'Open live workflow',
+                  view: 'workspace' as View,
+                  icon: Play,
+                  tone: 'from-teal-300/20 to-emerald-300/5',
+                },
+                {
+                  eyebrow: 'Build trust',
+                  title: 'Inspect every safety boundary',
+                  detail:
+                    'See privacy blocking, citation gates, model review, and the approval checkpoint.',
+                  action: 'Explore AI safeguards',
+                  view: 'architecture' as View,
+                  icon: ShieldCheck,
+                  tone: 'from-amber-300/20 to-orange-300/5',
+                },
+                {
+                  eyebrow: 'See proof',
+                  title: 'Review evaluation evidence',
+                  detail:
+                    'Explore the 200-case golden corpus and the provider-tested 40-case core.',
+                  action: 'Open evaluation lab',
+                  view: 'evals' as View,
+                  icon: BarChart3,
+                  tone: 'from-sky-300/20 to-cyan-300/5',
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.title}
+                    type="button"
+                    aria-label={item.action}
+                    onClick={() => setActiveView(item.view)}
+                    className="group overflow-hidden rounded-[1.5rem] border border-slate-800 bg-slate-950 text-left text-white shadow-[0_20px_60px_-42px_rgba(15,23,42,0.9)] transition-all hover:-translate-y-1 hover:border-teal-300/30 hover:shadow-xl"
+                  >
+                    <div className={`bg-gradient-to-br ${item.tone} p-6`}>
+                      <div className="flex items-center justify-between">
+                        <span className="grid size-11 place-items-center rounded-xl border border-white/10 bg-white/[0.07] text-teal-200">
+                          <Icon className="size-5" />
+                        </span>
+                        <ChevronRight className="size-4 text-slate-500 transition-transform group-hover:translate-x-1 group-hover:text-white" />
+                      </div>
+                      <p className="mt-6 text-[9px] font-bold uppercase tracking-[0.2em] text-teal-300">
+                        {item.eyebrow}
+                      </p>
+                      <h3 className="mt-2 font-heading text-xl font-semibold tracking-[-0.025em]">
+                        {item.title}
+                      </h3>
+                      <p className="mt-3 text-xs leading-5 text-slate-400">
+                        {item.detail}
+                      </p>
+                      <p className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-white">
+                        {item.action} <ChevronRight className="size-3" />
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-col justify-between gap-4 rounded-[1.5rem] border border-amber-200/70 bg-gradient-to-r from-amber-50 via-white to-teal-50 p-5 sm:flex-row sm:items-center sm:px-7">
+              <div className="flex items-start gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-800">
+                  <Info className="size-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-slate-950">
+                    Training demonstration—not a case decision system
+                  </p>
+                  <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-600">
+                    Never determines guilt, credibility, remorse, diagnosis,
+                    risk, eligibility, or mandatory participation. Use fictional
+                    or thoroughly de-identified scenarios only.
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setActiveView('architecture')}
+                className="shrink-0 rounded-full bg-white"
+              >
+                Read the safety contract <ChevronRight />
+              </Button>
+            </div>
+          </section>
+        )}
+
+        {activeView === 'workspace' && (
+          <section aria-label="Live restorative justice workflow">
+            <div className="hidden">
+              <div className="mb-6 overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 text-white shadow-[0_28px_90px_-38px_rgba(15,23,42,0.8)]">
+                <div className="grid xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+                  <div className="relative flex flex-col justify-center px-6 py-9 sm:px-9 sm:py-12 xl:px-12 xl:py-14">
+                    <div
+                      className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(45,212,191,0.18),transparent_30rem),radial-gradient(circle_at_90%_85%,rgba(251,191,36,0.08),transparent_22rem)]"
+                      aria-hidden="true"
+                    />
+                    <div className="relative">
+                      <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.19em] text-teal-300">
+                        <Sparkles className="size-3.5" /> Evidence before advice
+                      </p>
+                      <h1 className="max-w-2xl font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.05em] sm:text-5xl lg:text-[3.4rem]">
+                        Repair harm. Protect choice. Keep people in charge.
+                      </h1>
+                      <p className="mt-5 max-w-xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                        CommonGround AI helps restorative-justice and
+                        victim-services practitioners explore safer options
+                        using public evidence, visible safeguards, and required
+                        human review.
+                      </p>
+                      <div className="mt-6 flex flex-wrap gap-2.5">
+                        <Button
+                          size="lg"
+                          onClick={() =>
+                            document
+                              .getElementById('workflow-start')
+                              ?.scrollIntoView({ behavior: 'smooth' })
+                          }
+                          className="h-10 rounded-full bg-teal-300 px-5 font-semibold text-slate-950 shadow-lg shadow-teal-950/20 hover:bg-teal-200"
+                        >
+                          <Play /> Try a guided scenario
+                        </Button>
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          onClick={() => setActiveView('architecture')}
+                          className="h-10 rounded-full border-white/20 bg-white/[0.06] px-5 text-white hover:bg-white/10 hover:text-white"
+                        >
+                          See how the AI works <ChevronRight />
+                        </Button>
+                      </div>
+                      <div className="mt-6 flex flex-wrap gap-2">
+                        <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100">
+                          <HeartHandshake /> Voluntary participation
+                        </Badge>
+                        <Badge className="border border-sky-300/25 bg-sky-300/10 text-sky-100">
+                          <ShieldCheck /> Safety and support
+                        </Badge>
+                        <Badge className="border border-amber-300/25 bg-amber-300/10 text-amber-100">
+                          <UserCheck /> Human-approved guidance
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <figure className="relative min-h-80 overflow-hidden border-t border-white/10 xl:min-h-[500px] xl:border-l xl:border-t-0">
+                    <Image
+                      src="/commonground-rj-hero-v4.jpg"
+                      alt="A diverse, voluntary restorative-practice circle in a welcoming community room. A male facilitator with a clipboard and a victim-services advocate support participants while an open chair and pathway represent choice; a subtle evidence, privacy, and human-approval network illustrates CommonGround AI assisting the process."
+                      fill
+                      priority
+                      sizes="(min-width: 1280px) 55vw, 100vw"
+                      className="object-cover transition-transform duration-700 hover:scale-[1.015]"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent px-6 pb-6 pt-24">
+                      <p className="max-w-2xl text-xs leading-5 text-white/90 sm:text-sm">
+                        <strong>
+                          AI supports the practice—it does not run it.
+                        </strong>{' '}
+                        The people, their safety, and their choices remain
+                        authoritative.
+                      </p>
+                    </div>
+                  </figure>
+                </div>
+                <div className="grid border-t border-white/10 sm:grid-cols-3">
+                  {[
+                    [
+                      'Restorative justice',
+                      'Repair harm through voluntary, accountable, community-centered options.',
+                      HeartHandshake,
+                    ],
+                    [
+                      'Victim services',
+                      'Prioritize safety, voice, privacy, advocacy, and continuing choice.',
+                      ShieldCheck,
+                    ],
+                    [
+                      'CommonGround AI',
+                      'Find cited public guidance, test safeguards, and wait for a trained reviewer.',
+                      BrainCircuit,
+                    ],
+                  ].map(([label, description, Icon], index) => (
+                    <div
+                      key={label as string}
+                      className={`group flex gap-3 px-5 py-5 transition-colors hover:bg-white/[0.035] ${index ? 'border-t border-white/10 sm:border-l sm:border-t-0' : ''}`}
+                    >
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/10 text-teal-200 transition-transform group-hover:-translate-y-0.5">
+                        <Icon className="size-4" />
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold text-white">
+                          {label as string}
+                        </p>
+                        <p className="mt-1 text-[11px] leading-4 text-slate-400">
+                          {description as string}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6 rounded-[1.75rem] border border-border/70 bg-card/85 p-5 shadow-[0_18px_60px_-42px_rgba(15,23,42,0.5)] backdrop-blur sm:p-6">
+                <div className="mb-5 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-primary">
+                      A transparent path
+                    </p>
+                    <h2 className="mt-1 font-heading text-xl font-semibold tracking-[-0.03em] sm:text-2xl">
+                      From a human question to a human decision
+                    </h2>
+                  </div>
+                  <p className="max-w-lg text-xs leading-5 text-muted-foreground">
+                    Every AI step is visible, evidence-backed, and bounded by
+                    safeguards designed for restorative practice.
+                  </p>
+                </div>
+                <ol className="grid gap-3 md:grid-cols-4">
+                  {[
+                    [
+                      '01',
+                      'Describe',
+                      'Start with a fictional, de-identified practice scenario.',
+                      MessageSquareText,
+                    ],
+                    [
+                      '02',
+                      'Find evidence',
+                      'Retrieve and rank approved public guidance.',
+                      FileSearch,
+                    ],
+                    [
+                      '03',
+                      'Test safeguards',
+                      'Check citations, autonomy, safety, and boundaries.',
+                      ShieldCheck,
+                    ],
+                    [
+                      '04',
+                      'Human review',
+                      'A trained person approves, revises, or withholds.',
+                      UserCheck,
+                    ],
+                  ].map(([number, label, detail, Icon], index) => (
+                    <li
+                      key={label as string}
+                      className="group relative rounded-2xl border border-border/70 bg-background/75 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
+                    >
+                      {index < 3 && (
+                        <span
+                          className="absolute -right-2.5 top-8 z-10 hidden size-5 place-items-center rounded-full border bg-card text-muted-foreground md:grid"
+                          aria-hidden="true"
+                        >
+                          <ChevronRight className="size-3" />
+                        </span>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="size-4" />
+                        </span>
+                        <span className="font-mono text-[10px] font-semibold text-muted-foreground">
+                          {number as string}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm font-semibold">
+                        {label as string}
+                      </p>
+                      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                        {detail as string}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <Alert className="mb-6 border-amber-200/80 bg-gradient-to-r from-amber-50 via-white to-teal-50 text-slate-950 shadow-sm">
+                <Info className="text-amber-700" />
+                <AlertTitle>
+                  Before you begin · training demonstration
+                </AlertTitle>
+                <AlertDescription className="max-w-5xl text-slate-600">
+                  Use fictional or thoroughly de-identified scenarios only. This
+                  system retrieves public guidance and drafts options for
+                  trained human review; it never determines guilt, credibility,
+                  remorse, mental health, risk, legal eligibility, or mandatory
+                  participation.
+                </AlertDescription>
+              </Alert>
+
+              <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  ['Graphs', '2 workflows · 15 nodes', Waypoints],
+                  ['Corpus', '10 public sources', Database],
+                  ['Evaluation', '48 safety · 24 retrieval', BarChart3],
+                  ['Privacy', 'Metadata-only traces', LockKeyhole],
+                ].map(([label, value, Icon]) => (
+                  <Card
+                    key={label as string}
+                    size="sm"
+                    className="border border-border/70 bg-card/90 shadow-[0_12px_36px_-28px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 hover:border-primary/25"
+                  >
+                    <CardContent className="flex h-full items-start gap-3">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                        <Icon className="size-4" />
+                      </span>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          {label as string}
+                        </p>
+                        <p className="mt-1 text-xs font-semibold">
+                          {value as string}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+            <SectionHeading
+              eyebrow="Guided practice workflow"
+              title="Explore one scenario from evidence to human review."
+              description="Choose a fictional case, run the protected agent workflow, and inspect only the evidence and safeguards needed at each step."
+            />
             <div
               id="workflow-start"
               className="scroll-mt-32 grid gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
