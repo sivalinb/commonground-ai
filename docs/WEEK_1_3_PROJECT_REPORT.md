@@ -1,4 +1,4 @@
-# CommonGround AI — Week 1–3 Cumulative Project Report
+# CommonGround AI — Week 1–4 Cumulative Project Report
 
 ## Project overview
 
@@ -10,7 +10,7 @@ Source code: https://github.com/sivalinb/commonground-ai
 
 ### Verification snapshot
 
-Documentation and production behavior were rechecked on September 1, 2026. The public demo, GitHub source, four submission documents, and deployed evaluation report agree on the current system scope and measured results. The latest quality workflow passes type checking, linting, 31 deterministic unit tests, the 48-case safety suite, and the production build.
+Documentation and provider behavior were rechecked on September 2, 2026. The public demo, GitHub source, submission documents, and executable evaluation reports agree on the current system scope and measured results. The quality workflow covers type checking, linting, 36 deterministic unit tests, the 48-case safety suite, 24-query retrieval preflight, the 40-case Week 4 dataset validator, and the production build.
 
 ## Week 1 — Data application with vibe coding
 
@@ -102,6 +102,25 @@ All provider actions are reads or draft generation. The application does not sen
 - Duplicate or expired approvals are rejected.
 - Provider calls have timeouts and bounded retries; deterministic failures stop safely.
 
+## Week 4 — Agent evaluation and improvement
+
+The CommonGround Guidance Agent is evaluated as a single defined system. A versioned 40-case LangSmith golden dataset contains 20 happy paths, 12 edge cases, six known failures, and two adversarial cases. Each case includes an expected disposition, expected sources, critical-safety flag, tags, reference rationale, and autonomy/trauma/handoff labels.
+
+The frozen baseline uses hybrid retrieval, five candidates, top-three reranking, no graph expansion, and the prior prompt. The improved agent adds Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, explicit unsupported-request abstention, autonomy-focused examples, and stronger retry recovery. Both experiments use the same dataset and evaluators.
+
+The provider-backed September 2 run records safe task completion, critical guardrail compliance, Recall@5, full expected-source coverage, citation validity, independent Mistral faithfulness/autonomy/trauma/handoff scores, trajectory correctness, p50/p95 latency, tokens, normalized cost, case-level trace IDs, and failure clusters. The detailed baseline/post-improvement results are generated in `docs/WEEK_4_EVALUATION_REPORT.md`.
+
+### Evaluator design
+
+- Deterministic code checks disposition, privacy/prohibited gates, source IDs, citations, handoff state, and release thresholds.
+- Mistral independently judges claim faithfulness, autonomy, trauma-aware language, and human handoff.
+- A trajectory evaluator checks required LangGraph stages and correct early stops.
+- Human-authored references define expected behavior; an independent blinded review guide is included for agency-grade calibration.
+
+### Production monitoring
+
+The monitoring contract alerts on quality drift below safe completion, guardrail, faithfulness, retrieval, and handoff thresholds; latency or cost regression above the declared ceilings; and provider/tool failures above two percent. Raw operational narratives remain excluded from LangSmith.
+
 ## Development iterations
 
 1. Built the public case-analysis workspace and fictional scenarios.
@@ -114,6 +133,7 @@ All provider actions are reads or draft generation. The application does not sen
 8. Added Neo4j GraphRAG, Mistral cross-provider review, and Deepgram voice.
 9. Added Cloudflare Turnstile, D1 rate records, and production quality gates.
 10. Added durable LangGraph checkpoint/resume, signed reviewer sessions, retrieval metrics, provider-backed faithfulness evaluation, and course-evidence documentation.
+11. Added the versioned 40-case LangSmith dataset, frozen baseline, four targeted improvements, case-linked evaluators, failure clustering, cost/latency measurements, and post-improvement comparison.
 
 ## What was learned
 

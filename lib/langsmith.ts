@@ -2,6 +2,14 @@ import { fetchWithPolicy } from './http';
 
 type RunPayload = Record<string, unknown>;
 
+export type EvaluationTraceContext = {
+  caseId: string;
+  datasetVersion: string;
+  experimentName: string;
+  expectedDisposition?: 'answer' | 'abstain' | 'refuse' | 'privacy_block';
+  langsmithExampleId?: string;
+};
+
 export class MetadataTracer {
   readonly runId = crypto.randomUUID();
   readonly timeline: Array<{
@@ -36,14 +44,19 @@ export class MetadataTracer {
     if (!response.ok) throw new Error(`LangSmith returned ${response.status}`);
   }
 
+  constructor(private readonly evaluation?: EvaluationTraceContext) {}
+
   async start(traceId: string, characterCount: number) {
     await this.send('/runs', 'POST', {
       id: this.runId,
       name: 'commonground-langgraph-analysis',
       run_type: 'chain',
       session_name:
-        process.env.LANGSMITH_PROJECT || 'commonground-ai-production',
+        this.evaluation?.experimentName ||
+        process.env.LANGSMITH_PROJECT ||
+        'commonground-ai-production',
       start_time: Date.now(),
+      reference_example_id: this.evaluation?.langsmithExampleId,
       inputs: { character_count: characterCount, raw_case_text_logged: false },
       extra: {
         metadata: {
@@ -51,6 +64,10 @@ export class MetadataTracer {
           environment: 'production',
           privacy_mode: 'metadata-only',
           graph_version: 'rj-graph-v5',
+          case_id: this.evaluation?.caseId,
+          dataset_version: this.evaluation?.datasetVersion,
+          experiment_name: this.evaluation?.experimentName,
+          expected_disposition: this.evaluation?.expectedDisposition,
         },
       },
     });
@@ -68,10 +85,28 @@ export class MetadataTracer {
       id: childId,
       parent_run_id: this.runId,
       name: stage,
-      run_type: 'tool',
+      run_type: [
+        'embedding',
+        'rerank',
+        'generation',
+        'safety_review',
+        'cross_model_review',
+      ].includes(stage)
+        ? 'llm'
+        : stage === 'human_approval'
+          ? 'chain'
+          : 'tool',
       start_time: started,
       inputs: { raw_text_logged: false },
-      extra: { metadata: { stage, privacy_mode: 'metadata-only' } },
+      extra: {
+        metadata: {
+          stage,
+          privacy_mode: 'metadata-only',
+          case_id: this.evaluation?.caseId,
+          dataset_version: this.evaluation?.datasetVersion,
+          experiment_name: this.evaluation?.experimentName,
+        },
+      },
     }).catch(() => undefined);
     try {
       const result = await operation();

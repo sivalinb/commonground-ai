@@ -161,6 +161,53 @@ type EvalReport = {
       graph: Record<string, number | null>;
     };
   };
+  week4: {
+    dataset: string;
+    datasetVersion: string;
+    generatedAt: string;
+    mode: string;
+    distribution: Record<string, number>;
+    evaluatorSet: string[];
+    baseline: Week4Experiment;
+    improved: Week4Experiment;
+    deltas: Record<string, number | null>;
+    releaseGate: {
+      passed: boolean;
+      passBars: Record<string, number>;
+    };
+    targetedImprovements: Array<{
+      id: string;
+      hypothesis: string;
+      implementation: string;
+      measuredBy: string[];
+    }>;
+    monitoringPlan: Array<{
+      signal: string;
+      alertBelow?: number;
+      alertAbove?: number;
+    }>;
+    langsmith: null | {
+      datasetId: string;
+      datasetName: string;
+      datasetUrl: string;
+      experiments: Record<string, string>;
+    };
+    limitations: string[];
+  };
+};
+
+type Week4Experiment = {
+  profile: string;
+  experimentName: string;
+  total: number;
+  passed: number;
+  metrics: Record<string, number | null>;
+  topFailureClusters: Array<{
+    cluster: string;
+    count: number;
+    estimatedCostUsd: number;
+    exampleTraceIds: string[];
+  }>;
 };
 
 const scenarios: Record<
@@ -258,17 +305,51 @@ const graphSteps = [
   },
 ];
 
-const tabs: Array<[View, string, typeof MessageSquareText]> = [
-  ['workspace', 'Live workflow', MessageSquareText],
-  ['practice', 'AI practice lab', Bot],
-  ['evidence', 'Evidence', BookOpenCheck],
-  ['evals', 'Evaluations', BarChart3],
-  ['trace', 'Trace', Activity],
-  ['monitor', 'Policy monitor', Globe2],
-  ['map', 'Knowledge map', Network],
-  ['sources', 'Public sources', Globe2],
-  ['architecture', 'Architecture', Network],
-  ['course', 'Week 1–3 evidence', GraduationCap],
+const tabGroups: Array<{
+  label: string;
+  description: string;
+  icon: typeof MessageSquareText;
+  marker: string;
+  activeClass: string;
+  items: Array<[View, string, typeof MessageSquareText]>;
+}> = [
+  {
+    label: 'Try the tools',
+    description: 'Run a workflow or practice a response',
+    icon: Play,
+    marker: 'bg-teal-300',
+    activeClass: 'border-teal-300/40 bg-teal-300/10 text-teal-50',
+    items: [
+      ['workspace', 'Live workflow', MessageSquareText],
+      ['practice', 'AI practice lab', Bot],
+    ],
+  },
+  {
+    label: 'Safety & evidence',
+    description: 'Inspect sources, safeguards, and quality',
+    icon: ShieldCheck,
+    marker: 'bg-amber-300',
+    activeClass: 'border-amber-300/40 bg-amber-300/10 text-amber-50',
+    items: [
+      ['evidence', 'Evidence', BookOpenCheck],
+      ['evals', 'AI evaluations', BarChart3],
+      ['trace', 'AI trace', Activity],
+      ['monitor', 'Policy monitor', Globe2],
+      ['map', 'Knowledge map', Network],
+    ],
+  },
+  {
+    label: 'About the system',
+    description: 'Explore sources, architecture, and proof',
+    icon: Layers3,
+    marker: 'bg-sky-300',
+    activeClass: 'border-sky-300/40 bg-sky-300/10 text-sky-50',
+    items: [
+      ['sources', 'Public sources', Globe2],
+      ['architecture', 'Architecture', Network],
+      ['course', 'Project evidence', GraduationCap],
+    ],
+  },
 ];
 
 function Score({ value }: { value: number }) {
@@ -289,16 +370,22 @@ function SectionHeading({
   description: string;
 }) {
   return (
-    <div className="mb-5 max-w-4xl">
-      <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.17em] text-primary">
-        {eyebrow}
-      </p>
-      <h2 className="font-heading text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
-        {title}
-      </h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        {description}
-      </p>
+    <div className="relative mb-7 overflow-hidden rounded-[1.75rem] border border-white/70 bg-card/85 p-6 shadow-[0_18px_60px_-36px_rgba(15,23,42,0.45)] backdrop-blur sm:p-8">
+      <div
+        className="absolute -right-10 -top-16 size-48 rounded-full bg-primary/10 blur-3xl"
+        aria-hidden="true"
+      />
+      <div className="relative max-w-4xl">
+        <p className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
+          <span className="size-1.5 rounded-full bg-primary" /> {eyebrow}
+        </p>
+        <h2 className="font-heading text-2xl font-semibold tracking-[-0.035em] sm:text-4xl">
+          {title}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
+          {description}
+        </p>
+      </div>
     </div>
   );
 }
@@ -368,6 +455,10 @@ export default function Home() {
       new Map(liveResult?.timeline.map((event) => [event.stage, event]) || []),
     [liveResult],
   );
+  const activeTabGroup =
+    tabGroups.find((group) =>
+      group.items.some(([value]) => value === activeView),
+    ) || tabGroups[0];
 
   function chooseScenario(key: ScenarioKey) {
     setScenarioKey(key);
@@ -470,28 +561,34 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-slate-900/10 bg-slate-950/95 text-white shadow-lg shadow-slate-950/5 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1580px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <main className="app-shell min-h-screen bg-background text-foreground">
+      <a
+        href="#main-content"
+        className="fixed left-4 top-3 z-[60] -translate-y-20 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 shadow-xl transition-transform focus:translate-y-0"
+      >
+        Skip to main content
+      </a>
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/[0.97] text-white shadow-[0_12px_40px_-24px_rgba(15,23,42,0.8)] backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => setActiveView('workspace')}
-            className="flex items-center gap-3 text-left"
+            className="group flex items-center gap-3 rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"
           >
-            <span className="grid size-10 place-items-center rounded-xl bg-teal-400 text-slate-950 shadow-inner">
+            <span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-teal-300 to-emerald-400 text-slate-950 shadow-[0_8px_24px_-10px_rgba(45,212,191,0.9)] transition-transform group-hover:-rotate-3 group-hover:scale-105">
               <HeartHandshake className="size-5" />
             </span>
             <span>
-              <span className="block font-heading text-[15px] font-semibold">
+              <span className="block font-heading text-[15px] font-semibold tracking-[-0.015em]">
                 CommonGround AI
               </span>
-              <span className="hidden text-[11px] text-slate-300 sm:block">
-                Victim-centered practice intelligence
+              <span className="hidden text-[11px] text-slate-400 sm:block">
+                Evidence-led · human-reviewed
               </span>
             </span>
           </button>
           <div className="flex items-center gap-2">
-            <Badge className="hidden border border-emerald-400/30 bg-emerald-400/10 text-emerald-200 md:inline-flex">
-              <CircleDot /> Live RAG
+            <Badge className="hidden border border-emerald-300/25 bg-emerald-300/10 text-emerald-100 md:inline-flex">
+              <CircleDot className="animate-pulse" /> Live AI system
             </Badge>
             <a
               href="https://github.com/sivalinb/commonground-ai"
@@ -500,68 +597,131 @@ export default function Home() {
             >
               <Button
                 variant="outline"
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                className="h-9 border-white/15 bg-white/[0.06] px-3 text-white hover:bg-white/10 hover:text-white"
               >
-                <Code2 /> Source code
+                <Code2 /> <span className="hidden sm:inline">Source code</span>
               </Button>
             </a>
           </div>
         </div>
-      </header>
-
-      <div className="border-b border-border bg-card/80">
-        <div
-          className="mx-auto flex max-w-[1580px] gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-8"
+        <nav
+          className="border-t border-white/[0.07]"
           aria-label="Application sections"
         >
-          {tabs.map(([value, label, Icon]) => (
-            <Button
-              key={value}
-              variant={activeView === value ? 'default' : 'ghost'}
-              onClick={() => setActiveView(value)}
-              className="shrink-0 px-3"
-              aria-current={activeView === value ? 'page' : undefined}
-            >
-              <Icon /> {label}
-            </Button>
-          ))}
-        </div>
-      </div>
+          <div className="mx-auto grid max-w-4xl grid-cols-3 gap-2 px-3 py-2 sm:px-6">
+            {tabGroups.map((group) => {
+              const GroupIcon = group.icon;
+              const isActive = group === activeTabGroup;
+              return (
+                <button
+                  key={group.label}
+                  type="button"
+                  onClick={() => setActiveView(group.items[0][0])}
+                  className={`group/category relative min-h-14 rounded-xl border px-2 py-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-3 ${
+                    isActive
+                      ? group.activeClass
+                      : 'border-white/[0.07] bg-white/[0.025] text-slate-300 hover:border-white/15 hover:bg-white/[0.055] hover:text-white'
+                  }`}
+                  aria-current={isActive ? 'true' : undefined}
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      className={`grid size-7 shrink-0 place-items-center rounded-lg text-slate-950 ${group.marker}`}
+                    >
+                      <GroupIcon className="size-3.5" />
+                    </span>
+                    <span className="text-[10px] font-semibold leading-tight sm:text-xs">
+                      {group.label}
+                    </span>
+                  </span>
+                  <span className="mt-1.5 hidden pl-9 text-[9px] leading-3.5 text-slate-400 lg:block">
+                    {group.description}
+                  </span>
+                  {isActive && (
+                    <span
+                      className={`absolute inset-x-3 -bottom-px h-0.5 rounded-full ${group.marker}`}
+                      aria-hidden="true"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <div className="border-t border-white/[0.07] bg-black/20">
+            <div className="mx-auto flex max-w-[1480px] flex-wrap items-center justify-center gap-1.5 px-3 py-2 sm:px-6">
+              <span className="mr-1 hidden items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.13em] text-slate-500 lg:flex">
+                <span
+                  className={`size-1.5 rounded-full ${activeTabGroup.marker}`}
+                />
+                {activeTabGroup.label}
+              </span>
+              {activeTabGroup.items.map(([value, label, Icon]) => (
+                <Button
+                  key={value}
+                  variant="ghost"
+                  onClick={() => setActiveView(value)}
+                  className={`h-7 rounded-full px-2.5 text-[11px] sm:text-xs ${
+                    activeView === value
+                      ? 'bg-white text-slate-950 shadow-sm hover:bg-white hover:text-slate-950'
+                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                  aria-current={activeView === value ? 'page' : undefined}
+                >
+                  <Icon /> {label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </nav>
+      </header>
 
-      <div className="mx-auto max-w-[1580px] px-4 pb-16 pt-5 sm:px-6 lg:px-8">
-        <Alert className="mb-5 border-sky-200 bg-gradient-to-r from-sky-50 to-teal-50 text-sky-950">
-          <Info />
-          <AlertTitle>Training and portfolio demonstration</AlertTitle>
-          <AlertDescription className="text-sky-900/75">
-            Use fictional or thoroughly de-identified scenarios only. This
-            system retrieves public guidance and drafts options for trained
-            human review; it never determines guilt, credibility, remorse,
-            mental health, risk, legal eligibility, or mandatory participation.
-          </AlertDescription>
-        </Alert>
-
+      <div
+        id="main-content"
+        className="mx-auto max-w-[1480px] scroll-mt-32 px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pt-8"
+      >
         {activeView === 'workspace' && (
           <section aria-label="Live restorative justice workflow">
-            <div className="mb-5 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 text-white shadow-2xl shadow-slate-950/15">
-              <div className="grid xl:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)]">
-                <div className="relative flex flex-col justify-center px-6 py-8 sm:px-9 sm:py-10 xl:px-12">
+            <div className="mb-6 overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 text-white shadow-[0_28px_90px_-38px_rgba(15,23,42,0.8)]">
+              <div className="grid xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+                <div className="relative flex flex-col justify-center px-6 py-9 sm:px-9 sm:py-12 xl:px-12 xl:py-14">
                   <div
-                    className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(45,212,191,0.16),transparent_34rem)]"
+                    className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(45,212,191,0.18),transparent_30rem),radial-gradient(circle_at_90%_85%,rgba(251,191,36,0.08),transparent_22rem)]"
                     aria-hidden="true"
                   />
                   <div className="relative">
-                    <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-teal-300">
+                    <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.19em] text-teal-300">
                       <Sparkles className="size-3.5" /> Evidence before advice
                     </p>
-                    <h1 className="max-w-2xl font-heading text-3xl font-semibold tracking-[-0.045em] sm:text-5xl">
+                    <h1 className="max-w-2xl font-heading text-4xl font-semibold leading-[1.04] tracking-[-0.05em] sm:text-5xl lg:text-[3.4rem]">
                       Repair harm. Protect choice. Keep people in charge.
                     </h1>
-                    <p className="mt-4 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
+                    <p className="mt-5 max-w-xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
                       CommonGround AI helps restorative-justice and
                       victim-services practitioners explore safer options using
                       public evidence, visible safeguards, and required human
                       review.
                     </p>
+                    <div className="mt-6 flex flex-wrap gap-2.5">
+                      <Button
+                        size="lg"
+                        onClick={() =>
+                          document
+                            .getElementById('workflow-start')
+                            ?.scrollIntoView({ behavior: 'smooth' })
+                        }
+                        className="h-10 rounded-full bg-teal-300 px-5 font-semibold text-slate-950 shadow-lg shadow-teal-950/20 hover:bg-teal-200"
+                      >
+                        <Play /> Try a guided scenario
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        onClick={() => setActiveView('architecture')}
+                        className="h-10 rounded-full border-white/20 bg-white/[0.06] px-5 text-white hover:bg-white/10 hover:text-white"
+                      >
+                        See how the AI works <ChevronRight />
+                      </Button>
+                    </div>
                     <div className="mt-6 flex flex-wrap gap-2">
                       <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100">
                         <HeartHandshake /> Voluntary participation
@@ -575,17 +735,17 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <figure className="relative min-h-72 overflow-hidden border-t border-white/10 xl:min-h-[410px] xl:border-l xl:border-t-0">
+                <figure className="relative min-h-80 overflow-hidden border-t border-white/10 xl:min-h-[500px] xl:border-l xl:border-t-0">
                   <Image
-                    src="/commonground-rj-hero-v1.jpg"
-                    alt="A diverse, voluntary restorative-practice circle in a welcoming community room. A facilitator and victim-services advocate support participants while an open chair and pathway represent choice; a subtle evidence, privacy, and human-approval network illustrates CommonGround AI assisting the process."
+                    src="/commonground-rj-hero-v4.jpg"
+                    alt="A diverse, voluntary restorative-practice circle in a welcoming community room. A male facilitator with a clipboard and a victim-services advocate support participants while an open chair and pathway represent choice; a subtle evidence, privacy, and human-approval network illustrates CommonGround AI assisting the process."
                     fill
                     priority
                     sizes="(min-width: 1280px) 55vw, 100vw"
-                    className="object-cover"
+                    className="object-cover transition-transform duration-700 hover:scale-[1.015]"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent px-5 pb-5 pt-20">
-                    <p className="max-w-2xl text-xs leading-5 text-white/90">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent px-6 pb-6 pt-24">
+                    <p className="max-w-2xl text-xs leading-5 text-white/90 sm:text-sm">
                       <strong>
                         AI supports the practice—it does not run it.
                       </strong>{' '}
@@ -615,9 +775,9 @@ export default function Home() {
                 ].map(([label, description, Icon], index) => (
                   <div
                     key={label as string}
-                    className={`flex gap-3 px-5 py-4 ${index ? 'border-t border-white/10 sm:border-l sm:border-t-0' : ''}`}
+                    className={`group flex gap-3 px-5 py-5 transition-colors hover:bg-white/[0.035] ${index ? 'border-t border-white/10 sm:border-l sm:border-t-0' : ''}`}
                   >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/10 text-teal-200">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/10 text-teal-200 transition-transform group-hover:-translate-y-0.5">
                       <Icon className="size-4" />
                     </span>
                     <div>
@@ -633,7 +793,92 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mb-6 rounded-[1.75rem] border border-border/70 bg-card/85 p-5 shadow-[0_18px_60px_-42px_rgba(15,23,42,0.5)] backdrop-blur sm:p-6">
+              <div className="mb-5 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-primary">
+                    A transparent path
+                  </p>
+                  <h2 className="mt-1 font-heading text-xl font-semibold tracking-[-0.03em] sm:text-2xl">
+                    From a human question to a human decision
+                  </h2>
+                </div>
+                <p className="max-w-lg text-xs leading-5 text-muted-foreground">
+                  Every AI step is visible, evidence-backed, and bounded by
+                  safeguards designed for restorative practice.
+                </p>
+              </div>
+              <ol className="grid gap-3 md:grid-cols-4">
+                {[
+                  [
+                    '01',
+                    'Describe',
+                    'Start with a fictional, de-identified practice scenario.',
+                    MessageSquareText,
+                  ],
+                  [
+                    '02',
+                    'Find evidence',
+                    'Retrieve and rank approved public guidance.',
+                    FileSearch,
+                  ],
+                  [
+                    '03',
+                    'Test safeguards',
+                    'Check citations, autonomy, safety, and boundaries.',
+                    ShieldCheck,
+                  ],
+                  [
+                    '04',
+                    'Human review',
+                    'A trained person approves, revises, or withholds.',
+                    UserCheck,
+                  ],
+                ].map(([number, label, detail, Icon], index) => (
+                  <li
+                    key={label as string}
+                    className="group relative rounded-2xl border border-border/70 bg-background/75 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg"
+                  >
+                    {index < 3 && (
+                      <span
+                        className="absolute -right-2.5 top-8 z-10 hidden size-5 place-items-center rounded-full border bg-card text-muted-foreground md:grid"
+                        aria-hidden="true"
+                      >
+                        <ChevronRight className="size-3" />
+                      </span>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                        <Icon className="size-4" />
+                      </span>
+                      <span className="font-mono text-[10px] font-semibold text-muted-foreground">
+                        {number as string}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-sm font-semibold">
+                      {label as string}
+                    </p>
+                    <p className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                      {detail as string}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <Alert className="mb-6 border-amber-200/80 bg-gradient-to-r from-amber-50 via-white to-teal-50 text-slate-950 shadow-sm">
+              <Info className="text-amber-700" />
+              <AlertTitle>Before you begin · training demonstration</AlertTitle>
+              <AlertDescription className="max-w-5xl text-slate-600">
+                Use fictional or thoroughly de-identified scenarios only. This
+                system retrieves public guidance and drafts options for trained
+                human review; it never determines guilt, credibility, remorse,
+                mental health, risk, legal eligibility, or mandatory
+                participation.
+              </AlertDescription>
+            </Alert>
+
+            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 ['Graphs', '2 workflows · 15 nodes', Waypoints],
                 ['Corpus', '10 public sources', Database],
@@ -643,10 +888,12 @@ export default function Home() {
                 <Card
                   key={label as string}
                   size="sm"
-                  className="border border-border/70 bg-card/90"
+                  className="border border-border/70 bg-card/90 shadow-[0_12px_36px_-28px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 hover:border-primary/25"
                 >
-                  <CardContent className="flex h-full flex-col justify-between gap-3">
-                    <Icon className="size-5 text-primary" />
+                  <CardContent className="flex h-full items-start gap-3">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="size-4" />
+                    </span>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                         {label as string}
@@ -660,10 +907,13 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
+            <div
+              id="workflow-start"
+              className="scroll-mt-32 grid gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
+            >
               <div className="space-y-4">
-                <Card className="border border-border/70 shadow-xl shadow-slate-900/5">
-                  <CardHeader className="border-b">
+                <Card className="border border-border/70 shadow-[0_20px_60px_-38px_rgba(15,23,42,0.55)]">
+                  <CardHeader className="border-b bg-gradient-to-r from-card to-primary/[0.04]">
                     <CardTitle>
                       1. Choose a fictional training scenario
                     </CardTitle>
@@ -684,7 +934,7 @@ export default function Home() {
                               scenarioKey === key ? 'default' : 'outline'
                             }
                             onClick={() => chooseScenario(key)}
-                            className="h-auto justify-start whitespace-normal px-3 py-3 text-left"
+                            className="h-auto rounded-xl justify-start whitespace-normal px-3 py-3 text-left"
                           >
                             <Icon className="shrink-0" />
                             <span>
@@ -741,7 +991,7 @@ export default function Home() {
                       size="lg"
                       onClick={runAnalysis}
                       disabled={running || caseText.trim().length < 20}
-                      className="min-w-48"
+                      className="min-w-48 rounded-full"
                     >
                       {running ? (
                         <RefreshCw className="animate-spin" />
@@ -761,7 +1011,7 @@ export default function Home() {
                 )}
               </div>
 
-              <Card className="border border-slate-800 bg-slate-950 text-white shadow-2xl shadow-slate-950/15">
+              <Card className="border border-slate-800 bg-slate-950 text-white shadow-[0_24px_70px_-38px_rgba(15,23,42,0.85)]">
                 <CardHeader className="border-b border-white/10">
                   <CardTitle className="text-white">
                     2. Observable LangGraph execution
@@ -1126,10 +1376,281 @@ export default function Home() {
         {activeView === 'evals' && (
           <section aria-label="Evaluation lab">
             <SectionHeading
-              eyebrow="Versioned evaluation"
-              title="Measured safeguards—not decorative percentages."
-              description="The repository includes 48 executable synthetic cases, including counterfactual fairness pairs and prompt attacks. Deterministic preflight checks run locally; live mode exercises the provider-backed workflow while production traces and evaluator feedback are recorded in LangSmith."
+              eyebrow="Versioned evaluation laboratory"
+              title="One dataset. Two experiments. Every result traceable."
+              description="A 40-case end-to-end golden dataset is run against a frozen baseline and the improved agent. Code evaluators, an independent Mistral judge, trajectory checks, manually specified reference labels, latency, token use, and cost are compared in LangSmith."
             />
+            {evalReport?.week4 && (
+              <div className="mb-6 space-y-5">
+                <Card className="overflow-hidden border-slate-800 bg-slate-950 text-white">
+                  <CardHeader className="border-b border-white/10">
+                    <div>
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100">
+                          Golden dataset v{evalReport.week4.datasetVersion}
+                        </Badge>
+                        <Badge className="border border-sky-300/25 bg-sky-300/10 text-sky-100">
+                          {evalReport.week4.mode}
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-white">
+                        Baseline → post-improvement evidence
+                      </CardTitle>
+                      <CardDescription className="mt-1 text-slate-400">
+                        {evalReport.week4.dataset} ·{' '}
+                        {evalReport.week4.improved.total} identical cases per
+                        experiment
+                      </CardDescription>
+                    </div>
+                    <CardAction className="flex flex-col items-end gap-2">
+                      <Badge
+                        className={
+                          evalReport.week4.releaseGate.passed
+                            ? 'bg-emerald-400 text-slate-950'
+                            : 'bg-amber-300 text-slate-950'
+                        }
+                      >
+                        {evalReport.week4.releaseGate.passed
+                          ? 'Release gates passed'
+                          : 'Measured gaps remain'}
+                      </Badge>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <a
+                          href="https://github.com/sivalinb/commonground-ai/blob/main/data/week4-eval-report.json"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[10px] font-semibold text-teal-200 hover:text-white"
+                        >
+                          Public result data ↗
+                        </a>
+                        {evalReport.week4.langsmith?.datasetUrl && (
+                          <a
+                            href={evalReport.week4.langsmith.datasetUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] font-semibold text-sky-200 hover:text-white"
+                          >
+                            LangSmith dataset ↗
+                          </a>
+                        )}
+                      </div>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent className="grid gap-3 pt-5 sm:grid-cols-2 xl:grid-cols-4">
+                    {[
+                      ['safeTaskCompletion', 'Safe completion', '%'],
+                      ['recallAt5', 'Recall@5', '%'],
+                      ['claimFaithfulness', 'Faithfulness', '%'],
+                      ['p95LatencyMs', 'P95 latency', 'ms'],
+                    ].map(([key, label, unit]) => {
+                      const baseline = evalReport.week4.baseline.metrics[key];
+                      const improved = evalReport.week4.improved.metrics[key];
+                      const delta = evalReport.week4.deltas[key];
+                      const lowerIsBetter = key === 'p95LatencyMs';
+                      const favorable =
+                        typeof delta === 'number' &&
+                        (lowerIsBetter ? delta <= 0 : delta >= 0);
+                      return (
+                        <div
+                          key={key}
+                          className="rounded-2xl border border-white/10 bg-white/[0.055] p-4"
+                        >
+                          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                            {label}
+                          </p>
+                          <div className="mt-3 flex items-end justify-between gap-3">
+                            <div>
+                              <p className="font-mono text-xs text-slate-400">
+                                {baseline ?? '—'} {unit}
+                              </p>
+                              <p className="font-mono text-2xl font-semibold text-white">
+                                {improved ?? '—'} {unit}
+                              </p>
+                            </div>
+                            <Badge
+                              className={
+                                favorable
+                                  ? 'bg-emerald-400/15 text-emerald-200'
+                                  : 'bg-amber-300/15 text-amber-100'
+                              }
+                            >
+                              {typeof delta === 'number'
+                                ? `${delta > 0 ? '+' : ''}${delta}`
+                                : '—'}
+                            </Badge>
+                          </div>
+                          <p className="mt-2 text-[10px] text-slate-500">
+                            baseline → improved
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Four tested improvements</CardTitle>
+                      <CardDescription>
+                        Each hypothesis is tied to a measurable output, not a
+                        subjective feature claim.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-3 md:grid-cols-2">
+                      {evalReport.week4.targetedImprovements.map(
+                        (improvement, index) => (
+                          <div
+                            key={improvement.id}
+                            className="rounded-2xl border bg-muted/25 p-4"
+                          >
+                            <span className="mb-3 grid size-8 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                              {index + 1}
+                            </span>
+                            <p className="text-sm font-semibold">
+                              {improvement.implementation}
+                            </p>
+                            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                              {improvement.hypothesis}
+                            </p>
+                          </div>
+                        ),
+                      )}
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Golden-dataset composition</CardTitle>
+                      <CardDescription>
+                        Synthetic, de-identified, labeled, and versioned.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {Object.entries(evalReport.week4.distribution).map(
+                        ([split, count]) => (
+                          <div key={split}>
+                            <div className="mb-1.5 flex items-center justify-between text-xs">
+                              <span className="font-medium">
+                                {split.replaceAll('_', ' ')}
+                              </span>
+                              <span className="font-mono font-semibold">
+                                {count} · {Math.round((count / 40) * 100)}%
+                              </span>
+                            </div>
+                            <Progress value={(count / 40) * 100} />
+                          </div>
+                        ),
+                      )}
+                      <div className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs leading-5 text-sky-950">
+                        <strong>Evaluator panel:</strong> deterministic code,
+                        independent Mistral judge, agent-trajectory checks, and
+                        manually specified reference outcomes.
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-4">
+                  {[
+                    ['1', 'Define', 'Metrics, pass bars, labels, and case mix'],
+                    [
+                      '2',
+                      'Instrument',
+                      'Case-linked root traces and child spans',
+                    ],
+                    [
+                      '3',
+                      'Diagnose',
+                      'Failure clusters, traces, latency, and cost',
+                    ],
+                    ['4', 'Improve', 'Same-dataset rerun with honest deltas'],
+                  ].map(([number, title, detail]) => (
+                    <div
+                      key={number}
+                      className="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm"
+                    >
+                      <span className="font-mono text-xs font-bold text-primary">
+                        PHASE {number}
+                      </span>
+                      <p className="mt-2 font-heading text-lg font-semibold">
+                        {title}
+                      </p>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                        {detail}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid gap-4 xl:grid-cols-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Post-improvement failure analysis</CardTitle>
+                      <CardDescription>
+                        Dominant clusters remain visible with case-linked trace
+                        IDs and estimated failed-run cost.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {evalReport.week4.improved.topFailureClusters.length ? (
+                        evalReport.week4.improved.topFailureClusters.map(
+                          (cluster) => (
+                            <div
+                              key={cluster.cluster}
+                              className="rounded-xl border border-amber-200 bg-amber-50 p-3"
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <span className="text-xs font-semibold text-amber-950">
+                                  {cluster.cluster.replaceAll('_', ' ')}
+                                </span>
+                                <Badge variant="outline">
+                                  {cluster.count} case
+                                  {cluster.count === 1 ? '' : 's'}
+                                </Badge>
+                              </div>
+                              <p className="mt-2 break-all font-mono text-[10px] text-amber-900/75">
+                                {cluster.exampleTraceIds.join(', ') ||
+                                  'Stopped before trace ingestion'}
+                              </p>
+                            </div>
+                          ),
+                        )
+                      ) : (
+                        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-950">
+                          No post-improvement failures were observed in this
+                          experiment.
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Production monitoring contract</CardTitle>
+                      <CardDescription>
+                        The same offline metrics become drift and operations
+                        alerts after release.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-2 sm:grid-cols-2">
+                      {evalReport.week4.monitoringPlan.map((monitor) => (
+                        <div
+                          key={monitor.signal}
+                          className="flex items-center justify-between gap-2 rounded-xl border p-3"
+                        >
+                          <span className="text-[11px] font-medium">
+                            {monitor.signal.replaceAll('_', ' ')}
+                          </span>
+                          <Badge variant="outline" className="font-mono">
+                            {typeof monitor.alertBelow === 'number'
+                              ? `< ${monitor.alertBelow}`
+                              : `> ${monitor.alertAbove}`}
+                          </Badge>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
             <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {evalReport?.categories.map((category) => (
                 <Card key={category.label} size="sm">
@@ -1539,7 +2060,7 @@ export default function Home() {
               title="A production-minded AI system, not a chatbot wrapper."
               description="Each layer is independently testable and replaceable. The browser never receives Fireworks, Pinecone, Mistral, Deepgram, Neo4j, You.com, LangSmith, or Turnstile secret keys."
             />
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {[
                 {
                   title: 'Experience',
@@ -1603,7 +2124,9 @@ export default function Home() {
                 },
               ].map(({ title, icon: Icon, items, tone }) => (
                 <div key={title} className="flex flex-col gap-3">
-                  <Card className={`h-full border ${tone}`}>
+                  <Card
+                    className={`h-full border shadow-[0_16px_42px_-34px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-1 hover:shadow-xl ${tone}`}
+                  >
                     <CardHeader>
                       <span className="mb-2 grid size-10 place-items-center rounded-xl bg-white/80">
                         <Icon className="size-5" />
@@ -1693,13 +2216,13 @@ export default function Home() {
         )}
 
         {activeView === 'course' && (
-          <section aria-label="Week 1 through Week 3 course evidence">
+          <section aria-label="Week 1 through Week 4 course evidence">
             <SectionHeading
               eyebrow="Cumulative course evidence"
-              title="One project demonstrating all three weeks of AI learning."
-              description="CommonGround AI progresses from a vibe-coded working application, to measurable hybrid RAG, to a durable multi-agent LangGraph workflow with tools, voice, evaluations, and human control."
+              title="One project demonstrating four layers of applied AI learning."
+              description="CommonGround AI progresses from a working AI application, to measurable hybrid RAG, to a durable LangGraph workflow, and finally to a controlled baseline-versus-improved evaluation experiment with LangSmith evidence."
             />
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {[
                 {
                   week: 'Week 1',
@@ -1735,6 +2258,18 @@ export default function Home() {
                     'Conditional state, retries, and safe stop paths',
                     'D1-backed LangGraph interrupt and resume',
                     'Signed reviewer session and metadata-only audit record',
+                  ],
+                },
+                {
+                  week: 'Week 4',
+                  title: 'Agent evaluation and improvement',
+                  score: 'Complete',
+                  icon: BarChart3,
+                  items: [
+                    '40-case versioned LangSmith golden dataset',
+                    'Code, LLM-judge, trajectory, and reference evaluators',
+                    'Frozen baseline and identical post-improvement rerun',
+                    'Failure clusters, trace IDs, latency, tokens, cost, and deltas',
                   ],
                 },
               ].map(({ week, title, score, icon: Icon, items }) => (
@@ -1831,35 +2366,52 @@ export default function Home() {
       </div>
 
       <footer className="border-t border-slate-800 bg-slate-950 text-slate-300">
-        <div className="mx-auto flex max-w-[1580px] flex-col justify-between gap-4 px-4 py-6 text-xs sm:flex-row sm:px-6 lg:px-8">
-          <div>
-            <p className="font-semibold text-white">CommonGround AI</p>
-            <p className="mt-1 text-slate-400">
+        <div className="mx-auto grid max-w-[1480px] gap-8 px-4 py-10 text-xs sm:px-6 md:grid-cols-[minmax(0,1.3fr)_minmax(220px,0.7fr)] lg:px-8">
+          <div className="max-w-2xl">
+            <span className="mb-4 grid size-11 place-items-center rounded-2xl bg-teal-300 text-slate-950">
+              <HeartHandshake className="size-5" />
+            </span>
+            <p className="font-heading text-base font-semibold text-white">
+              CommonGround AI
+            </p>
+            <p className="mt-2 max-w-xl leading-5 text-slate-400">
               Human judgment, victim choice, and approved policy remain
-              authoritative.
+              authoritative. AI helps practitioners find evidence and examine
+              safer options; it never replaces restorative relationships.
             </p>
           </div>
-          <div className="flex flex-wrap gap-4">
-            <button
-              onClick={() => setActiveView('sources')}
-              className="hover:text-white"
-            >
-              Public sources
-            </button>
-            <button
-              onClick={() => setActiveView('evals')}
-              className="hover:text-white"
-            >
-              Evaluation evidence
-            </button>
-            <a
-              href="https://github.com/sivalinb/commonground-ai"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-white"
-            >
-              GitHub repository
-            </a>
+          <div>
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+              Continue exploring
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-1">
+              <button
+                onClick={() => setActiveView('sources')}
+                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2.5 text-left transition-colors hover:border-teal-300/40 hover:bg-white/5 hover:text-white"
+              >
+                Public sources <ChevronRight className="size-3.5" />
+              </button>
+              <button
+                onClick={() => setActiveView('evals')}
+                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2.5 text-left transition-colors hover:border-teal-300/40 hover:bg-white/5 hover:text-white"
+              >
+                Evaluation evidence <ChevronRight className="size-3.5" />
+              </button>
+              <a
+                href="https://github.com/sivalinb/commonground-ai"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2.5 transition-colors hover:border-teal-300/40 hover:bg-white/5 hover:text-white"
+              >
+                GitHub repository <ExternalLink className="size-3.5" />
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-white/[0.07]">
+          <div className="mx-auto flex max-w-[1480px] flex-col gap-2 px-4 py-4 text-[10px] text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+            <span>Training demonstration · Fictional scenarios only</span>
+            <span>Restorative practice stays human-led</span>
           </div>
         </div>
       </footer>

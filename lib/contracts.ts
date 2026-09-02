@@ -43,6 +43,18 @@ export const analyzeRequestSchema = z.object({
   jurisdiction: z.enum(['colorado', 'national']).default('colorado'),
   turnstileToken: z.string().max(2048).optional(),
   retrievalMode: z.enum(['vector', 'hybrid', 'graph']).optional(),
+  evaluationProfile: z.enum(['baseline', 'improved']).optional(),
+  evaluationContext: z
+    .object({
+      caseId: z.string().trim().min(1).max(100),
+      datasetVersion: z.string().trim().min(1).max(100),
+      experimentName: z.string().trim().min(1).max(120),
+      expectedDisposition: z
+        .enum(['answer', 'abstain', 'refuse', 'privacy_block'])
+        .optional(),
+      langsmithExampleId: z.uuid().optional(),
+    })
+    .optional(),
 });
 
 export const approvalRequestSchema = z.object({

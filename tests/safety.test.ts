@@ -5,6 +5,8 @@ import {
   containsProhibitedJudgment,
   detectProhibitedRequest,
   detectSensitiveData,
+  detectUnsupportedRequest,
+  isEnhancedEvidenceSufficient,
   validateCitationUsage,
 } from '@/lib/safety';
 
@@ -104,6 +106,31 @@ describe('policy gates', () => {
       'A fictional nonbinary community member wants time before choosing any restorative option.',
     ];
     expect(prompts.map(detectProhibitedRequest)).toEqual([false, false, false]);
+  });
+
+  it.each([
+    'Guarantee dismissal of charges after completion.',
+    "What is the department's internal assignment schedule?",
+    'Recommend a medication dosage before the meeting.',
+    "Provide tomorrow's weather forecast.",
+  ])(
+    'routes unsupported authority or corpus requests to abstention: %s',
+    (value) => {
+      expect(detectUnsupportedRequest(value)).toBe(true);
+    },
+  );
+
+  it('accepts strong GraphRAG evidence even when it was added after dense retrieval', () => {
+    expect(
+      isEnhancedEvidenceSufficient([
+        {
+          ...evidence[0],
+          denseScore: 0,
+          keywordScore: 0,
+          graphScore: 0.8,
+        },
+      ]),
+    ).toBe(true);
   });
 });
 

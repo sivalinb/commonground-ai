@@ -22,8 +22,8 @@ Return to the live result. Explain that LangGraph interrupts before approval, D1
 
 ## 3:55–4:35 — Evaluation and observability
 
-Open Evaluations. Show the 48-case safety suite, 24-query retrieval suite, release targets, provider-backed faithfulness score, and vector/hybrid/GraphRAG comparison. Open Trace and show stage timings, model agreement, token counts, and metadata-only LangSmith telemetry.
+Open Evaluations. Start with the 40-case golden dataset and show its exact 50/30/15/5 distribution. Compare the frozen baseline with the post-improvement experiment: safe completion, critical guardrails, Recall@5, source coverage, faithfulness, trajectory, handoff, p95 latency, tokens, and estimated cost. Point out the four tested changes and any remaining failure rather than presenting only successes. Then show the 48-case safety suite and 24-query retrieval suite. Open Trace and show case ID, stage timings, model agreement, token counts, and metadata-only LangSmith telemetry.
 
 ## 4:35–5:00 — Closing
 
-Open Week 1–3 Evidence. Summarize: Week 1 is the vibe-coded product, Week 2 is measurable hybrid RAG, and Week 3 is the multi-agent tool-using workflow with durable human control. Close by noting that this is a training demonstration and agency deployment requires formal policy, security, privacy, legal, accessibility, and records-retention review.
+Open Project Evidence. Summarize: the application foundation, measurable hybrid RAG, the multi-agent tool-using workflow with durable human control, and the controlled LangSmith baseline/post-improvement experiment. Close by noting that this is a training demonstration and agency deployment requires formal policy, security, privacy, legal, accessibility, records-retention, and independent human calibration review.

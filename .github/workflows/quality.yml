@@ -27,4 +27,5 @@ jobs:
       - run: pnpm test
       - run: pnpm eval
       - run: pnpm eval:retrieval
+      - run: pnpm eval:week4
       - run: pnpm build

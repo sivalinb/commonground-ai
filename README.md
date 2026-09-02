@@ -27,7 +27,7 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
 - Role-based Fireworks model routing with safe fallback to the primary configured model
 - Deepgram Nova-3 transcription and Aura-2 bilingual read-aloud with no application audio retention
-- A versioned 48-case safety suite, a 24-query retrieval suite with vector/hybrid/GraphRAG ablation, and 31 deterministic unit tests
+- A versioned 48-case safety suite, a 24-query retrieval suite, a 40-case end-to-end golden dataset with frozen baseline/post-improvement LangSmith experiments, and 36 deterministic unit tests
 - Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
 
 ## Architecture
@@ -132,6 +132,8 @@ Evaluator feedback keys cover grounding, safety approval, citation validity, hum
 
 The `rj-retrieval-v1` dataset adds 24 labeled retrieval questions and explicit targets for Recall@5, mean reciprocal rank, citation precision, claim faithfulness, correct abstention, and P95 latency. Provider-backed mode uses Mistral as an independent claim-to-evidence judge and compares vector-only, hybrid, and GraphRAG retrieval on 10 shared queries. See [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md).
 
+The `commonground-rj-week4-v1` LangSmith dataset adds 40 end-to-end cases: 20 happy paths, 12 edge cases, six known failures, and two adversarial inputs. The same cases run against a frozen hybrid-RAG baseline and the improved GraphRAG agent. Code evaluators, an independent Mistral judge, trajectory checks, manually specified reference outcomes, latency, token usage, estimated cost, case-linked trace IDs, and failure clusters are recorded. The provider-backed report is generated directly from the executable experiment; see [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md).
+
 Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97% citation precision**, **100% claim faithfulness**, **100% correct abstention**, and **7.93 s P95 latency**. On the 10-query ablation, GraphRAG reached **100%** Recall@5 and task success versus **70%** for vector-only and hybrid modes.
 
 ## Course submission evidence
@@ -140,6 +142,8 @@ Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97%
 - [`docs/PROMPTS_AND_ITERATIONS.md`](docs/PROMPTS_AND_ITERATIONS.md) — AI-assisted development prompt and iteration log
 - [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md) — metrics, datasets, targets, and ablation method
 - [`docs/FIVE_MINUTE_DEMO.md`](docs/FIVE_MINUTE_DEMO.md) — timed demonstration script
+- [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) — baseline/post-improvement evidence and failure analysis
+- [`docs/WEEK_4_REVIEWER_GUIDE.md`](docs/WEEK_4_REVIEWER_GUIDE.md) — independent human calibration procedure
 
 ## Knowledge base
 
@@ -211,6 +215,7 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm eval
+pnpm eval:week4
 pnpm build
 ```
 
@@ -223,6 +228,7 @@ Before deployment, also verify:
 - Missing evidence produces abstention.
 - The safety critic can prevent output.
 - LangSmith traces contain metadata only.
+- The 40-case dataset validates, and provider-backed Week 4 experiments use the same dataset/version and evaluator schema.
 - Public API abuse controls and spending limits are appropriate for the audience.
 
 ## Operational boundary

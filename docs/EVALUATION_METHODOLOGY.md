@@ -26,6 +26,12 @@ Forty-eight synthetic, de-identified cases covering privacy identifiers, coercio
 
 Twenty-four questions covering direct retrieval, exact-source lookup, multi-document reasoning, Colorado jurisdiction, victim autonomy, trauma-informed services, youth digital harm, reporting, multi-hop safeguards, and out-of-corpus abstention.
 
+### `commonground-rj-week4-v1`
+
+Forty end-to-end cases stored in the repository and as a versioned LangSmith dataset: 20 happy paths, 12 edge cases, six known failures, and two adversarial cases. Each case has an expected disposition, expected source IDs, critical-safety flag, scenario tags, reference rationale, and autonomy/trauma/handoff labels. The dataset is synthetic and de-identified; it contains no operational case information.
+
+The primary experiment evaluates the CommonGround Guidance Agent, not the entire website. Its user outcome is a safe, cited, autonomy-preserving practice brief—or a correct privacy block, refusal, abstention, or human handoff.
+
 ## Evaluation modes
 
 ### Deterministic preflight
@@ -45,6 +51,15 @@ Ten shared questions run through:
 3. Hybrid retrieval + Neo4j GraphRAG
 
 Recall@5, mean reciprocal rank, and task success are compared using identical expected-source labels.
+
+### End-to-end baseline and improvement experiment
+
+The Week 4 runner evaluates the same 40 LangSmith examples twice:
+
+1. Frozen baseline: Pinecone + BM25 hybrid retrieval, five candidates, top-three reranking, no graph expansion, baseline prompt.
+2. Improved: Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, unsupported-request abstention, autonomy-focused prompt examples, and stronger provider retries.
+
+Code evaluators score disposition, citation structure, retrieval, critical guardrails, trajectory, and human-handoff state. Mistral independently scores faithfulness, autonomy preservation, trauma-aware quality, and handoff appropriateness. Human-authored reference outcomes provide expected behavior and rationale. The independent human calibration procedure is documented separately and must be completed before any agency-use claim.
 
 ## Latest measured result
 
@@ -67,6 +82,8 @@ The 10-query ablation produced 100% Recall@5, MRR, and task success for GraphRAG
 
 Every failed case records its expected outcome, actual outcome, retrieval mode, retrieved evidence IDs, ranking scores, faithfulness score, and latency. Failures are grouped into retrieval miss, ranking miss, unsupported generation, incorrect abstention, safety disagreement, provider failure, or latency regression.
 
+The Week 4 report additionally records a representative LangSmith trace ID and estimated wasted provider cost for each of the three largest failure clusters. Configuration failures and provider throttling remain visible as operational evidence rather than being relabeled as model-quality failures.
+
 ## Privacy
 
 Evaluation data is synthetic. LangSmith receives counts, scores, versions, durations, provider stages, and status—not raw case narratives, retrieved excerpts, or generated briefs.
@@ -77,3 +94,6 @@ Evaluation data is synthetic. LangSmith receives counts, scores, versions, durat
 - `pnpm eval:retrieval` runs deterministic retrieval preflight.
 - `pnpm eval:live` runs the provider-backed safety suite against an authorized environment.
 - `pnpm eval:retrieval:live` runs provider-backed retrieval, faithfulness judging, and the 10-query ablation.
+- `pnpm eval:week4` validates the 40-case dataset, labels, and exact scenario distribution without credentials.
+- `pnpm eval:week4:live` runs both configurations through an authorized HTTP deployment.
+- `pnpm eval:week4:direct` runs the provider-backed workflow directly, uploads/version-controls the LangSmith dataset, creates baseline and improved experiments, and regenerates the JSON and Markdown reports.

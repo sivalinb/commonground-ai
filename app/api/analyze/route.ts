@@ -67,8 +67,14 @@ export async function POST(request: Request) {
         },
         400,
       );
-    const { caseText, jurisdiction, turnstileToken, retrievalMode } =
-      parsed.data;
+    const {
+      caseText,
+      jurisdiction,
+      turnstileToken,
+      retrievalMode,
+      evaluationProfile,
+      evaluationContext,
+    } = parsed.data;
     const sensitive = detectSensitiveData(caseText);
     if (sensitive.length) {
       return secureJson(
@@ -113,7 +119,11 @@ export async function POST(request: Request) {
       runtime: {
         ...runtime,
         retrievalMode: evaluationAccess ? retrievalMode : 'graph',
+        evaluationProfile: evaluationAccess
+          ? evaluationProfile || 'improved'
+          : 'improved',
       },
+      evaluation: evaluationAccess ? evaluationContext : undefined,
       checkpointer,
     });
     if (

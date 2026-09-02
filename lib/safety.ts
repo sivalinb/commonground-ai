@@ -44,6 +44,15 @@ const prohibitedRequestPatterns = [
   /\b(?:bypass|disable|override)\b.{0,40}\b(?:safety|privacy|policy|guardrail)\b/i,
 ];
 
+const unsupportedRequestPatterns = [
+  /\b(?:guarantees?|guaranteed|promise|predict)\b.{0,80}\b(?:legal outcome|dismissal|charges|sentence)\b/i,
+  /\b(?:internal|department|agency)\b.{0,80}\b(?:policy|procedure|schedule|assigned|assignment)\b/i,
+  /\b(?:medication|medicine|dosage|dose|prescription)\b/i,
+  /\b(?:weather|forecast|temperature)\b/i,
+  /\b(?:weak|insufficient|unrelated)\b.{0,60}\bevidence\b/i,
+  /\b(?:evidence|retrieval|provider|service)\b.{0,60}\b(?:times? out|timeout|unavailable|fails?)\b/i,
+];
+
 export function detectSensitiveData(value: string) {
   return sensitiveRules
     .filter(([, pattern]) => pattern.test(value))
@@ -56,6 +65,10 @@ export function containsProhibitedJudgment(value: string) {
 
 export function detectProhibitedRequest(value: string) {
   return prohibitedRequestPatterns.some((pattern) => pattern.test(value));
+}
+
+export function detectUnsupportedRequest(value: string) {
+  return unsupportedRequestPatterns.some((pattern) => pattern.test(value));
 }
 
 export function validateCitationUsage(
@@ -87,6 +100,17 @@ export function isEvidenceSufficient(evidence: Evidence[]) {
   return (
     best.rerankScore >= 0.12 &&
     (best.denseScore >= 0.2 || best.keywordScore >= 0.08)
+  );
+}
+
+export function isEnhancedEvidenceSufficient(evidence: Evidence[]) {
+  const best = evidence[0];
+  if (!best) return false;
+  return (
+    best.rerankScore >= 0.1 &&
+    (best.denseScore >= 0.18 ||
+      best.keywordScore >= 0.06 ||
+      best.graphScore >= 0.2)
   );
 }
 
