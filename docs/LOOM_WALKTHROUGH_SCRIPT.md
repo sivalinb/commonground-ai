@@ -15,7 +15,7 @@ In LangSmith, open the 200-case dataset first. Also keep the historical 40-case 
 
 ## 0:00–0:35 — evaluation one-liner
 
-> I measure safe task completion, Recall@5, expected-source coverage, claim faithfulness, autonomy-preserving handoff, trajectory correctness, P95 latency, token usage, and estimated cost on the CommonGround Guidance Agent using a versioned 200-case golden dataset covering happy paths, edge cases, known failures, and adversarial inputs. Deterministic code evaluators score all 400 baseline and improved workflows, and an independent Mistral LLM-as-judge scores every answer output. Release requires zero critical-safety failures and every predeclared numeric threshold.
+> I measure five primary outcomes—safe task completion, critical guardrail compliance, Recall@5, claim faithfulness, and autonomy-preserving handoff—on the CommonGround Guidance Agent using a versioned 200-case golden dataset covering happy paths, edge cases, known failures, and adversarial inputs. I pair those quality measures with P95 latency, token usage, and estimated cost. Deterministic code evaluators score all 400 baseline and improved workflows, and an independent Mistral LLM-as-judge scores every answer output. Release requires zero critical-safety failures and every predeclared numeric threshold.
 
 State the user outcome: a practitioner receives grounded, victim-centered training guidance, or the system safely refuses, abstains, or hands off when automation is inappropriate.
 
@@ -27,6 +27,7 @@ Open the public evaluation laboratory and then the LangSmith dataset dashboard.
 - Show the 200 examples and the 100 happy-path, 60 edge, 30 known-failure, and 10 adversarial distribution.
 - Explain that every case has a unique synthetic narrative, expected disposition, expected sources, critical flag, scenario tags, rationale, and autonomy, trauma, and handoff labels.
 - Point out that 200 cases exceed the handout's 30–50 minimum and 50–100 suggested range.
+- Name the five primary metrics, then identify latency, tokens, and cost as operational constraints. This directly satisfies the handout's request for 3–5 outcome-linked metrics without hiding the additional diagnostics.
 - Name the evaluator mix: exact/code-based, LLM-as-judge, trajectory evaluation, and independent human calibration.
 - Show the numeric pass bars. Emphasize that quality is paired with latency, token, and cost measures.
 
