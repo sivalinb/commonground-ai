@@ -1,0 +1,59 @@
+{
+  "dataset": "commonground-rj-week4-200-v2",
+  "datasetVersion": "2.0.0",
+  "sampleVersion": "1.0.0",
+  "sampleSize": 30,
+  "selection": "deterministic_stratified_priority_sample",
+  "distribution": {
+    "happy_path": 15,
+    "edge_case": 9,
+    "known_failure": 4,
+    "adversarial": 2
+  },
+  "requiredCoverage": {
+    "youth": true,
+    "colorado": true,
+    "noContact": true,
+    "privacyBlock": true,
+    "abstention": true,
+    "refusal": true
+  },
+  "reviewerTarget": {
+    "overallAgreementPercent": 85,
+    "criticalCaseAgreementPercent": 100,
+    "falseSafeCount": 0
+  },
+  "status": "prepared_blinded_review_pending",
+  "selectedCaseIds": [
+    "w4-v2-happy-01-01",
+    "w4-v2-happy-01-04",
+    "w4-v2-happy-01-07",
+    "w4-v2-happy-01-10",
+    "w4-v2-happy-07-01",
+    "w4-v2-happy-07-04",
+    "w4-v2-happy-07-07",
+    "w4-v2-happy-07-10",
+    "w4-happy-01",
+    "w4-happy-17",
+    "w4-v2-happy-01-02",
+    "w4-v2-happy-01-03",
+    "w4-v2-happy-01-05",
+    "w4-v2-happy-01-06",
+    "w4-v2-happy-01-08",
+    "w4-edge-05",
+    "w4-v2-edge-05-03",
+    "w4-v2-edge-05-06",
+    "w4-v2-edge-06-02",
+    "w4-v2-edge-06-05",
+    "w4-v2-edge-07-01",
+    "w4-v2-edge-07-04",
+    "w4-v2-edge-08-03",
+    "w4-v2-edge-08-06",
+    "w4-v2-failure-03-02",
+    "w4-v2-failure-03-01",
+    "w4-v2-failure-03-03",
+    "w4-v2-failure-01-01",
+    "w4-adversarial-02",
+    "w4-v2-adversarial-03"
+  ]
+}

@@ -47,6 +47,7 @@ const cases = (await readFile(datasetPath, 'utf8'))
   .split('\n')
   .map((line) => JSON.parse(line) as RetrievalCase);
 const live = process.argv.includes('--live');
+const writeReport = live || process.argv.includes('--write-report');
 const baseUrl = (process.env.EVAL_BASE_URL || 'http://localhost:3000').replace(
   /\/$/,
   '',
@@ -306,7 +307,9 @@ const report = {
     ? 'Provider-backed GraphRAG run with an independent Mistral claim-faithfulness judge and a 10-query vector/hybrid/graph ablation.'
     : 'Deterministic BM25 retrieval preflight. Run pnpm eval:retrieval:live for provider-backed evaluation.',
 };
-await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+if (writeReport) {
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+}
 console.log(JSON.stringify(report));
 const targetsMet = live
   ? report.passed === report.total &&

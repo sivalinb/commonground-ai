@@ -65,6 +65,7 @@ describe('privacy screening', () => {
   it.each([
     'What steps can someone take to document and report cyberbullying?',
     'Which local officer is assigned to case training next Tuesday?',
+    'A case number should never be included in training guidance.',
   ])(
     'does not mistake ordinary case or report language for an ID: %s',
     (value) => {

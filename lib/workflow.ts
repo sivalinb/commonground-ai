@@ -31,6 +31,7 @@ import {
 import {
   containsProhibitedJudgment,
   detectProhibitedRequest,
+  detectSensitiveData,
   detectUnsupportedRequest,
   isEnhancedEvidenceSufficient,
   isEvidenceSufficient,
@@ -49,6 +50,7 @@ export type WorkflowRuntime = {
   pineconeHost: string;
   namespace: string;
   embeddingModel: string;
+  embeddingDimensions: number;
   rerankModel: string;
   chatModel: string;
   mistralKey?: string;
@@ -293,7 +295,7 @@ function createWorkflow(checkpointer: BaseCheckpointSaver) {
       return runtime.tracer.stage(
         'embedding',
         'Create semantic query',
-        'Fireworks Qwen3 · 1024 dimensions',
+        `Fireworks Qwen3 · ${runtime.embeddingDimensions} dimensions`,
         async () => {
           const parsed = embeddingsResponseSchema.parse(
             await fireworks(
@@ -302,7 +304,7 @@ function createWorkflow(checkpointer: BaseCheckpointSaver) {
               {
                 model: runtime.embeddingModel,
                 input: state.caseText,
-                dimensions: 1024,
+                dimensions: runtime.embeddingDimensions,
               },
               'Fireworks embedding',
             ),
@@ -1138,6 +1140,32 @@ export async function executeWorkflow(input: {
     graph_expansion: result.graph.provider === 'neo4j' ? 1 : 0,
     citation_validity:
       citationValidation.selectedIds.length > 0 || result.abstained ? 1 : 0,
+    claim_citation_coverage:
+      result.abstained ||
+      [result.finding, ...result.options, ...result.safeguards].every(
+        (claim) => claim.citation_ids.length > 0,
+      )
+        ? 1
+        : 0,
+    output_schema_valid: practiceBriefSchema.safeParse({
+      finding: result.finding,
+      options: result.options,
+      safeguards: result.safeguards,
+      abstained: result.abstained,
+    }).success
+      ? 1
+      : 0,
+    pii_leakage_free: detectSensitiveData(
+      [
+        result.finding.text,
+        ...result.options.map((item) => item.text),
+        ...result.safeguards.map((item) => item.text),
+      ].join('\n'),
+    ).length
+      ? 0
+      : 1,
+    latency_within_slo: result.latencyMs <= 15_000 ? 1 : 0,
+    provider_tool_success: 1,
     human_handoff: result.awaitingApproval || result.abstained ? 1 : 0,
   });
   runtimeRegistry.delete(threadId);

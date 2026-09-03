@@ -20,7 +20,7 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - Fireworks Qwen3 embeddings, reranking, JSON-schema-constrained generation, and an independent safety critic
 - Hybrid retrieval using Pinecone dense search, local BM25, reciprocal-rank fusion, and jurisdiction filtering
 - Neo4j Aura GraphRAG expansion over approved source, safeguard, and jurisdiction relationships
-- A dedicated, deletion-protected Pinecone index and isolated namespace
+- An isolated `commonground-rj-v1` namespace in the configured Pinecone Serverless index
 - A Fireworks safety critic plus an independent Mistral cross-provider release panel
 - Claim-level source citations, deterministic citation validation, groundedness signals, abstention, and required human approval
 - Metadata-only LangSmith production traces and evaluator feedback
@@ -29,7 +29,7 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 - A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
 - Role-based Fireworks model routing with safe fallback to the primary configured model
 - Deepgram Nova-3 transcription and Aura-2 bilingual read-aloud with no application audio retention
-- A versioned 48-case safety suite, a 24-query retrieval suite, a 200-case LangSmith golden dataset with a 40-case frozen baseline/post-improvement core, and 42 deterministic unit tests
+- A versioned 48-case safety suite, a 24-query retrieval suite, a 200-case LangSmith golden dataset, two complete 200-case provider experiments, and 47 deterministic unit tests
 - Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
 - Append-only, narrative-free D1 audit events for privacy blocks, workflow handoffs, reviewer decisions, practice runs, and corpus monitoring
 
@@ -85,7 +85,7 @@ flowchart LR
 | Experience         | React 19, Vinext, Tailwind CSS, shadcn/ui | Responsive interactive website                                                     |
 | Generation         | Fireworks AI                              | Structured practice brief, role-play, coaching, and first safety critique          |
 | Model panel        | Mistral AI                                | Independent cross-provider safety review and victim-services practice agent        |
-| Embeddings         | Fireworks Qwen3 Embedding                 | 1,024-dimensional vectors                                                          |
+| Embeddings         | Fireworks Qwen3 Embedding                 | 256-dimensional vectors aligned to the existing Pinecone index                     |
 | Orchestration      | LangGraph                                 | Typed state, conditional routing, and a human-review checkpoint                    |
 | Retrieval          | Pinecone Serverless + BM25                | Dense and lexical retrieval with namespace isolation                               |
 | GraphRAG           | Neo4j Aura Query API                      | Expands candidates through safeguard and jurisdiction relationships over HTTPS     |
@@ -136,9 +136,11 @@ Evaluator feedback keys cover grounding, safety approval, citation validity, hum
 
 The `rj-retrieval-v1` dataset adds 24 labeled retrieval questions and explicit targets for Recall@5, mean reciprocal rank, citation precision, claim faithfulness, correct abstention, and P95 latency. Provider-backed mode uses Mistral as an independent claim-to-evidence judge and compares vector-only, hybrid, and GraphRAG retrieval on 10 shared queries. See [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md).
 
-The `commonground-rj-week4-v1` LangSmith dataset adds 40 end-to-end cases: 20 happy paths, 12 edge cases, six known failures, and two adversarial inputs. The same cases run against a frozen hybrid-RAG baseline and the improved GraphRAG agent. Code evaluators, an independent Mistral judge, trajectory checks, manually specified reference outcomes, latency, token usage, estimated cost, case-linked trace IDs, and failure clusters are recorded. The provider-backed report is generated directly from the executable experiment; see [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md).
+The original `commonground-rj-week4-v1` LangSmith dataset contains a frozen 40-case benchmark. Its historical provider result remains available in [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) for reproducibility.
 
-The immutable `commonground-rj-week4-200-v2` LangSmith dataset expands coverage to **200 cases**: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. It includes the 40-case provider-tested benchmark core plus a 160-case golden extension. Every case has a unique synthetic narrative, expected disposition, source labels, critical flag, scenario tags, rationale, and autonomy/trauma/handoff labels. CI validates all 200 examples; provider-backed results remain explicitly scoped to the 40-case core until a separately recorded full-corpus run is completed.
+The immutable `commonground-rj-week4-200-v2` LangSmith dataset expands coverage to **200 cases**: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. Every case has a unique synthetic narrative, expected disposition, source labels, critical flag, scenario tags, rationale, and autonomy/trauma/handoff labels. The full corpus completed two provider-backed configurations—400 workflow results—with deterministic code evaluation on every result and independent Mistral LLM-as-Judge review on all 268 answer outputs. The improved configuration passed the release gate with a **100% critical-safety pass**, **100% Recall@5**, **88.6% complete expected-source coverage@5**, **99.6% claim faithfulness**, and **7.5 s P95 latency**. See [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md) and the checked-in [case-level JSON evidence](data/week4-full-eval-report.json).
+
+The 200-case dataset is verified in LangSmith. Full experiment, randomized pairwise, and 30-case human-queue persistence are implemented but remain pending because the account reached its monthly trace allowance. The local report preserves the complete provider and judge evidence without presenting pending LangSmith artifacts as completed.
 
 Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97% citation precision**, **100% claim faithfulness**, **100% correct abstention**, and **7.93 s P95 latency**. On the 10-query ablation, GraphRAG reached **100%** Recall@5 and task success versus **70%** for vector-only and hybrid modes.
 
@@ -149,7 +151,10 @@ Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97%
 - [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md) — metrics, datasets, targets, and ablation method
 - [`docs/FIVE_MINUTE_DEMO.md`](docs/FIVE_MINUTE_DEMO.md) — timed demonstration script
 - [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) — baseline/post-improvement evidence and failure analysis
+- [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md) — current 200-case baseline/post-improvement results and release decision
 - [`docs/WEEK_4_REVIEWER_GUIDE.md`](docs/WEEK_4_REVIEWER_GUIDE.md) — independent human calibration procedure
+- [`data/evaluator-contract.json`](data/evaluator-contract.json) — machine-readable evaluator panel, score anchors, release thresholds, pairwise policy, and production privacy boundary
+- [`evals/human-calibration-sample-v1.csv`](evals/human-calibration-sample-v1.csv) — deterministic 30-case blinded reviewer worksheet
 
 ## Knowledge base
 
@@ -184,7 +189,7 @@ Open `http://localhost:3000`.
 
 ### Create the Pinecone index
 
-Create a dense cosine index with 1,024 dimensions. The deployed demo uses:
+Create a dense cosine index with 256 dimensions. The deployed demo uses:
 
 - Index: `commonground-rj`
 - Namespace: `commonground-rj-v1`
@@ -235,7 +240,8 @@ Before deployment, also verify:
 - Missing evidence produces abstention.
 - The safety critic can prevent output.
 - LangSmith traces contain metadata only.
-- The 200-case v2 dataset validates exactly, and the frozen provider-backed experiments remain scoped to its 40-case benchmark core.
+- The 200-case v2 dataset validates exactly; both full provider configurations and all applicable code and model-based judges have completed.
+- LangSmith full-experiment, pairwise, and human-queue persistence remains pending until account trace capacity is available.
 - Public API abuse controls and spending limits are appropriate for the audience.
 
 ## Production-readiness evidence

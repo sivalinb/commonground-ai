@@ -9,7 +9,7 @@ const sensitiveRules = [
   ['phone number', /(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}/],
   [
     'case or report number',
-    /\b(?:case|report|incident)\s*(?:(?:number|no\.?|#)\s*[:#-]?\s*|[:#-]\s*)[A-Z0-9-]{5,}\b/i,
+    /\b(?:case|report|incident)\s*(?:(?:number|no\.?|#)\s*[:#-]?\s*|[:#-]\s*)(?=[A-Z0-9-]{5,}\b)(?=[A-Z0-9-]*\d)[A-Z0-9-]+\b/i,
   ],
   [
     'street address',

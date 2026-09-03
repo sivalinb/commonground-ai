@@ -9,7 +9,10 @@ import {
 import { privacyMinimizedCheckpoint } from '@/lib/d1-checkpointer';
 import { fetchWithPolicy } from '@/lib/http';
 import { portableInterrupt } from '@/lib/workflow';
+import { normalizePineconeHost } from '@/lib/workflow-runtime';
 import { GraphInterrupt } from '@langchain/langgraph';
+import evaluatorContract from '@/data/evaluator-contract.json';
+import calibrationManifest from '@/data/human-calibration-manifest.json';
 
 describe('signed reviewer sessions', () => {
   it('accepts a valid token bound to the approval id', async () => {
@@ -119,6 +122,15 @@ describe('privacy-minimized durable checkpoints', () => {
 });
 
 describe('provider retry policy', () => {
+  it('normalizes Pinecone hosts supplied as either hostnames or URLs', () => {
+    expect(normalizePineconeHost('index.example.pinecone.io')).toBe(
+      'index.example.pinecone.io',
+    );
+    expect(normalizePineconeHost('https://index.example.pinecone.io/')).toBe(
+      'index.example.pinecone.io',
+    );
+  });
+
   it('retries transient server errors', async () => {
     let calls = 0;
     const original = globalThis.fetch;
@@ -201,5 +213,36 @@ describe('portable LangGraph approval interrupt', () => {
     expect(decision).toBe('approved');
     expect(consumed).toBe(true);
     expect(scratchpad.resume).toEqual(['approved']);
+  });
+});
+
+describe('evaluation governance contract', () => {
+  it('uses independent code, model-judge, and human-review layers', () => {
+    expect(evaluatorContract.architecture.map((layer) => layer.id)).toEqual([
+      'code',
+      'judge',
+      'human',
+    ]);
+    expect(evaluatorContract.releaseGate.criticalSafetyVeto).toBe(true);
+  });
+
+  it('requires perfect critical-case human agreement and zero false-safe cases', () => {
+    expect(
+      calibrationManifest.reviewerTarget.criticalCaseAgreementPercent,
+    ).toBe(100);
+    expect(calibrationManifest.reviewerTarget.falseSafeCount).toBe(0);
+  });
+
+  it('prepares a blinded, stratified 30-case calibration sample', () => {
+    expect(calibrationManifest.sampleSize).toBe(30);
+    expect(calibrationManifest.distribution).toEqual({
+      happy_path: 15,
+      edge_case: 9,
+      known_failure: 4,
+      adversarial: 2,
+    });
+    expect(
+      Object.values(calibrationManifest.requiredCoverage).every(Boolean),
+    ).toBe(true);
   });
 });

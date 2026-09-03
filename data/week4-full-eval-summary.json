@@ -1,0 +1,281 @@
+{
+  "dataset": "commonground-rj-week4-200-v2",
+  "datasetVersion": "2.0.0",
+  "generatedAt": "2026-09-03T01:55:49.208Z",
+  "mode": "provider-backed-local-evidence",
+  "provenance": {
+    "classification": "synthetic_and_deidentified",
+    "personallyIdentifiableData": false,
+    "labels": "manually specified reference outcomes with rationale",
+    "llmGeneratedSharePercent": 0
+  },
+  "runtimeControls": {
+    "primarySafetyReview": "fireworks",
+    "crossModelSafetyReview": "disabled_for_rate_control",
+    "independentJudge": "mistral",
+    "providerConcurrency": 2,
+    "judgeConcurrency": 1
+  },
+  "distribution": {
+    "happy_path": 100,
+    "edge_case": 60,
+    "known_failure": 30,
+    "adversarial": 10
+  },
+  "evaluatorSet": [
+    "deterministic_code_evaluator_panel",
+    "native_async_mistral_llm_as_judge",
+    "langgraph_trajectory_evaluator",
+    "human_authored_reference_labels",
+    "thirty_case_blinded_human_calibration_procedure"
+  ],
+  "baseline": {
+    "profile": "baseline",
+    "experimentName": "commonground-week4-baseline-v1",
+    "configuration": {
+      "retrieval": "Pinecone + BM25 hybrid",
+      "candidatePool": 5,
+      "rerankTopN": 3,
+      "graphExpansion": false,
+      "prompt": "rj-practice-v5-baseline"
+    },
+    "total": 200,
+    "passed": 194,
+    "metrics": {
+      "safeTaskCompletion": 97,
+      "criticalGuardrailCompliance": 96.6,
+      "recallAt5": 95,
+      "sourceCoverageAt5": 72.7,
+      "citationValidity": 100,
+      "claimCitationCoverage": 100,
+      "outputSchemaValid": 100,
+      "piiLeakageFree": 100,
+      "providerToolSuccess": 100,
+      "claimFaithfulness": 99.8,
+      "autonomyPreservation": 99.8,
+      "traumaAwareQuality": 99.8,
+      "overallRjQuality": 99.8,
+      "criticalJudgeSafety": 100,
+      "handoffAppropriateness": 97,
+      "trajectoryCorrectness": 97,
+      "p50LatencyMs": 6281,
+      "p95LatencyMs": 34725,
+      "averageTokensPerRun": 1603,
+      "averageEstimatedCostUsd": 0.001425
+    },
+    "topFailureClusters": [
+      {
+        "cluster": "critical_guardrail_miss",
+        "count": 3,
+        "estimatedCostUsd": 0.004931,
+        "exampleTraceIds": [
+          "cg_eval_3245134e-a51a-47de-93b0-8ac423ef272f",
+          "cg_eval_0ad20ead-0e1f-49dd-9847-5187eaab3754"
+        ]
+      },
+      {
+        "cluster": "retrieval_or_ranking_miss",
+        "count": 2,
+        "estimatedCostUsd": 0.002816,
+        "exampleTraceIds": [
+          "cg_eval_f6088f67-184f-4a45-ab03-5678e21891c6",
+          "cg_eval_b2ea54f6-6fb4-4c82-9ebc-5159f668afe5"
+        ]
+      },
+      {
+        "cluster": "handoff_or_autonomy_miss",
+        "count": 1,
+        "estimatedCostUsd": 0.002131,
+        "exampleTraceIds": ["cg_eval_18b3652b-9284-4410-8086-9e3df88b6680"]
+      }
+    ]
+  },
+  "improved": {
+    "profile": "improved",
+    "experimentName": "commonground-week4-improved-v1",
+    "configuration": {
+      "retrieval": "Pinecone + BM25 + Neo4j GraphRAG",
+      "candidatePool": 8,
+      "rerankTopN": 5,
+      "graphExpansion": true,
+      "prompt": "rj-practice-v6-eval-improved"
+    },
+    "total": 200,
+    "passed": 191,
+    "metrics": {
+      "safeTaskCompletion": 95.5,
+      "criticalGuardrailCompliance": 100,
+      "recallAt5": 100,
+      "sourceCoverageAt5": 88.6,
+      "citationValidity": 100,
+      "claimCitationCoverage": 100,
+      "outputSchemaValid": 100,
+      "piiLeakageFree": 100,
+      "providerToolSuccess": 100,
+      "claimFaithfulness": 99.6,
+      "autonomyPreservation": 100,
+      "traumaAwareQuality": 100,
+      "overallRjQuality": 100,
+      "criticalJudgeSafety": 100,
+      "handoffAppropriateness": 95.5,
+      "trajectoryCorrectness": 95.5,
+      "p50LatencyMs": 5801,
+      "p95LatencyMs": 7500,
+      "averageTokensPerRun": 1358,
+      "averageEstimatedCostUsd": 0.001206
+    },
+    "topFailureClusters": [
+      {
+        "cluster": "handoff_or_autonomy_miss",
+        "count": 9,
+        "estimatedCostUsd": 0.008627,
+        "exampleTraceIds": [
+          "cg_eval_0f27d85e-5050-4df0-b3e6-93cec927e573",
+          "cg_eval_83934d1a-e7c0-48b6-847d-2172093b31de"
+        ]
+      }
+    ]
+  },
+  "deltas": {
+    "safeTaskCompletion": -1.5,
+    "criticalGuardrailCompliance": 3.4,
+    "recallAt5": 5,
+    "sourceCoverageAt5": 15.9,
+    "citationValidity": 0,
+    "claimCitationCoverage": 0,
+    "outputSchemaValid": 0,
+    "piiLeakageFree": 0,
+    "providerToolSuccess": 0,
+    "claimFaithfulness": -0.2,
+    "autonomyPreservation": 0.2,
+    "traumaAwareQuality": 0.2,
+    "overallRjQuality": 0.2,
+    "criticalJudgeSafety": 0,
+    "handoffAppropriateness": -1.5,
+    "trajectoryCorrectness": -1.5,
+    "p50LatencyMs": -480,
+    "p95LatencyMs": -27225,
+    "averageTokensPerRun": -245,
+    "averageEstimatedCostUsd": -0.000219
+  },
+  "releaseGate": {
+    "passed": true,
+    "passBars": {
+      "safeTaskCompletion": 95,
+      "criticalGuardrailCompliance": 100,
+      "piiLeakageFree": 100,
+      "outputSchemaValid": 100,
+      "recallAt5": 90,
+      "citationValidity": 100,
+      "claimCitationCoverage": 100,
+      "claimFaithfulness": 90,
+      "autonomyPreservation": 95,
+      "traumaAwareQuality": 95,
+      "handoffAppropriateness": 95,
+      "trajectoryCorrectness": 95,
+      "providerToolSuccess": 98,
+      "p95LatencyMs": 15000,
+      "averageEstimatedCostUsd": 0.01
+    },
+    "criticalSafetyVeto": {
+      "passed": true,
+      "failures": 0
+    },
+    "compositeQualityScore": 99.5
+  },
+  "targetedImprovements": [
+    {
+      "id": "graph_expansion",
+      "hypothesis": "Neo4j safeguard relationships recover multi-hop evidence missed by shallow hybrid retrieval.",
+      "implementation": "Hybrid retrieval plus Neo4j graph expansion.",
+      "measuredBy": ["recallAt5", "safeTaskCompletion"]
+    },
+    {
+      "id": "candidate_depth",
+      "hypothesis": "A larger candidate pool reduces ranking misses on mixed-jurisdiction and youth-safety cases.",
+      "implementation": "Candidate pool increased from five to eight.",
+      "measuredBy": ["recallAt5"]
+    },
+    {
+      "id": "rerank_depth",
+      "hypothesis": "Reranking five passages instead of three improves evidence coverage without uncited claims.",
+      "implementation": "Fireworks rerank top-N increased from three to five.",
+      "measuredBy": ["recallAt5", "citationValidity", "p95LatencyMs"]
+    },
+    {
+      "id": "autonomy_few_shot",
+      "hypothesis": "Explicit examples improve autonomy, trauma-aware language, and safe human handoff.",
+      "implementation": "Prompt v6 adds no-contact, changing-mind, youth-safety, and uncertainty examples.",
+      "measuredBy": [
+        "autonomyPreservation",
+        "traumaAwareQuality",
+        "handoffAppropriateness"
+      ]
+    }
+  ],
+  "monitoringPlan": [
+    {
+      "signal": "safe_task_completion",
+      "alertBelow": 95
+    },
+    {
+      "signal": "critical_guardrail_compliance",
+      "alertBelow": 100
+    },
+    {
+      "signal": "pii_leakage_free",
+      "alertBelow": 100
+    },
+    {
+      "signal": "output_schema_valid",
+      "alertBelow": 100
+    },
+    {
+      "signal": "claim_faithfulness",
+      "alertBelow": 95
+    },
+    {
+      "signal": "retrieval_recall_at_5",
+      "alertBelow": 90
+    },
+    {
+      "signal": "p95_latency_ms",
+      "alertAbove": 15000
+    },
+    {
+      "signal": "average_estimated_cost_usd",
+      "alertAbove": 0.01
+    },
+    {
+      "signal": "provider_or_tool_failure_rate",
+      "alertAbove": 2
+    }
+  ],
+  "costAssumptions": {
+    "generationAndJudgeUsdPerMillionTokens": 0.9,
+    "embeddingUsdPerMillionTokens": 0.08,
+    "note": "Normalized estimate for experiment comparison. Provider billing remains authoritative."
+  },
+  "langsmith": null,
+  "observabilityPublication": {
+    "datasetVerified": true,
+    "experimentsPersisted": false,
+    "pairwisePersisted": false,
+    "humanQueueCreated": false,
+    "localEvidenceComplete": true
+  },
+  "evaluatorCalibration": {
+    "judgeScale": "anchored_integer_0_to_4",
+    "humanSampleSize": 30,
+    "overallAgreementTarget": 85,
+    "criticalCaseAgreementTarget": 100,
+    "falseSafeTarget": 0,
+    "status": "procedure_ready_review_pending"
+  },
+  "limitations": [
+    "Synthetic evaluation data does not establish real-world agency effectiveness.",
+    "Manually specified reference labels define expected behavior; agency deployment still requires independent multi-reviewer output calibration.",
+    "Cost uses configurable blended token rates and excludes free-tier allowances and infrastructure overhead.",
+    "This run preserved complete local provider and Mistral-judge evidence but did not persist experiment traces, pairwise results, or the human queue to LangSmith."
+  ]
+}

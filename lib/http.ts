@@ -25,7 +25,9 @@ export async function fetchWithPolicy(
       clearTimeout(timeout);
     }
     if (attempt < retries)
-      await new Promise((resolve) => setTimeout(resolve, 180 * 2 ** attempt));
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.min(8_000, 750 * 2 ** attempt)),
+      );
   }
 
   throw lastError || new Error(`${options.label} failed`);

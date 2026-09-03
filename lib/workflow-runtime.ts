@@ -1,5 +1,12 @@
 import type { WorkflowRuntimeInput } from './workflow';
 
+export function normalizePineconeHost(host: string) {
+  return host
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/\/+$/, '');
+}
+
 export function workflowRuntimeFromEnvironment(): WorkflowRuntimeInput | null {
   const fireworksKey = process.env.FIREWORKS_API_KEY;
   const pineconeKey = process.env.PINECONE_API_KEY;
@@ -15,11 +22,14 @@ export function workflowRuntimeFromEnvironment(): WorkflowRuntimeInput | null {
   return {
     fireworksKey,
     pineconeKey,
-    pineconeHost,
+    pineconeHost: normalizePineconeHost(pineconeHost),
     namespace: process.env.PINECONE_NAMESPACE || 'commonground-rj-v1',
     embeddingModel:
       process.env.FIREWORKS_EMBEDDING_MODEL ||
       'accounts/fireworks/models/qwen3-embedding-8b',
+    embeddingDimensions: Number(
+      process.env.FIREWORKS_EMBEDDING_DIMENSIONS || 256,
+    ),
     rerankModel:
       process.env.FIREWORKS_RERANK_MODEL ||
       'accounts/fireworks/models/qwen3-reranker-8b',

@@ -24,7 +24,13 @@ I measured safe task completion, claim faithfulness, Recall@5, autonomy-preservi
 - Reference outcomes: 139 answer, 28 abstain, 20 refuse, 13 privacy block; 87 critical cases
 - Validation: exact distribution, unique IDs and narratives, known source IDs, required labels, and deterministic privacy/refusal activation
 
-The numeric baseline-versus-improved results below remain scoped to the 40-case provider-tested core. The full 200-case provider experiment has not been run and is not implied by these results.
+The numeric baseline-versus-improved results below remain the frozen 40-case historical benchmark. The current 200-case provider experiment is complete and published separately in [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md), with case-level evidence in [`../data/week4-full-eval-report.json`](../data/week4-full-eval-report.json).
+
+### Evaluator panel v2 implementation status
+
+The executable runner now adds a deterministic LangSmith code panel for exact disposition, critical guardrails, output schema, PII leakage, citation integrity, claim citation coverage, expected-source coverage, model safety, trajectory, handoff, latency, cost, and provider health. A native asynchronous Mistral evaluator applies an anchored 0–4 rubric to evidence faithfulness, autonomy, trauma-aware quality, handoff, and overall RJ quality; it also returns stable reason codes and a critical-failure decision. A blinded randomized pairwise judge compares baseline and GraphRAG experiments, and the improved run can populate a deterministic 30-case human annotation queue.
+
+The v2 release decision applies a critical-safety veto before its weighted explanatory score. A PII leak, critical guardrail miss, or LLM-judge critical failure blocks release regardless of aggregate quality. The full run passed that veto with zero failures. The table below remains the frozen earlier 40-case result and has not been retroactively relabeled as the 200-case run.
 
 ## Baseline versus improved
 
@@ -89,3 +95,5 @@ Improved: Pinecone + BM25 + Neo4j GraphRAG, eight candidates, top-five reranking
 ## Reproduction
 
 `pnpm eval:week4` validates the 40-case experiment core. `pnpm eval:week4:dataset` validates the 200-case v2 corpus without credentials. `pnpm eval:week4:dataset:sync` verifies it in LangSmith. `pnpm eval:week4:live` runs the controlled provider experiment through an authorized HTTP environment. `pnpm eval:week4:direct` runs the provider-backed 40-case pipeline directly and publishes its experiments to LangSmith.
+
+For the current evidence, `pnpm eval:week4:full:local` runs or resumes both 200-case configurations with checkpointed provider results and native Mistral judging. `pnpm eval:week4:full` additionally persists LangSmith pointwise experiments, pairwise comparison, and the annotation queue when trace capacity is available.

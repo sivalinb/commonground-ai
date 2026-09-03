@@ -16,6 +16,13 @@ const namespace = process.env.PINECONE_NAMESPACE || 'commonground-rj-v1';
 const embeddingModel =
   process.env.FIREWORKS_EMBEDDING_MODEL ||
   'accounts/fireworks/models/qwen3-embedding-8b';
+const embeddingDimensions = Number(
+  process.env.FIREWORKS_EMBEDDING_DIMENSIONS || 256,
+);
+const pineconeHost = process.env.PINECONE_INDEX_HOST.replace(
+  /^https?:\/\//i,
+  '',
+).replace(/\/+$/, '');
 
 const embeddingResponse = await fetch(
   'https://api.fireworks.ai/inference/v1/embeddings',
@@ -28,7 +35,7 @@ const embeddingResponse = await fetch(
     body: JSON.stringify({
       model: embeddingModel,
       input: documents.map((document) => document.text),
-      dimensions: 1024,
+      dimensions: embeddingDimensions,
     }),
   },
 );
@@ -42,18 +49,15 @@ const vectors = documents.map((document, index) => ({
   metadata: document,
 }));
 
-const upsertResponse = await fetch(
-  `https://${process.env.PINECONE_INDEX_HOST}/vectors/upsert`,
-  {
-    method: 'POST',
-    headers: {
-      'Api-Key': process.env.PINECONE_API_KEY,
-      'Content-Type': 'application/json',
-      'X-Pinecone-Api-Version': '2026-04',
-    },
-    body: JSON.stringify({ namespace, vectors }),
+const upsertResponse = await fetch(`https://${pineconeHost}/vectors/upsert`, {
+  method: 'POST',
+  headers: {
+    'Api-Key': process.env.PINECONE_API_KEY,
+    'Content-Type': 'application/json',
+    'X-Pinecone-Api-Version': '2026-04',
   },
-);
+  body: JSON.stringify({ namespace, vectors }),
+});
 if (!upsertResponse.ok) {
   throw new Error(`Pinecone upsert failed (${upsertResponse.status})`);
 }

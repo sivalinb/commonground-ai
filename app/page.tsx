@@ -151,6 +151,50 @@ type EvalReport = {
   note: string;
   categories: Array<{ label: string; count: number }>;
   releaseThresholds: Record<string, number>;
+  evaluatorContract: {
+    version: string;
+    architecture: Array<{
+      id: string;
+      label: string;
+      purpose: string;
+      metrics: string[];
+    }>;
+    judgeScale: Record<string, string>;
+    releaseGate: {
+      criticalSafetyVeto: boolean;
+      thresholds: Record<string, number>;
+    };
+    pairwise: {
+      enabled: boolean;
+      comparison: string;
+      randomizeOrder: boolean;
+      criteria: string[];
+    };
+    humanCalibration: {
+      sampleSize: number;
+      blindReview: boolean;
+      overallAgreementTarget: number;
+      criticalCaseAgreementTarget: number;
+      operationalStatus: string;
+    };
+    onlineMonitoring: {
+      metadataOnly: boolean;
+      deterministicCoveragePercent: number;
+      textJudgePolicy: string;
+      feedbackLoop: string;
+    };
+  };
+  calibrationManifest: {
+    sampleSize: number;
+    distribution: Record<string, number>;
+    requiredCoverage: Record<string, boolean>;
+    reviewerTarget: {
+      overallAgreementPercent: number;
+      criticalCaseAgreementPercent: number;
+      falseSafeCount: number;
+    };
+    status: string;
+  };
   retrieval: {
     dataset: string;
     mode: string;
@@ -191,6 +235,13 @@ type EvalReport = {
       deterministicValidation: number;
       fullProviderRun: string;
       note: string;
+      observabilityPublication?: {
+        datasetVerified: boolean;
+        experimentsPersisted: boolean;
+        pairwisePersisted: boolean;
+        humanQueueCreated: boolean;
+        localEvidenceComplete: boolean;
+      };
     };
   };
   week4: {
@@ -206,6 +257,8 @@ type EvalReport = {
     releaseGate: {
       passed: boolean;
       passBars: Record<string, number>;
+      criticalSafetyVeto?: { passed: boolean; failures: number };
+      compositeQualityScore?: number;
     };
     targetedImprovements: Array<{
       id: string;
@@ -223,6 +276,13 @@ type EvalReport = {
       datasetName: string;
       datasetUrl: string;
       experiments: Record<string, string>;
+      pairwise?: null | { experimentName: string; url: string | null };
+      humanQueue?: null | {
+        name: string;
+        selectedCaseCount: number;
+        queueSize: number;
+        status: string;
+      };
     };
     limitations: string[];
   };
@@ -284,7 +344,7 @@ const graphSteps = [
   {
     stage: 'embedding',
     label: 'Embedding',
-    detail: 'Fireworks · 1024d',
+    detail: 'Fireworks · 256d',
     icon: BrainCircuit,
   },
   {
@@ -470,8 +530,7 @@ export default function Home() {
   const [researchResults, setResearchResults] = useState<
     Array<{ title: string; url: string; description: string }>
   >([]);
-  const [trainingUseAcknowledged, setTrainingUseAcknowledged] =
-    useState(false);
+  const [trainingUseAcknowledged, setTrainingUseAcknowledged] = useState(false);
 
   useEffect(() => {
     fetch('/api/evals')
@@ -538,11 +597,7 @@ export default function Home() {
   }
 
   async function submitApproval(
-    decision:
-      | 'approved'
-      | 'revision_requested'
-      | 'rejected'
-      | 'escalated',
+    decision: 'approved' | 'revision_requested' | 'rejected' | 'escalated',
   ) {
     if (!liveResult?.approvalId || !liveResult.approvalToken) return;
     setSavingApproval(true);
@@ -978,7 +1033,7 @@ export default function Home() {
                   eyebrow: 'See proof',
                   title: 'Review evaluation evidence',
                   detail:
-                    'Explore the 200-case golden corpus and the provider-tested 40-case core.',
+                    'Explore two complete 200-case provider runs, independent judging, and the release gate.',
                   action: 'Open evaluation lab',
                   view: 'evals' as View,
                   icon: BarChart3,
@@ -1804,9 +1859,101 @@ export default function Home() {
           <section aria-label="Evaluation lab">
             <SectionHeading
               eyebrow="Versioned evaluation laboratory"
-              title="200 golden cases. A provider-tested core. Every result scoped."
-              description="LangSmith v2 contains 200 synthetic, de-identified cases with manually specified reference labels. Its 40-case benchmark core retains the frozen baseline-versus-improved provider experiments; all 200 cases pass deterministic schema, safety-trigger, source-ID, uniqueness, and distribution validation."
+              title="200 golden cases. Two complete provider runs. One honest release gate."
+              description="The full v2 corpus ran through the frozen baseline and improved GraphRAG configuration. All 268 answer outputs received an independent Mistral review; deterministic evaluators covered all 400 results. LangSmith still holds the versioned dataset, while full experiment persistence awaits account trace capacity."
             />
+            {evalReport?.evaluatorContract && (
+              <Card className="mb-6 overflow-hidden border-violet-200 bg-gradient-to-br from-violet-50 via-background to-teal-50">
+                <CardHeader>
+                  <div>
+                    <div className="mb-2 flex flex-wrap gap-2">
+                      <Badge className="bg-violet-700 text-white">
+                        Evaluator panel v{evalReport.evaluatorContract.version}
+                      </Badge>
+                      <Badge variant="outline">
+                        Safety veto before weighted quality
+                      </Badge>
+                    </div>
+                    <CardTitle>
+                      Three independent layers decide readiness
+                    </CardTitle>
+                    <CardDescription className="mt-1 max-w-3xl">
+                      Objective rules, an independent model judge, and blinded
+                      practitioner calibration answer different questions. No
+                      average score can hide a critical-safety failure.
+                    </CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3 lg:grid-cols-3">
+                    {evalReport.evaluatorContract.architecture.map(
+                      (layer, index) => {
+                        const Icon = [Code2, BrainCircuit, UserCheck][index];
+                        return (
+                          <div
+                            key={layer.id}
+                            className="rounded-2xl border bg-background/85 p-4 shadow-sm"
+                          >
+                            <div className="mb-3 flex items-center justify-between gap-3">
+                              <span className="grid size-9 place-items-center rounded-xl bg-violet-100 text-violet-800">
+                                <Icon className="size-4" />
+                              </span>
+                              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                Layer {index + 1}
+                              </span>
+                            </div>
+                            <p className="font-heading text-base font-semibold">
+                              {layer.label}
+                            </p>
+                            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                              {layer.purpose}
+                            </p>
+                            <div className="mt-3 flex flex-wrap gap-1.5">
+                              {layer.metrics.slice(0, 4).map((metric) => (
+                                <Badge
+                                  key={metric}
+                                  variant="secondary"
+                                  className="text-[9px]"
+                                >
+                                  {metric}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      },
+                    )}
+                  </div>
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
+                    <div className="rounded-xl border border-violet-200 bg-violet-50 p-3 text-xs leading-5 text-violet-950">
+                      <strong>Pairwise:</strong> the randomized
+                      baseline-versus-GraphRAG judge is implemented. LangSmith
+                      persistence is pending renewed trace capacity.
+                    </div>
+                    <div className="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs leading-5 text-teal-950">
+                      <strong>Human calibration:</strong>{' '}
+                      {evalReport.calibrationManifest?.sampleSize ||
+                        evalReport.evaluatorContract.humanCalibration
+                          .sampleSize}
+                      -case stratified worksheet prepared for blinded review;
+                      queue creation and reviewer scoring are still pending. The
+                      targets are ≥
+                      {
+                        evalReport.evaluatorContract.humanCalibration
+                          .overallAgreementTarget
+                      }
+                      % overall and 100% critical-case agreement targets.
+                    </div>
+                    <div className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs leading-5 text-sky-950">
+                      <strong>Production privacy:</strong> deterministic
+                      metadata checks cover 100% of runs; narratives remain
+                      outside LangSmith unless explicitly synthetic or
+                      de-identified.
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {evalReport?.week4 && evalReport.week4Dataset && (
               <div className="mb-6 space-y-5">
                 <Card className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-background to-sky-50">
@@ -1829,7 +1976,7 @@ export default function Home() {
                         {evalReport.week4Dataset.dataset} is an immutable v2
                         dataset:{' '}
                         {evalReport.week4Dataset.cohorts.providerBenchmarkCore}{' '}
-                        provider-tested core cases plus{' '}
+                        benchmark-core cases plus{' '}
                         {evalReport.week4Dataset.cohorts.goldenExtension}{' '}
                         expanded coverage cases.
                       </CardDescription>
@@ -1877,18 +2024,26 @@ export default function Home() {
                       ),
                     )}
                     <div className="sm:col-span-2 xl:col-span-4 rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs leading-5 text-sky-950">
-                      <strong>Evidence boundary:</strong>{' '}
-                      {
-                        evalReport.week4Dataset.evaluationStatus
-                          .providerBackedCore
-                      }{' '}
-                      cases have frozen provider-backed results; all{' '}
+                      <strong>Evidence status:</strong> all{' '}
                       {
                         evalReport.week4Dataset.evaluationStatus
                           .deterministicValidation
                       }{' '}
-                      are validated and versioned. The full 200-case provider
-                      run remains a separate, explicitly reported experiment.
+                      cases completed baseline and improved provider runs. The
+                      local code and Mistral-judge report is complete; LangSmith
+                      experiment, pairwise, and human-queue persistence remains
+                      pending because the account trace quota is exhausted.
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Badge className="bg-emerald-700 text-white">
+                          400 provider workflows complete
+                        </Badge>
+                        <Badge className="bg-teal-700 text-white">
+                          LangSmith dataset verified
+                        </Badge>
+                        <Badge className="bg-amber-200 text-amber-950">
+                          Trace publication pending capacity
+                        </Badge>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -1897,7 +2052,7 @@ export default function Home() {
                     <div>
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100">
-                          Evaluated core v{evalReport.week4.datasetVersion}
+                          Full corpus v{evalReport.week4.datasetVersion}
                         </Badge>
                         <Badge className="border border-sky-300/25 bg-sky-300/10 text-sky-100">
                           {evalReport.week4.mode}
@@ -1926,7 +2081,7 @@ export default function Home() {
                       </Badge>
                       <div className="flex flex-wrap justify-end gap-2">
                         <a
-                          href="https://github.com/sivalinb/commonground-ai/blob/main/data/week4-eval-report.json"
+                          href="https://github.com/sivalinb/commonground-ai/blob/main/data/week4-full-eval-report.json"
                           target="_blank"
                           rel="noreferrer"
                           className="text-[10px] font-semibold text-teal-200 hover:text-white"
@@ -1940,7 +2095,7 @@ export default function Home() {
                             rel="noreferrer"
                             className="text-[10px] font-semibold text-sky-200 hover:text-white"
                           >
-                            40-case experiment dataset ↗
+                            LangSmith experiment dataset ↗
                           </a>
                         )}
                       </div>
@@ -2030,10 +2185,9 @@ export default function Home() {
                   </Card>
                   <Card>
                     <CardHeader>
-                      <CardTitle>Provider-tested core composition</CardTitle>
+                      <CardTitle>Full provider-run composition</CardTitle>
                       <CardDescription>
-                        The original 40 cases remain the controlled comparison
-                        set.
+                        All 200 cases ran against both frozen configurations.
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -2045,10 +2199,19 @@ export default function Home() {
                                 {split.replaceAll('_', ' ')}
                               </span>
                               <span className="font-mono font-semibold">
-                                {count} · {Math.round((count / 40) * 100)}%
+                                {count} ·{' '}
+                                {Math.round(
+                                  (count / evalReport.week4.improved.total) *
+                                    100,
+                                )}
+                                %
                               </span>
                             </div>
-                            <Progress value={(count / 40) * 100} />
+                            <Progress
+                              value={
+                                (count / evalReport.week4.improved.total) * 100
+                              }
+                            />
                           </div>
                         ),
                       )}
@@ -2639,7 +2802,7 @@ export default function Home() {
                   title: 'Assurance',
                   icon: ShieldCheck,
                   items: [
-                    '200-case golden + 40-case tested core',
+                    '200-case golden · 400 provider runs',
                     'Fairness + attack tests',
                     'LangSmith child spans',
                   ],
@@ -2947,10 +3110,18 @@ export default function Home() {
           <div className="mx-auto flex max-w-[1480px] flex-col gap-2 px-4 py-4 text-[10px] text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
             <span>Training demonstration · Fictional scenarios only</span>
             <span className="flex flex-wrap gap-x-3 gap-y-1">
-              <a href="/privacy" className="hover:text-white">Privacy</a>
-              <a href="/security" className="hover:text-white">Security</a>
-              <a href="/accessibility" className="hover:text-white">Accessibility</a>
-              <a href="/limitations" className="hover:text-white">AI limitations</a>
+              <a href="/privacy" className="hover:text-white">
+                Privacy
+              </a>
+              <a href="/security" className="hover:text-white">
+                Security
+              </a>
+              <a href="/accessibility" className="hover:text-white">
+                Accessibility
+              </a>
+              <a href="/limitations" className="hover:text-white">
+                AI limitations
+              </a>
             </span>
           </div>
         </div>

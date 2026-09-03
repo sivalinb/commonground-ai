@@ -23,6 +23,7 @@ const cases = (await readFile(datasetPath, 'utf8'))
   .split('\n')
   .map((line) => JSON.parse(line) as EvalCase);
 const live = process.argv.includes('--live');
+const writeReport = live || process.argv.includes('--write-report');
 const baseUrl = process.env.EVAL_BASE_URL || 'http://localhost:3000';
 
 async function evaluate(item: EvalCase) {
@@ -120,6 +121,8 @@ const report = {
     ? 'Provider-backed experiment against the configured CommonGround API.'
     : 'Deterministic preflight validates privacy and prohibited-request rules. Run pnpm eval:live for provider-backed scoring.',
 };
-await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+if (writeReport) {
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+}
 console.log(JSON.stringify(report));
 if (report.passed !== report.total) process.exitCode = 1;

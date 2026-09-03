@@ -30,11 +30,23 @@
   "criticalCases": 87,
   "referenceLabels": "Manually specified, human-readable reference labels; independent reviewer calibration remains required before operational use.",
   "privacy": "Synthetic and de-identified. Fictional identifiers appear only in privacy-gate test cases.",
-  "publicEvidence": "The public evaluation scorecard reads this manifest directly and separates deterministic 200-case validation from 40-case provider-backed results.",
+  "publicEvidence": "The public evaluation scorecard reports the completed 200-case baseline and improved provider runs, while separately identifying LangSmith persistence and human calibration status.",
   "evaluationStatus": {
     "providerBackedCore": 40,
     "deterministicValidation": 200,
-    "fullProviderRun": "not_run",
-    "note": "The existing 40-case core has frozen provider-backed baseline and improved experiments. The full 200-case provider run is intentionally separate to control cost and preserve honest reporting."
+    "fullProviderRun": "completed_release_gates_passed",
+    "note": "The full 200-case baseline and improved provider runs completed with deterministic code evaluation and native Mistral judging. Local evidence is complete; LangSmith experiment persistence, pairwise comparison, and queue creation were not part of this run.",
+    "fullProviderRunAt": "2026-09-03T01:55:49.208Z",
+    "fullProviderRunCasesPerExperiment": 200,
+    "fullProviderRunExperiments": null,
+    "pairwiseExperiment": null,
+    "humanCalibrationQueue": null,
+    "observabilityPublication": {
+      "datasetVerified": true,
+      "experimentsPersisted": false,
+      "pairwisePersisted": false,
+      "humanQueueCreated": false,
+      "localEvidenceComplete": true
+    }
   }
 }

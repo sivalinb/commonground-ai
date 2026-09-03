@@ -42,7 +42,7 @@ export async function mistralStructured<T extends z.ZodType>(input: {
           ],
         }),
       },
-      { label: 'Mistral structured review', timeoutMs: 18_000, retries: 1 },
+      { label: 'Mistral structured review', timeoutMs: 18_000, retries: 4 },
     );
     if (!response.ok)
       throw new Error(`Mistral structured review returned ${response.status}`);

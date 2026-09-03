@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { consumeRateLimit, recordAuditEvent, savePracticeRun } from '@/lib/db';
 import { requireSameOrigin, secureJson } from '@/lib/http';
 import { executePractice } from '@/lib/practice';
+import { normalizePineconeHost } from '@/lib/workflow-runtime';
 import { detectProhibitedRequest, detectSensitiveData } from '@/lib/safety';
 import { verifyTurnstile } from '@/lib/turnstile';
 
@@ -109,11 +110,14 @@ export async function POST(request: Request) {
       runtime: {
         fireworksKey,
         pineconeKey,
-        pineconeHost,
+        pineconeHost: normalizePineconeHost(pineconeHost),
         namespace: process.env.PINECONE_NAMESPACE || 'commonground-rj-v1',
         embeddingModel:
           process.env.FIREWORKS_EMBEDDING_MODEL ||
           'accounts/fireworks/models/qwen3-embedding-8b',
+        embeddingDimensions: Number(
+          process.env.FIREWORKS_EMBEDDING_DIMENSIONS || 256,
+        ),
         rerankModel:
           process.env.FIREWORKS_RERANK_MODEL ||
           'accounts/fireworks/models/qwen3-reranker-8b',

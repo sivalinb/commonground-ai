@@ -22,6 +22,7 @@ export type PracticeRuntime = {
   pineconeHost: string;
   namespace: string;
   embeddingModel: string;
+  embeddingDimensions: number;
   rerankModel: string;
   chatModel: string;
   fastModel: string;
@@ -324,7 +325,7 @@ const practiceGraph = new StateGraph(stateSchema)
             {
               model: runtime.embeddingModel,
               input: query,
-              dimensions: 1024,
+              dimensions: runtime.embeddingDimensions,
             },
             'Fireworks practice embedding',
           ),
