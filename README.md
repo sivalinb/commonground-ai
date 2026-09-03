@@ -155,9 +155,10 @@ Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97%
 - [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md) — current 200-case baseline/post-improvement results and release decision
 - [`docs/WEEK_4_REVIEWER_GUIDE.md`](docs/WEEK_4_REVIEWER_GUIDE.md) — independent human calibration procedure
 - [`docs/WEEK_4_ABLATION_REPORT.md`](docs/WEEK_4_ABLATION_REPORT.md) — one-change-at-a-time results and nine-regression attribution
-- [`docs/LOOM_WALKTHROUGH_SCRIPT.md`](docs/LOOM_WALKTHROUGH_SCRIPT.md) — recording script and evidence checklist
 - [`data/evaluator-contract.json`](data/evaluator-contract.json) — machine-readable evaluator panel, score anchors, release thresholds, pairwise policy, and production privacy boundary
 - [`evals/human-calibration-sample-v1.csv`](evals/human-calibration-sample-v1.csv) — deterministic 30-case blinded reviewer worksheet
+
+Recommended reviewer path: begin with the [evaluation methodology](docs/EVALUATION_METHODOLOGY.md), inspect the [200-case baseline and improved results](docs/FULL_CORPUS_EVALUATION_REPORT.md), verify the [one-change-at-a-time ablation and regression analysis](docs/WEEK_4_ABLATION_REPORT.md), open the [case-level LangSmith trace](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true), and finish with the [independent calibration protocol](docs/WEEK_4_REVIEWER_GUIDE.md). The public Evaluation Lab presents the same evidence visually; repository artifacts remain the source of record.
 
 ## Knowledge base
 
