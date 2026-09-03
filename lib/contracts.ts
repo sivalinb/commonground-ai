@@ -65,27 +65,29 @@ export const humanDecisionSchema = z.enum([
   'escalated',
 ]);
 
-export const approvalRequestSchema = z.object({
-  approvalId: z.uuid(),
-  approvalToken: z.string().min(32).max(256),
-  decision: humanDecisionSchema,
-  reviewerRole: z.enum([
-    'volunteer',
-    'facilitator',
-    'victim_advocate',
-    'supervisor',
-    'instructor',
-  ]),
-  comment: z.string().trim().max(500).default(''),
-}).superRefine((value, context) => {
-  if (value.decision !== 'approved' && value.comment.length < 8) {
-    context.addIssue({
-      code: 'custom',
-      path: ['comment'],
-      message: 'A short rationale is required for this decision.',
-    });
-  }
-});
+export const approvalRequestSchema = z
+  .object({
+    approvalId: z.uuid(),
+    approvalToken: z.string().min(32).max(256),
+    decision: humanDecisionSchema,
+    reviewerRole: z.enum([
+      'volunteer',
+      'facilitator',
+      'victim_advocate',
+      'supervisor',
+      'instructor',
+    ]),
+    comment: z.string().trim().max(500).default(''),
+  })
+  .superRefine((value, context) => {
+    if (value.decision !== 'approved' && value.comment.length < 8) {
+      context.addIssue({
+        code: 'custom',
+        path: ['comment'],
+        message: 'A short rationale is required for this decision.',
+      });
+    }
+  });
 
 export type Evidence = z.infer<typeof evidenceSchema>;
 export type CitedText = z.infer<typeof citedTextSchema>;
@@ -103,6 +105,7 @@ export type TimelineEvent = {
 
 export type PublicResult = {
   traceId: string;
+  langsmithRunId?: string;
   approvalId?: string;
   approvalToken?: string;
   approvalStatus:
@@ -144,4 +147,15 @@ export type PublicResult = {
   timeline: TimelineEvent[];
   promptVersion: string;
   corpusVersion: string;
+  evaluationDiagnostics?: {
+    abstainReason: string;
+    evidence: Array<{
+      id: string;
+      denseScore: number;
+      keywordScore: number;
+      fusionScore: number;
+      graphScore: number;
+      rerankScore: number;
+    }>;
+  };
 };

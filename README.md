@@ -102,6 +102,8 @@ flowchart LR
 | Testing            | Vitest + versioned JSONL evals            | Unit tests and deterministic/provider-backed evaluation modes                      |
 | Hosting            | OpenAI Sites / Cloudflare Workers         | Public server-rendered application and protected secrets                           |
 
+Cloudflare is supporting infrastructure, not an AI capability or bonus-point claim. It remains because Turnstile limits public abuse and D1 preserves the minimum human-approval/rate/audit metadata needed for a safe, resumable workflow. The judged AI evidence centers on the models, retrieval, orchestration, evaluators, traces, and measurable improvements.
+
 ## Safety and privacy design
 
 The application is designed to fail closed:
@@ -138,9 +140,9 @@ The `rj-retrieval-v1` dataset adds 24 labeled retrieval questions and explicit t
 
 The original `commonground-rj-week4-v1` LangSmith dataset contains a frozen 40-case benchmark. Its historical provider result remains available in [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) for reproducibility.
 
-The immutable `commonground-rj-week4-200-v2` LangSmith dataset expands coverage to **200 cases**: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. Every case has a unique synthetic narrative, expected disposition, source labels, critical flag, scenario tags, rationale, and autonomy/trauma/handoff labels. The full corpus completed two provider-backed configurations—400 workflow results—with deterministic code evaluation on every result and independent Mistral LLM-as-Judge review on all 268 answer outputs. The improved configuration passed the release gate with a **100% critical-safety pass**, **100% Recall@5**, **88.6% complete expected-source coverage@5**, **99.6% claim faithfulness**, and **7.5 s P95 latency**. See [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md) and the checked-in [case-level JSON evidence](data/week4-full-eval-report.json).
+The immutable `commonground-rj-week4-200-v2` LangSmith dataset expands coverage to **200 cases**: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. Every case has a unique synthetic narrative, expected disposition, source labels, critical flag, scenario tags, rationale, and autonomy/trauma/handoff labels. The full corpus completed two provider-backed configurations—400 workflow results—with deterministic code evaluation on every result and independent Mistral LLM-as-Judge review on all **269 answer outputs**. The count reconciles to 139 baseline answers plus 130 improved answers; the improved model self-abstained on nine answer-expected cases after retrieval. The improved configuration passed the zero-tolerance critical-safety veto and 15 of 16 numeric release thresholds, but remains below the predeclared LLM handoff-quality bar (**94.4% measured; 95% target**). It also measured **100% Recall@5**, **88.6% complete expected-source coverage@5**, **99.6% claim faithfulness**, and **7.5 s P95 latency**. A controlled 49-case ablation attributes one abstention to the prompt-only lever and eight to the combined prompt-plus-evidence context. See [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md), [`docs/WEEK_4_ABLATION_REPORT.md`](docs/WEEK_4_ABLATION_REPORT.md), and the checked-in [case-level JSON evidence](data/week4-full-eval-report.json).
 
-The 200-case dataset is verified in LangSmith. Full experiment, randomized pairwise, and 30-case human-queue persistence are implemented but remain pending because the account reached its monthly trace allowance. The local report preserves the complete provider and judge evidence without presenting pending LangSmith artifacts as completed.
+The 200-case dataset is verified in LangSmith, and a [direct case-level trace](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true) exposes nine child runs plus code-evaluator feedback. Full 200-case experiment, randomized pairwise, and 30-case human-queue publication are implemented, but the latest new-trace attempt was rejected with HTTP 429 because the workspace reached its monthly unique-trace allowance. The local report preserves complete provider and judge evidence without presenting blocked LangSmith artifacts as completed. Independent 30-case human calibration also remains pending and is never replaced by an AI-generated claim.
 
 Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97% citation precision**, **100% claim faithfulness**, **100% correct abstention**, and **7.93 s P95 latency**. On the 10-query ablation, GraphRAG reached **100%** Recall@5 and task success versus **70%** for vector-only and hybrid modes.
 
@@ -152,6 +154,8 @@ Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97%
 - [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) — baseline/post-improvement evidence and failure analysis
 - [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md) — current 200-case baseline/post-improvement results and release decision
 - [`docs/WEEK_4_REVIEWER_GUIDE.md`](docs/WEEK_4_REVIEWER_GUIDE.md) — independent human calibration procedure
+- [`docs/WEEK_4_ABLATION_REPORT.md`](docs/WEEK_4_ABLATION_REPORT.md) — one-change-at-a-time results and nine-regression attribution
+- [`docs/LOOM_WALKTHROUGH_SCRIPT.md`](docs/LOOM_WALKTHROUGH_SCRIPT.md) — recording script and evidence checklist
 - [`data/evaluator-contract.json`](data/evaluator-contract.json) — machine-readable evaluator panel, score anchors, release thresholds, pairwise policy, and production privacy boundary
 - [`evals/human-calibration-sample-v1.csv`](evals/human-calibration-sample-v1.csv) — deterministic 30-case blinded reviewer worksheet
 

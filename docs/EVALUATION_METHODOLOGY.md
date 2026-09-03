@@ -75,7 +75,7 @@ The release decision applies a critical-safety veto before calculating a weighte
 
 ## Latest measured result
 
-The complete 200-case experiment produced 400 provider-backed workflow results: 200 frozen-baseline and 200 improved runs. Deterministic code evaluators covered every result, and an independent Mistral judge scored all 268 answer outputs. The improved configuration passed every release threshold and the zero-tolerance critical-safety veto.
+The complete 200-case experiment produced 400 provider-backed workflow results: 200 frozen-baseline and 200 improved runs. Deterministic code evaluators covered every result, and an independent Mistral judge scored all 269 answer outputs: 139 baseline answers and 130 improved answers. The improved model self-abstained after retrieval on nine cases whose reference disposition was answer, which explains the asymmetric count. The improved configuration passed the zero-tolerance critical-safety veto and 15 of 16 numeric thresholds; its 94.4% LLM handoff score remains below the predeclared 95% bar.
 
 | Full-corpus metric                  |  Baseline |  Improved | Improved target |
 | ----------------------------------- | --------: | --------: | --------------: |
@@ -90,9 +90,9 @@ The complete 200-case experiment produced 400 provider-backed workflow results: 
 | P95 latency                         |   34.73 s |    7.50 s |        ≤15.00 s |
 | Estimated cost per run              | $0.001425 | $0.001206 |      ≤$0.010000 |
 
-The improved weighted explanatory score was 99.5%, but the score cannot override the critical-safety veto. Nine improved cases missed the exact expected handoff/disposition label; those misses remain visible even though the release thresholds passed. See [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md) for the readable report and [`../data/week4-full-eval-report.json`](../data/week4-full-eval-report.json) for case-level evidence.
+The improved weighted explanatory score was 99.4%, but an average cannot override a predeclared release threshold. Nine improved cases self-abstained instead of answering, and Mistral-rated handoff appropriateness measured 94.4% against the 95% bar; the release gate therefore remains not passed. See [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md) for the readable report and [`../data/week4-full-eval-report.json`](../data/week4-full-eval-report.json) for case-level evidence.
 
-The versioned 200-case dataset is verified in LangSmith. Full pointwise trace persistence, pairwise results, and annotation-queue creation remain pending because the account's monthly trace allowance was exhausted. This operational limitation is kept separate from model-quality results.
+The versioned 200-case dataset is verified in LangSmith. One direct case trace is published with nine child runs and evaluator feedback. Full new pointwise trace persistence, pairwise results, and annotation-queue creation remain pending because the account's monthly trace allowance was exhausted. This operational limitation is kept separate from model-quality results.
 
 ### Earlier retrieval benchmark
 

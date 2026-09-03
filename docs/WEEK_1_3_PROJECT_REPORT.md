@@ -106,7 +106,7 @@ All provider actions are reads or draft generation. The application does not sen
 
 The CommonGround Guidance Agent is evaluated as a single defined system. The immutable `commonground-rj-week4-200-v2` LangSmith golden dataset contains 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. It includes the original 40-case provider-tested benchmark core plus a 160-case coverage extension. Every case includes an expected disposition, expected sources, critical-safety flag, tags, reference rationale, and autonomy/trauma/handoff labels.
 
-The frozen baseline uses hybrid retrieval, five candidates, top-three reranking, no graph expansion, and the prior prompt. The improved agent adds Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, explicit unsupported-request abstention, autonomy-focused examples, and stronger retry recovery. Both configurations completed all 200 golden cases, producing 400 provider results. Deterministic code evaluators covered every result, and the independent Mistral judge scored all 268 answer outputs. The improved configuration passed the release gate with zero critical-safety-veto failures, 100% Recall@5, 88.6% complete expected-source coverage@5, 99.6% claim faithfulness, and 7.5-second P95 latency.
+The frozen baseline uses hybrid retrieval, five candidates, top-three reranking, no graph expansion, and the prior prompt. The improved agent adds Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, explicit unsupported-request abstention, autonomy-focused examples, and stronger retry recovery. Both configurations completed all 200 golden cases, producing 400 provider results. Deterministic code evaluators covered every result, and the independent Mistral judge scored all 269 answer outputs: 139 baseline answers plus 130 improved answers. The improved configuration passed the zero-tolerance critical-safety veto and 15 of 16 numeric thresholds, while measuring a 94.4% LLM handoff score against the predeclared 95% bar. It retained 100% Recall@5, 88.6% complete expected-source coverage@5, 99.6% claim faithfulness, and 7.5-second P95 latency.
 
 The provider-backed September 2 run records safe task completion, critical guardrail compliance, Recall@5, full expected-source coverage, citation validity, independent Mistral faithfulness/autonomy/trauma/handoff scores, trajectory correctness, p50/p95 latency, tokens, normalized cost, case-level trace IDs, and failure clusters. The detailed baseline/post-improvement results are generated in `docs/WEEK_4_EVALUATION_REPORT.md`.
 
@@ -119,7 +119,7 @@ The provider-backed September 2 run records safe task completion, critical guard
 - Manually specified reference labels define expected behavior; a deterministic 30-case sample and LangSmith annotation-queue workflow support blinded RJ and victim-services calibration at 85% overall agreement, 100% critical-case agreement, and zero false-safe cases.
 - A critical-safety veto runs before the weighted explanatory quality score, so no average can hide a PII, guardrail, or judge-critical failure.
 
-The versioned 200-case dataset is verified in LangSmith. Full experiment traces, randomized pairwise results, and the 30-case annotation queue are implemented but remain pending because the current LangSmith monthly trace allowance is exhausted. The complete provider and judge evidence is preserved locally and checked into the repository; independent human calibration remains required before any agency-use claim.
+The versioned 200-case dataset is verified in LangSmith, and one full-path synthetic case trace is published with nine child runs and evaluator feedback. Full new experiment traces, randomized pairwise results, and the 30-case annotation queue are implemented but remain pending because the current LangSmith monthly trace allowance is exhausted. The complete provider and judge evidence is preserved locally and checked into the repository; independent human calibration remains required before any agency-use claim.
 
 ### Production monitoring
 
@@ -139,7 +139,7 @@ The monitoring contract alerts on quality drift below safe completion, guardrail
 10. Added durable LangGraph checkpoint/resume, signed reviewer sessions, retrieval metrics, provider-backed faithfulness evaluation, and course-evidence documentation.
 11. Added the 40-case provider-tested benchmark core, frozen baseline, four targeted improvements, case-linked evaluators, failure clustering, cost/latency measurements, and post-improvement comparison.
 12. Expanded the immutable LangSmith golden corpus to 200 cases with exact 50/30/15/5 split coverage, 87 critical cases, source-integrity checks, deterministic safety-trigger validation, and a reviewer-calibration boundary.
-13. Ran the complete 200-case baseline and improved configurations, applied code evaluators to all 400 results and Mistral judging to 268 answer outputs, added a safety-first release gate, resumable checkpoints, and a public evidence summary.
+13. Ran the complete 200-case baseline and improved configurations, applied code evaluators to all 400 results and Mistral judging to 269 answer outputs, added a safety-first release gate, resumable checkpoints, and a public evidence summary.
 
 ## What was learned
 

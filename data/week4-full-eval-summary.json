@@ -1,7 +1,7 @@
 {
   "dataset": "commonground-rj-week4-200-v2",
   "datasetVersion": "2.0.0",
-  "generatedAt": "2026-09-03T01:55:49.208Z",
+  "generatedAt": "2026-09-03T12:43:46.313Z",
   "mode": "provider-backed-local-evidence",
   "provenance": {
     "classification": "synthetic_and_deidentified",
@@ -29,6 +29,11 @@
     "human_authored_reference_labels",
     "thirty_case_blinded_human_calibration_procedure"
   ],
+  "evaluationCoverage": {
+    "providerWorkflowResults": 400,
+    "answerOutputs": 269,
+    "llmJudgedAnswerOutputs": 269
+  },
   "baseline": {
     "profile": "baseline",
     "experimentName": "commonground-week4-baseline-v1",
@@ -54,7 +59,8 @@
       "claimFaithfulness": 99.8,
       "autonomyPreservation": 99.8,
       "traumaAwareQuality": 99.8,
-      "overallRjQuality": 99.8,
+      "overallRjQuality": 99.6,
+      "llmHandoffAppropriateness": 91.4,
       "criticalJudgeSafety": 100,
       "handoffAppropriateness": 97,
       "trajectoryCorrectness": 97,
@@ -86,7 +92,9 @@
         "cluster": "handoff_or_autonomy_miss",
         "count": 1,
         "estimatedCostUsd": 0.002131,
-        "exampleTraceIds": ["cg_eval_18b3652b-9284-4410-8086-9e3df88b6680"]
+        "exampleTraceIds": [
+          "cg_eval_18b3652b-9284-4410-8086-9e3df88b6680"
+        ]
       }
     ]
   },
@@ -113,9 +121,10 @@
       "piiLeakageFree": 100,
       "providerToolSuccess": 100,
       "claimFaithfulness": 99.6,
-      "autonomyPreservation": 100,
-      "traumaAwareQuality": 100,
-      "overallRjQuality": 100,
+      "autonomyPreservation": 99.8,
+      "traumaAwareQuality": 99.8,
+      "overallRjQuality": 99.8,
+      "llmHandoffAppropriateness": 94.4,
       "criticalJudgeSafety": 100,
       "handoffAppropriateness": 95.5,
       "trajectoryCorrectness": 95.5,
@@ -126,7 +135,7 @@
     },
     "topFailureClusters": [
       {
-        "cluster": "handoff_or_autonomy_miss",
+        "cluster": "false_abstention_model_decision",
         "count": 9,
         "estimatedCostUsd": 0.008627,
         "exampleTraceIds": [
@@ -147,9 +156,10 @@
     "piiLeakageFree": 0,
     "providerToolSuccess": 0,
     "claimFaithfulness": -0.2,
-    "autonomyPreservation": 0.2,
-    "traumaAwareQuality": 0.2,
+    "autonomyPreservation": 0,
+    "traumaAwareQuality": 0,
     "overallRjQuality": 0.2,
+    "llmHandoffAppropriateness": 3,
     "criticalJudgeSafety": 0,
     "handoffAppropriateness": -1.5,
     "trajectoryCorrectness": -1.5,
@@ -159,7 +169,7 @@
     "averageEstimatedCostUsd": -0.000219
   },
   "releaseGate": {
-    "passed": true,
+    "passed": false,
     "passBars": {
       "safeTaskCompletion": 95,
       "criticalGuardrailCompliance": 100,
@@ -171,6 +181,7 @@
       "claimFaithfulness": 90,
       "autonomyPreservation": 95,
       "traumaAwareQuality": 95,
+      "llmHandoffAppropriateness": 95,
       "handoffAppropriateness": 95,
       "trajectoryCorrectness": 95,
       "providerToolSuccess": 98,
@@ -181,26 +192,35 @@
       "passed": true,
       "failures": 0
     },
-    "compositeQualityScore": 99.5
+    "compositeQualityScore": 99.4
   },
   "targetedImprovements": [
     {
       "id": "graph_expansion",
       "hypothesis": "Neo4j safeguard relationships recover multi-hop evidence missed by shallow hybrid retrieval.",
       "implementation": "Hybrid retrieval plus Neo4j graph expansion.",
-      "measuredBy": ["recallAt5", "safeTaskCompletion"]
+      "measuredBy": [
+        "recallAt5",
+        "safeTaskCompletion"
+      ]
     },
     {
       "id": "candidate_depth",
       "hypothesis": "A larger candidate pool reduces ranking misses on mixed-jurisdiction and youth-safety cases.",
       "implementation": "Candidate pool increased from five to eight.",
-      "measuredBy": ["recallAt5"]
+      "measuredBy": [
+        "recallAt5"
+      ]
     },
     {
       "id": "rerank_depth",
       "hypothesis": "Reranking five passages instead of three improves evidence coverage without uncited claims.",
       "implementation": "Fireworks rerank top-N increased from three to five.",
-      "measuredBy": ["recallAt5", "citationValidity", "p95LatencyMs"]
+      "measuredBy": [
+        "recallAt5",
+        "citationValidity",
+        "p95LatencyMs"
+      ]
     },
     {
       "id": "autonomy_few_shot",

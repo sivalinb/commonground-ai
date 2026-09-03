@@ -3,12 +3,26 @@ import { readFile, writeFile } from 'node:fs/promises';
 type Split = 'happy_path' | 'edge_case' | 'known_failure' | 'adversarial';
 type GoldenCase = {
   id: string;
+  caseText: string;
   split: Split;
   jurisdiction: 'colorado' | 'national';
   expectedDisposition: 'answer' | 'abstain' | 'refuse' | 'privacy_block';
   critical: boolean;
   tags: string[];
   cohort: 'provider_benchmark_core' | 'golden_extension';
+};
+type ProviderCase = {
+  caseId: string;
+  profile: 'baseline' | 'improved';
+  actualDisposition: string;
+  evaluationPayload?: {
+    actualOutcome: {
+      disposition: string;
+      claims: string[];
+      citations: Array<{ id: string; snippet: string }>;
+      awaitingHumanApproval: boolean;
+    };
+  };
 };
 
 const datasetName = 'commonground-rj-week4-200-v2';
@@ -23,6 +37,14 @@ const csvPath = new URL(
 );
 const manifestPath = new URL(
   '../data/human-calibration-manifest.json',
+  import.meta.url,
+);
+const packetPath = new URL(
+  '../data/human-calibration-review-packet.json',
+  import.meta.url,
+);
+const checkpointPath = new URL(
+  '../.eval-cache/commonground-rj-week4-200-v2-2.0.0-provider-results.json',
   import.meta.url,
 );
 const cases = (await readFile(source, 'utf8'))
@@ -59,6 +81,30 @@ if (selected.length !== 30)
 
 const quote = (value: string | number | boolean) =>
   `"${String(value).replaceAll('"', '""')}"`;
+let providerCases: ProviderCase[] = [];
+try {
+  const checkpoint = JSON.parse(await readFile(checkpointPath, 'utf8')) as {
+    cases?: ProviderCase[];
+  };
+  providerCases = checkpoint.cases || [];
+} catch {
+  providerCases = [];
+}
+const improvedByCase = new Map(
+  providerCases
+    .filter((item) => item.profile === 'improved')
+    .map((item) => [item.caseId, item]),
+);
+const reviewOutcome = (result: ProviderCase | undefined) =>
+  result?.evaluationPayload?.actualOutcome ||
+  (result
+    ? {
+        disposition: result.actualDisposition,
+        claims: [],
+        citations: [],
+        awaitingHumanApproval: false,
+      }
+    : null);
 const headers = [
   'case_id',
   'split',
@@ -66,6 +112,11 @@ const headers = [
   'critical',
   'jurisdiction',
   'tags',
+  'synthetic_scenario',
+  'model_disposition',
+  'model_claims',
+  'model_citations',
+  'awaiting_human_approval',
   'reviewer_role',
   'review_date',
   'correct_disposition_0_to_4',
@@ -77,23 +128,34 @@ const headers = [
   'notes',
 ];
 const rows = selected.map((item) =>
-  [
-    item.id,
-    item.split,
-    item.cohort,
-    item.critical,
-    item.jurisdiction,
-    item.tags.join('|'),
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-  ]
+  (() => {
+    const result = improvedByCase.get(item.id);
+    const outcome = reviewOutcome(result);
+    return [
+      item.id,
+      item.split,
+      item.cohort,
+      item.critical,
+      item.jurisdiction,
+      item.tags.join('|'),
+      item.caseText,
+      outcome?.disposition || result?.actualDisposition || '',
+      (outcome?.claims || []).join('\n'),
+      (outcome?.citations || [])
+        .map((citation) => `[${citation.id}] ${citation.snippet}`)
+        .join('\n'),
+      outcome ? outcome.awaitingHumanApproval : '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ];
+  })()
     .map(quote)
     .join(','),
 );
@@ -131,7 +193,42 @@ const manifest = {
     falseSafeCount: 0,
   },
   status: 'prepared_blinded_review_pending',
+  reviewPacketComplete: selected.every((item) => {
+    const outcome = reviewOutcome(improvedByCase.get(item.id));
+    return Boolean(
+      outcome && (outcome.claims.length || outcome.disposition !== 'answer'),
+    );
+  }),
+  blindedFields:
+    'Automated scores, pass/fail results, expected disposition, and failure labels are excluded from the reviewer packet.',
   selectedCaseIds: selected.map((item) => item.id),
 };
 await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+await writeFile(
+  packetPath,
+  `${JSON.stringify(
+    {
+      dataset: datasetName,
+      datasetVersion,
+      sampleVersion: '1.0.0',
+      privacy: 'All scenarios and outputs are synthetic and de-identified.',
+      blinded: true,
+      cases: selected.map((item) => {
+        const result = improvedByCase.get(item.id);
+        return {
+          caseId: item.id,
+          split: item.split,
+          cohort: item.cohort,
+          critical: item.critical,
+          jurisdiction: item.jurisdiction,
+          tags: item.tags,
+          scenario: item.caseText,
+          actualOutcome: reviewOutcome(result),
+        };
+      }),
+    },
+    null,
+    2,
+  )}\n`,
+);
 console.log(JSON.stringify(manifest));

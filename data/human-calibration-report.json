@@ -1,0 +1,28 @@
+{
+  "dataset": "commonground-rj-week4-200-v2",
+  "datasetVersion": "2.0.0",
+  "sampleVersion": "1.0.0",
+  "generatedAt": "2026-09-03T12:10:56.927Z",
+  "langsmith": null,
+  "sampleSize": 30,
+  "completedCases": 0,
+  "pendingCases": 30,
+  "status": "awaiting_independent_review",
+  "agreementPercent": null,
+  "criticalCaseAgreementPercent": null,
+  "falseSafeCount": 0,
+  "dimensionAgreementPercent": {
+    "correct_disposition": null,
+    "autonomy": null,
+    "trauma_aware": null,
+    "evidence_support": null,
+    "human_handoff": null
+  },
+  "acceptanceTargets": {
+    "overallAgreementPercent": 85,
+    "criticalCaseAgreementPercent": 100,
+    "falseSafeCount": 0
+  },
+  "methodology": "Human rubric scores of 3–4 are treated as pass and 0–2 as fail, then compared with the corresponding automated evaluator decision across five dimensions.",
+  "cases": []
+}

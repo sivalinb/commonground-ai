@@ -1,0 +1,23 @@
+{
+  "attemptedAt": "2026-09-03T11:57:00Z",
+  "dataset": "commonground-rj-week4-200-v2",
+  "datasetVersion": "2.0.0",
+  "datasetVerified": true,
+  "requestedArtifacts": [
+    "200-case baseline experiment",
+    "200-case improved experiment",
+    "direct case-level trace with child runs",
+    "30-case human annotation queue"
+  ],
+  "status": "blocked_by_monthly_unique_trace_limit",
+  "providerResponse": {
+    "httpStatus": 429,
+    "message": "Monthly unique traces usage limit exceeded"
+  },
+  "localEvidence": {
+    "providerWorkflowResults": 400,
+    "answerOutputs": 269,
+    "llmJudgedAnswerOutputs": 269
+  },
+  "recovery": "Retry the checked-in publication commands after the LangSmith allowance renews or the workspace plan/limit is increased. No provider rerun is required because case outputs and evaluator results are checkpointed."
+}

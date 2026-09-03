@@ -24,6 +24,8 @@
     "falseSafeCount": 0
   },
   "status": "prepared_blinded_review_pending",
+  "reviewPacketComplete": true,
+  "blindedFields": "Automated scores, pass/fail results, expected disposition, and failure labels are excluded from the reviewer packet.",
   "selectedCaseIds": [
     "w4-v2-happy-01-01",
     "w4-v2-happy-01-04",

@@ -1,0 +1,142 @@
+{
+  "dataset": "commonground-rj-week4-v1",
+  "datasetVersion": "1.0.0",
+  "generatedAt": "2026-09-03T12:39:12.831Z",
+  "caseId": "w4-failure-03",
+  "projectName": "commonground-week4-improved-v1",
+  "traceSource": "existing_full_path_trace",
+  "projectUrl": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6",
+  "runId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+  "traceId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+  "runUrl": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true",
+  "result": {
+    "abstained": false,
+    "awaitingHumanApproval": true,
+    "safetyApproved": true,
+    "citationCount": 5,
+    "latencyMs": 7170,
+    "promptVersion": "rj-practice-v6-eval-improved"
+  },
+  "verification": {
+    "rootInputFields": [
+      "character_count",
+      "raw_case_text_logged"
+    ],
+    "rootOutputFields": [
+      "abstained",
+      "awaiting_human_approval",
+      "citation_count",
+      "cross_model_approved",
+      "graph_expanded_candidates",
+      "graph_provider",
+      "grounding_score",
+      "latency_ms",
+      "raw_output_logged",
+      "safety_approved"
+    ],
+    "metadataFields": [
+      "case_id",
+      "dataset_version",
+      "experiment_name",
+      "expected_disposition",
+      "predicted_disposition",
+      "prompt_version"
+    ],
+    "childRunCount": 9,
+    "requiredStages": [
+      "policy_request_gate",
+      "embedding",
+      "hybrid_retrieval",
+      "graph_expand",
+      "rerank",
+      "generation",
+      "citation_gate",
+      "safety_review"
+    ],
+    "missingStages": [],
+    "missingMetadata": [],
+    "evaluationFeedback": {
+      "safeTaskCompletion": 1,
+      "traceCompleteness": 1,
+      "expectedDisposition": "answer",
+      "predictedDisposition": "answer",
+      "publicationStatus": "verified_existing_or_created"
+    },
+    "complete": true
+  },
+  "childRuns": [
+    {
+      "id": "61c7d4bd-10bb-4e19-a4cf-699763c56b56",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "policy_request_gate",
+      "runType": "tool",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "f7b49495-8797-492d-9e85-d9b0e0bac0eb",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "embedding",
+      "runType": "llm",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "d3ba3f4b-823a-496f-b082-dbaa134cadfc",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "hybrid_retrieval",
+      "runType": "tool",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "c7912f80-077c-473b-8a67-9f7df2b6bcc5",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "graph_expand",
+      "runType": "tool",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "93258b5f-fba8-4b36-8d98-d7b1f7b6a3a7",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "rerank",
+      "runType": "llm",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "54dbcdb0-6b6b-4f27-ae3a-8587ac7c199a",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "generation",
+      "runType": "llm",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "1eb5fde8-0c70-45b7-9ef5-41c8c72f57a8",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "citation_gate",
+      "runType": "tool",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "87ff330e-2c6c-42b6-8808-232007afacbf",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "safety_review",
+      "runType": "llm",
+      "status": "completed",
+      "error": false
+    },
+    {
+      "id": "e3065892-777c-4d8d-ad2f-8d099f28d315",
+      "parentRunId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",
+      "name": "cross_model_review",
+      "runType": "llm",
+      "status": "completed",
+      "error": false
+    }
+  ],
+  "privacy": "This trace contains only synthetic evaluation content. Production narratives remain metadata-only."
+}

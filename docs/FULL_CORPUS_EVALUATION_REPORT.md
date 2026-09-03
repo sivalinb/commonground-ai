@@ -1,6 +1,6 @@
 # CommonGround AI — Agent Evaluation and Improvement Report
 
-Generated: 2026-09-03T01:55:49.208Z
+Generated: 2026-09-03T12:43:46.313Z
 
 ## Evaluation contract
 
@@ -16,29 +16,30 @@ I measured safe task completion, claim faithfulness, Recall@5, autonomy-preservi
 
 ## Baseline versus improved
 
-| Metric                          |     Baseline |     Improved |         Delta |
-| ------------------------------- | -----------: | -----------: | ------------: |
-| Safe task completion            |          97% |        95.5% |         -1.5% |
-| Critical guardrail compliance   |        96.6% |         100% |         +3.4% |
-| Recall@5                        |          95% |         100% |           +5% |
-| Full expected-source coverage@5 |        72.7% |        88.6% |        +15.9% |
-| Citation validity               |         100% |         100% |            0% |
-| Claim citation coverage         |         100% |         100% |            0% |
-| Output schema validity          |         100% |         100% |            0% |
-| PII leakage-free                |         100% |         100% |            0% |
-| Provider/tool success           |         100% |         100% |            0% |
-| Claim faithfulness              |        99.8% |        99.6% |         -0.2% |
-| Autonomy preservation           |        99.8% |         100% |         +0.2% |
-| Trauma-aware quality            |        99.8% |         100% |         +0.2% |
-| Overall RJ quality              |        99.8% |         100% |         +0.2% |
-| LLM critical-safety pass        |         100% |         100% |            0% |
-| Human handoff appropriateness   |          97% |        95.5% |         -1.5% |
-| Trajectory correctness          |          97% |        95.5% |         -1.5% |
-| P95 latency                     |     34725 ms |      7500 ms |     -27225 ms |
-| Average tokens/run              |         1603 |         1358 |          -245 |
-| Estimated cost/run              | 0.001425 USD | 0.001206 USD | -0.000219 USD |
+| Metric | Baseline | Improved | Delta |
+| --- | ---: | ---: | ---: |
+| Safe task completion | 97% | 95.5% | -1.5% |
+| Critical guardrail compliance | 96.6% | 100% | +3.4% |
+| Recall@5 | 95% | 100% | +5% |
+| Full expected-source coverage@5 | 72.7% | 88.6% | +15.9% |
+| Citation validity | 100% | 100% | 0% |
+| Claim citation coverage | 100% | 100% | 0% |
+| Output schema validity | 100% | 100% | 0% |
+| PII leakage-free | 100% | 100% | 0% |
+| Provider/tool success | 100% | 100% | 0% |
+| Claim faithfulness | 99.8% | 99.6% | -0.2% |
+| Autonomy preservation | 99.8% | 99.8% | 0% |
+| Trauma-aware quality | 99.8% | 99.8% | 0% |
+| Overall RJ quality | 99.6% | 99.8% | +0.2% |
+| LLM handoff appropriateness | 91.4% | 94.4% | +3% |
+| LLM critical-safety pass | 100% | 100% | 0% |
+| Human handoff appropriateness | 97% | 95.5% | -1.5% |
+| Trajectory correctness | 97% | 95.5% | -1.5% |
+| P95 latency | 34725 ms | 7500 ms | -27225 ms |
+| Average tokens/run | 1603 | 1358 | -245 |
+| Estimated cost/run | 0.001425 USD | 0.001206 USD | -0.000219 USD |
 
-Release gate: **PASS**. Critical-safety veto: **PASS**. Weighted explanatory quality score: **99.5%**. The weighted score never overrides the veto, and a measured miss is retained as evidence.
+Release gate: **NOT YET PASSED**. Critical-safety veto: **PASS**. Weighted explanatory quality score: **99.4%**. The weighted score never overrides the veto, and a measured miss is retained as evidence.
 
 ## Configuration under test
 
@@ -55,7 +56,9 @@ Improved: Pinecone + BM25 + Neo4j GraphRAG, eight candidates, top-five reranking
 
 ## Dominant failure clusters
 
-- **handoff_or_autonomy_miss**: 9 case(s), estimated failed-run cost $0.008627, trace IDs cg_eval_0f27d85e-5050-4df0-b3e6-93cec927e573, cg_eval_83934d1a-e7c0-48b6-847d-2172093b31de.
+- **false_abstention_model_decision**: 9 case(s), estimated failed-run cost $0.008627, trace IDs cg_eval_0f27d85e-5050-4df0-b3e6-93cec927e573, cg_eval_83934d1a-e7c0-48b6-847d-2172093b31de.
+
+The controlled 49-case ablation found that all nine candidate regressions were model-generated abstentions after retrieval, not evidence-confidence-gate stops. One reproduced with the prompt-only lever; eight appeared only when the improved prompt and expanded/reranked evidence context were combined. See [the per-improvement ablation report](WEEK_4_ABLATION_REPORT.md).
 
 ## LangSmith evidence
 
@@ -63,7 +66,9 @@ Improved: Pinecone + BM25 + Neo4j GraphRAG, eight candidates, top-five reranking
 - Improved experiment: Run locally without LangSmith publication
 - Randomized pairwise experiment: Not published in this run
 - Human calibration queue: Procedure ready; queue not created in this run
+- Direct case trace: [w4-failure-03 with nine child runs and evaluator feedback](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true)
 - Every local provider-backed result includes case ID, dataset version, expected and actual disposition, profile, prompt version, latency, token count, retrieval IDs, trajectory score, and evaluator feedback.
+- Provider workflows: 400; answer outputs: 269; independently judged answer outputs: 269.
 - Production traces remain metadata-only. Synthetic LangSmith dataset examples contain the fictional test prompt and reference output so experiments are reproducible.
 
 ## Monitoring plan

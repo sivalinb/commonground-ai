@@ -8,6 +8,11 @@ export type EvaluationTraceContext = {
   experimentName: string;
   expectedDisposition?: 'answer' | 'abstain' | 'refuse' | 'privacy_block';
   langsmithExampleId?: string;
+  syntheticDataAllowed?: boolean;
+  caseText?: string;
+  jurisdiction?: 'colorado' | 'national';
+  expectedSourceIds?: string[];
+  referenceRationale?: string;
 };
 
 export class MetadataTracer {
@@ -47,6 +52,17 @@ export class MetadataTracer {
   constructor(private readonly evaluation?: EvaluationTraceContext) {}
 
   async start(traceId: string, characterCount: number) {
+    const syntheticInputs = this.evaluation?.syntheticDataAllowed
+      ? {
+          case_id: this.evaluation.caseId,
+          case_text: this.evaluation.caseText,
+          jurisdiction: this.evaluation.jurisdiction,
+          expected_disposition: this.evaluation.expectedDisposition,
+          expected_source_ids: this.evaluation.expectedSourceIds,
+          reference_rationale: this.evaluation.referenceRationale,
+          synthetic_evaluation_data: true,
+        }
+      : { character_count: characterCount, raw_case_text_logged: false };
     await this.send('/runs', 'POST', {
       id: this.runId,
       name: 'commonground-langgraph-analysis',
@@ -57,7 +73,7 @@ export class MetadataTracer {
         'commonground-ai-production',
       start_time: Date.now(),
       reference_example_id: this.evaluation?.langsmithExampleId,
-      inputs: { character_count: characterCount, raw_case_text_logged: false },
+      inputs: syntheticInputs,
       extra: {
         metadata: {
           app_trace_id: traceId,
@@ -97,7 +113,13 @@ export class MetadataTracer {
           ? 'chain'
           : 'tool',
       start_time: started,
-      inputs: { raw_text_logged: false },
+      inputs: this.evaluation?.syntheticDataAllowed
+        ? {
+            stage,
+            operation: detail,
+            synthetic_evaluation_data: true,
+          }
+        : { raw_text_logged: false },
       extra: {
         metadata: {
           stage,

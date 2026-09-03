@@ -15,7 +15,9 @@ Review the checked-in, deterministic 30-case sample from `commonground-rj-week4-
 
 Include at least one youth-safety case, one Colorado case, one no-contact case, one privacy case, one abstention, and one refusal. Sample IDs should be recorded before viewing automated evaluator scores.
 
-The complete reviewer worksheet is checked in at [`../evals/human-calibration-sample-v1.csv`](../evals/human-calibration-sample-v1.csv). It is ready for offline blinded review. LangSmith annotation-queue creation remains pending renewed account trace capacity; no human-calibration result is claimed yet.
+The complete reviewer worksheet is checked in at [`../evals/human-calibration-sample-v1.csv`](../evals/human-calibration-sample-v1.csv). It is ready for offline blinded review. The LangSmith annotation-queue workflow and six required rubric fields are implemented, but queue creation remains blocked by the workspace's monthly unique-trace limit; no human-calibration result is claimed yet.
+
+After all 30 cases are scored, run `pnpm eval:week4:calibration:score` for the offline worksheet or `pnpm eval:week4:calibration:sync` after completing the LangSmith queue. The scorer requires reviewer role, review date, five anchored 0–4 scores, and an explicit critical-failure yes/no decision for every case. It deliberately reports agreement as pending if even one case is incomplete.
 
 ## Blind scoring rubric
 

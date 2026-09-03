@@ -1,6 +1,10 @@
 import report from '@/data/eval-report.json';
 import evaluatorContract from '@/data/evaluator-contract.json';
 import calibrationManifest from '@/data/human-calibration-manifest.json';
+import calibrationReport from '@/data/human-calibration-report.json';
+import langsmithPublication from '@/data/langsmith-publication-status.json';
+import traceEvidence from '@/data/week4-trace-evidence.json';
+import ablation from '@/data/week4-ablation-report.json';
 import retrieval from '@/data/retrieval-eval-report.json';
 import week4Dataset from '@/data/week4-dataset-manifest.json';
 import week4Core from '@/data/week4-eval-report.json';
@@ -26,6 +30,10 @@ export async function GET() {
     retrieval,
     evaluatorContract,
     calibrationManifest,
+    calibrationReport,
+    langsmithPublication,
+    traceEvidence,
+    ablation,
     week4Dataset,
     week4,
     week4Core,

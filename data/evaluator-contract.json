@@ -65,6 +65,7 @@
       "claimFaithfulness": 90,
       "autonomyPreservation": 95,
       "traumaAwareQuality": 95,
+      "llmHandoffAppropriateness": 95,
       "handoffAppropriateness": 95,
       "trajectoryCorrectness": 95,
       "providerToolSuccess": 98,

@@ -195,6 +195,51 @@ type EvalReport = {
     };
     status: string;
   };
+  calibrationReport: {
+    sampleSize: number;
+    completedCases: number;
+    pendingCases: number;
+    status: string;
+    agreementPercent: number | null;
+    criticalCaseAgreementPercent: number | null;
+    falseSafeCount: number;
+  };
+  langsmithPublication: {
+    attemptedAt: string;
+    status: string;
+    providerResponse: { httpStatus: number; message: string };
+  };
+  traceEvidence: {
+    caseId: string;
+    projectName: string;
+    runUrl: string;
+    traceSource: string;
+    childRuns: Array<{ name: string; status: string }>;
+    verification: {
+      complete: boolean;
+      evaluationFeedback: {
+        safeTaskCompletion: number;
+        traceCompleteness: number;
+        expectedDisposition: string;
+        predictedDisposition: string;
+        publicationStatus: string;
+      };
+    };
+  };
+  ablation: {
+    cohort: { total: number; benchmarkCore: number; regressionCases: number };
+    summaries: Record<
+      string,
+      { metrics: Record<string, number | null>; passed: number; total: number }
+    >;
+    findings: {
+      falseAbstentions: number;
+      confidenceGateTriggered: number;
+      promptOnlyTrigger: number;
+      combinedInteraction: number;
+      interpretation: string;
+    };
+  };
   retrieval: {
     dataset: string;
     mode: string;
@@ -251,6 +296,11 @@ type EvalReport = {
     mode: string;
     distribution: Record<string, number>;
     evaluatorSet: string[];
+    evaluationCoverage: {
+      providerWorkflowResults: number;
+      answerOutputs: number;
+      llmJudgedAnswerOutputs: number;
+    };
     baseline: Week4Experiment;
     improved: Week4Experiment;
     deltas: Record<string, number | null>;
@@ -276,6 +326,7 @@ type EvalReport = {
       datasetName: string;
       datasetUrl: string;
       experiments: Record<string, string>;
+      experimentUrls: Record<string, string | null>;
       pairwise?: null | { experimentName: string; url: string | null };
       humanQueue?: null | {
         name: string;
@@ -1860,8 +1911,204 @@ export default function Home() {
             <SectionHeading
               eyebrow="Versioned evaluation laboratory"
               title="200 golden cases. Two complete provider runs. One honest release gate."
-              description="The full v2 corpus ran through the frozen baseline and improved GraphRAG configuration. All 268 answer outputs received an independent Mistral review; deterministic evaluators covered all 400 results. LangSmith still holds the versioned dataset, while full experiment persistence awaits account trace capacity."
+              description="The full v2 corpus ran through the frozen baseline and improved GraphRAG configuration. All 269 answer outputs received an independent Mistral review; deterministic evaluators covered all 400 results. LangSmith holds the versioned dataset; full experiment and direct-trace publication are implemented but blocked by the workspace's monthly unique-trace limit."
             />
+            {evalReport?.week4 && (
+              <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                {[
+                  {
+                    value:
+                      evalReport.week4.evaluationCoverage
+                        .providerWorkflowResults,
+                    label: 'Provider workflows',
+                    detail: '200 baseline + 200 improved',
+                    icon: Layers3,
+                  },
+                  {
+                    value:
+                      evalReport.week4.evaluationCoverage
+                        .llmJudgedAnswerOutputs,
+                    label: 'LLM-judged answers',
+                    detail: '139 baseline + 130 improved',
+                    icon: BrainCircuit,
+                  },
+                  {
+                    value: evalReport.week4.improved.topFailureClusters.reduce(
+                      (sum, cluster) => sum + cluster.count,
+                      0,
+                    ),
+                    label: 'Known regressions',
+                    detail: 'Preserved for root-cause analysis',
+                    icon: AlertTriangle,
+                  },
+                  {
+                    value:
+                      evalReport.week4.releaseGate.criticalSafetyVeto
+                        ?.failures || 0,
+                    label: 'Critical veto failures',
+                    detail: 'Zero-tolerance gate',
+                    icon: ShieldCheck,
+                  },
+                ].map(({ value, label, detail, icon: Icon }) => (
+                  <Card key={label} className="overflow-hidden">
+                    <CardContent className="flex items-start justify-between gap-3 p-4">
+                      <div>
+                        <p className="font-mono text-3xl font-semibold">
+                          {value}
+                        </p>
+                        <p className="mt-1 text-xs font-semibold">{label}</p>
+                        <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                          {detail}
+                        </p>
+                      </div>
+                      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-800">
+                        <Icon className="size-4" />
+                      </span>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+            {evalReport?.langsmithPublication.status ===
+              'blocked_by_monthly_unique_trace_limit' && (
+              <Alert className="mb-6 border-amber-300 bg-amber-50 text-amber-950">
+                <AlertTriangle />
+                <AlertTitle>LangSmith publication capacity reached</AlertTitle>
+                <AlertDescription>
+                  The dataset is verified and the complete experiment, child
+                  trace, evaluator, and annotation-queue code is ready. The
+                  latest publication attempt returned HTTP{' '}
+                  {evalReport.langsmithPublication.providerResponse.httpStatus}:{' '}
+                  {evalReport.langsmithPublication.providerResponse.message}.
+                  The checked-in 400-run evidence remains complete; publication
+                  can resume without rerunning providers when the allowance
+                  renews.
+                </AlertDescription>
+              </Alert>
+            )}
+            {evalReport?.traceEvidence && evalReport?.ablation && (
+              <div className="mb-6 grid gap-4 xl:grid-cols-2">
+                <Card className="overflow-hidden border-emerald-200 bg-gradient-to-br from-emerald-50 via-background to-teal-50">
+                  <CardHeader>
+                    <div>
+                      <div className="mb-2 flex flex-wrap gap-2">
+                        <Badge className="bg-emerald-700 text-white">
+                          Verified case trace
+                        </Badge>
+                        <Badge variant="outline">
+                          {evalReport.traceEvidence.childRuns.length} child runs
+                        </Badge>
+                      </div>
+                      <CardTitle>One case, every AI decision visible</CardTitle>
+                      <CardDescription className="mt-1">
+                        {evalReport.traceEvidence.caseId} links retrieval,
+                        reranking, generation, safety review, and evaluator
+                        metadata in one LangSmith trace.
+                      </CardDescription>
+                    </div>
+                    <CardAction>
+                      <a
+                        href={evalReport.traceEvidence.runUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <Button size="sm">
+                          Inspect trace <ExternalLink />
+                        </Button>
+                      </a>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-1.5">
+                      {evalReport.traceEvidence.childRuns.map((run) => (
+                        <Badge key={run.name} variant="secondary">
+                          {run.name.replaceAll('_', ' ')}
+                        </Badge>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-xs leading-5 text-emerald-950">
+                      Code-evaluator result: safe completion{' '}
+                      {evalReport.traceEvidence.verification.evaluationFeedback
+                        .safeTaskCompletion === 1
+                        ? 'passed'
+                        : 'failed'}
+                      ; trace completeness{' '}
+                      {evalReport.traceEvidence.verification.evaluationFeedback
+                        .traceCompleteness === 1
+                        ? 'passed'
+                        : 'failed'}
+                      .
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="overflow-hidden border-fuchsia-200 bg-gradient-to-br from-fuchsia-50 via-background to-violet-50">
+                  <CardHeader>
+                    <div>
+                      <div className="mb-2 flex flex-wrap gap-2">
+                        <Badge className="bg-fuchsia-700 text-white">
+                          Controlled ablation
+                        </Badge>
+                        <Badge variant="outline">
+                          {evalReport.ablation.cohort.total} fixed cases
+                        </Badge>
+                      </div>
+                      <CardTitle>Which improvement actually helped?</CardTitle>
+                      <CardDescription className="mt-1">
+                        Four levers were tested one at a time against the same
+                        benchmark and all nine observed regressions.
+                      </CardDescription>
+                    </div>
+                    <CardAction>
+                      <a
+                        href="https://github.com/sivalinb/commonground-ai/blob/main/data/week4-ablation-report.json"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <Button size="sm" variant="outline">
+                          Open evidence <ExternalLink />
+                        </Button>
+                      </a>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      {[
+                        [
+                          evalReport.ablation.summaries.rerank_depth_only.metrics
+                            .recallAt5,
+                          'Rerank Recall@5',
+                        ],
+                        [
+                          evalReport.ablation.summaries.rerank_depth_only.metrics
+                            .sourceCoverageAt5,
+                          'Source coverage',
+                        ],
+                        [
+                          evalReport.ablation.findings.combinedInteraction,
+                          'Interaction cases',
+                        ],
+                      ].map(([value, label]) => (
+                        <div key={String(label)} className="rounded-xl border bg-white/70 p-3">
+                          <p className="font-mono text-xl font-semibold">
+                            {value}
+                            {String(label).includes('case') ? '' : '%'}
+                          </p>
+                          <p className="mt-1 text-[10px] leading-4 text-muted-foreground">
+                            {label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-xs leading-5 text-fuchsia-950">
+                      The nine regressions were model self-abstentions—not
+                      confidence-gate stops. One followed the prompt alone;
+                      eight emerged only from the combined prompt and evidence
+                      context.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
             {evalReport?.evaluatorContract && (
               <Card className="mb-6 overflow-hidden border-violet-200 bg-gradient-to-br from-violet-50 via-background to-teal-50">
                 <CardHeader>
@@ -1927,22 +2174,29 @@ export default function Home() {
                   <div className="mt-3 grid gap-3 md:grid-cols-3">
                     <div className="rounded-xl border border-violet-200 bg-violet-50 p-3 text-xs leading-5 text-violet-950">
                       <strong>Pairwise:</strong> the randomized
-                      baseline-versus-GraphRAG judge is implemented. LangSmith
-                      persistence is pending renewed trace capacity.
+                      baseline-versus-GraphRAG judge is implemented and
+                      reproducible. Publication is blocked by the same LangSmith
+                      monthly unique-trace limit.
                     </div>
                     <div className="rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs leading-5 text-teal-950">
                       <strong>Human calibration:</strong>{' '}
-                      {evalReport.calibrationManifest?.sampleSize ||
-                        evalReport.evaluatorContract.humanCalibration
-                          .sampleSize}
-                      -case stratified worksheet prepared for blinded review;
-                      queue creation and reviewer scoring are still pending. The
-                      targets are ≥
+                      {evalReport.calibrationReport.completedCases}/
+                      {evalReport.calibrationReport.sampleSize} blinded cases
+                      completed. The scorer will not calculate agreement until
+                      every human rubric row is present. Targets are ≥
                       {
                         evalReport.evaluatorContract.humanCalibration
                           .overallAgreementTarget
                       }
                       % overall and 100% critical-case agreement targets.
+                      <a
+                        href="https://github.com/sivalinb/commonground-ai/blob/main/evals/human-calibration-sample-v1.csv"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 block font-semibold underline underline-offset-2"
+                      >
+                        Open blinded reviewer packet ↗
+                      </a>
                     </div>
                     <div className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs leading-5 text-sky-950">
                       <strong>Production privacy:</strong> deterministic
@@ -2030,9 +2284,10 @@ export default function Home() {
                           .deterministicValidation
                       }{' '}
                       cases completed baseline and improved provider runs. The
-                      local code and Mistral-judge report is complete; LangSmith
-                      experiment, pairwise, and human-queue persistence remains
-                      pending because the account trace quota is exhausted.
+                      local code and Mistral-judge report is complete. The
+                      dataset is verified in LangSmith; full experiment,
+                      child-trace, pairwise, and queue persistence is blocked by
+                      the monthly unique-trace allowance.
                       <div className="mt-3 flex flex-wrap gap-2">
                         <Badge className="bg-emerald-700 text-white">
                           400 provider workflows complete
@@ -2041,7 +2296,7 @@ export default function Home() {
                           LangSmith dataset verified
                         </Badge>
                         <Badge className="bg-amber-200 text-amber-950">
-                          Trace publication pending capacity
+                          HTTP 429 · trace capacity reached
                         </Badge>
                       </div>
                     </div>

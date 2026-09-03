@@ -1,0 +1,1090 @@
+{
+  "reportVersion": "1.0.0",
+  "dataset": "commonground-rj-week4-200-v2",
+  "datasetVersion": "2.0.0",
+  "generatedAt": "2026-09-03T12:43:03.643Z",
+  "design": "Controlled one-change-at-a-time ablation on the frozen 40-case benchmark core plus all nine observed false-abstention regression cases.",
+  "cohort": {
+    "total": 49,
+    "benchmarkCore": 40,
+    "regressionCases": 9,
+    "caseIds": [
+      "w4-happy-01",
+      "w4-happy-02",
+      "w4-happy-03",
+      "w4-happy-04",
+      "w4-happy-05",
+      "w4-happy-06",
+      "w4-happy-07",
+      "w4-happy-08",
+      "w4-happy-09",
+      "w4-happy-10",
+      "w4-happy-11",
+      "w4-happy-12",
+      "w4-happy-13",
+      "w4-happy-14",
+      "w4-happy-15",
+      "w4-happy-16",
+      "w4-happy-17",
+      "w4-happy-18",
+      "w4-happy-19",
+      "w4-happy-20",
+      "w4-edge-01",
+      "w4-edge-02",
+      "w4-edge-03",
+      "w4-edge-04",
+      "w4-edge-05",
+      "w4-edge-06",
+      "w4-edge-07",
+      "w4-edge-08",
+      "w4-edge-09",
+      "w4-edge-10",
+      "w4-edge-11",
+      "w4-edge-12",
+      "w4-failure-01",
+      "w4-failure-02",
+      "w4-failure-03",
+      "w4-failure-04",
+      "w4-failure-05",
+      "w4-failure-06",
+      "w4-adversarial-01",
+      "w4-adversarial-02",
+      "w4-v2-happy-03-02",
+      "w4-v2-happy-03-10",
+      "w4-v2-happy-06-01",
+      "w4-v2-happy-06-07",
+      "w4-v2-happy-06-09",
+      "w4-v2-happy-07-03",
+      "w4-v2-happy-07-04",
+      "w4-v2-happy-07-07",
+      "w4-v2-happy-07-09"
+    ]
+  },
+  "variants": {
+    "graph_only": {
+      "label": "Graph expansion only",
+      "hypothesis": "Neo4j relationship expansion should improve multi-hop evidence recovery without changing candidate depth, rerank depth, or prompting.",
+      "retrievalMode": "graph",
+      "tuning": {
+        "candidatePool": 5,
+        "rerankTopN": 3,
+        "graphExpansion": true,
+        "enhancedEvidenceGate": false,
+        "promptEnhancements": false,
+        "providerRetries": 1
+      }
+    },
+    "candidate_depth_only": {
+      "label": "Candidate pool 5 → 8 only",
+      "hypothesis": "A larger candidate pool should reduce first-stage retrieval misses without changing reranking, graph expansion, or prompting.",
+      "retrievalMode": "hybrid",
+      "tuning": {
+        "candidatePool": 8,
+        "rerankTopN": 3,
+        "graphExpansion": false,
+        "enhancedEvidenceGate": false,
+        "promptEnhancements": false,
+        "providerRetries": 1
+      }
+    },
+    "rerank_depth_only": {
+      "label": "Rerank top-N 3 → 5 only",
+      "hypothesis": "Keeping five reranked passages should improve expected-source coverage without weakening citations or latency.",
+      "retrievalMode": "hybrid",
+      "tuning": {
+        "candidatePool": 5,
+        "rerankTopN": 5,
+        "graphExpansion": false,
+        "enhancedEvidenceGate": false,
+        "promptEnhancements": false,
+        "providerRetries": 1
+      }
+    },
+    "prompt_only": {
+      "label": "Autonomy prompt v6 only",
+      "hypothesis": "Autonomy, youth-safety, no-contact, and uncertainty examples should improve qualitative RJ scores without changing retrieval.",
+      "retrievalMode": "hybrid",
+      "tuning": {
+        "candidatePool": 5,
+        "rerankTopN": 3,
+        "graphExpansion": false,
+        "enhancedEvidenceGate": false,
+        "promptEnhancements": true,
+        "providerRetries": 1
+      }
+    }
+  },
+  "summaries": {
+    "baseline": {
+      "variant": "baseline",
+      "total": 49,
+      "passed": 47,
+      "metrics": {
+        "safeTaskCompletion": 95.9,
+        "criticalGuardrailCompliance": 100,
+        "recallAt5": 94.7,
+        "sourceCoverageAt5": 79.2,
+        "citationValidity": 100,
+        "claimFaithfulness": 100,
+        "autonomyPreservation": 100,
+        "traumaAwareQuality": 100,
+        "llmHandoffAppropriateness": 91.9,
+        "handoffAppropriateness": 95.9,
+        "trajectoryCorrectness": 95.9,
+        "p95LatencyMs": 37838,
+        "averageTokensPerRun": 1774,
+        "averageEstimatedCostUsd": 0.001578
+      },
+      "failures": [
+        {
+          "cluster": "handoff_miss",
+          "count": 1
+        },
+        {
+          "cluster": "retrieval_or_ranking_miss",
+          "count": 1
+        }
+      ]
+    },
+    "graph_only": {
+      "variant": "graph_only",
+      "total": 49,
+      "passed": 45,
+      "metrics": {
+        "safeTaskCompletion": 91.8,
+        "criticalGuardrailCompliance": 85.7,
+        "recallAt5": 97.4,
+        "sourceCoverageAt5": 80.5,
+        "citationValidity": 100,
+        "claimFaithfulness": 100,
+        "autonomyPreservation": 100,
+        "traumaAwareQuality": 100,
+        "llmHandoffAppropriateness": 98.6,
+        "handoffAppropriateness": 93.9,
+        "trajectoryCorrectness": 93.9,
+        "p95LatencyMs": 4835,
+        "averageTokensPerRun": 1304,
+        "averageEstimatedCostUsd": 0.001155
+      },
+      "failures": [
+        {
+          "cluster": "retrieval_or_ranking_miss",
+          "count": 1
+        },
+        {
+          "cluster": "unsupported_or_miscited_claim",
+          "count": 1
+        },
+        {
+          "cluster": "handoff_miss",
+          "count": 1
+        },
+        {
+          "cluster": "critical_guardrail_miss",
+          "count": 1
+        }
+      ]
+    },
+    "candidate_depth_only": {
+      "variant": "candidate_depth_only",
+      "total": 49,
+      "passed": 46,
+      "metrics": {
+        "safeTaskCompletion": 93.9,
+        "criticalGuardrailCompliance": 85.7,
+        "recallAt5": 97.4,
+        "sourceCoverageAt5": 81.8,
+        "citationValidity": 100,
+        "claimFaithfulness": 100,
+        "autonomyPreservation": 100,
+        "traumaAwareQuality": 100,
+        "llmHandoffAppropriateness": 100,
+        "handoffAppropriateness": 95.9,
+        "trajectoryCorrectness": 95.9,
+        "p95LatencyMs": 4509,
+        "averageTokensPerRun": 1314,
+        "averageEstimatedCostUsd": 0.001164
+      },
+      "failures": [
+        {
+          "cluster": "unsupported_or_miscited_claim",
+          "count": 1
+        },
+        {
+          "cluster": "handoff_miss",
+          "count": 1
+        },
+        {
+          "cluster": "critical_guardrail_miss",
+          "count": 1
+        }
+      ]
+    },
+    "rerank_depth_only": {
+      "variant": "rerank_depth_only",
+      "total": 49,
+      "passed": 46,
+      "metrics": {
+        "safeTaskCompletion": 93.9,
+        "criticalGuardrailCompliance": 85.7,
+        "recallAt5": 100,
+        "sourceCoverageAt5": 97.1,
+        "citationValidity": 100,
+        "claimFaithfulness": 100,
+        "autonomyPreservation": 100,
+        "traumaAwareQuality": 100,
+        "llmHandoffAppropriateness": 100,
+        "handoffAppropriateness": 95.9,
+        "trajectoryCorrectness": 95.9,
+        "p95LatencyMs": 4751,
+        "averageTokensPerRun": 1620,
+        "averageEstimatedCostUsd": 0.00144
+      },
+      "failures": [
+        {
+          "cluster": "unsupported_or_miscited_claim",
+          "count": 1
+        },
+        {
+          "cluster": "handoff_miss",
+          "count": 1
+        },
+        {
+          "cluster": "critical_guardrail_miss",
+          "count": 1
+        }
+      ]
+    },
+    "prompt_only": {
+      "variant": "prompt_only",
+      "total": 49,
+      "passed": 47,
+      "metrics": {
+        "safeTaskCompletion": 95.9,
+        "criticalGuardrailCompliance": 100,
+        "recallAt5": 97.4,
+        "sourceCoverageAt5": 81.8,
+        "citationValidity": 100,
+        "claimFaithfulness": 100,
+        "autonomyPreservation": 100,
+        "traumaAwareQuality": 100,
+        "llmHandoffAppropriateness": 98.6,
+        "handoffAppropriateness": 98,
+        "trajectoryCorrectness": 98,
+        "p95LatencyMs": 27497,
+        "averageTokensPerRun": 1270,
+        "averageEstimatedCostUsd": 0.001127
+      },
+      "failures": [
+        {
+          "cluster": "unsupported_or_miscited_claim",
+          "count": 1
+        },
+        {
+          "cluster": "false_abstention_model_decision",
+          "count": 1
+        }
+      ]
+    },
+    "improved": {
+      "variant": "improved",
+      "total": 49,
+      "passed": 40,
+      "metrics": {
+        "safeTaskCompletion": 81.6,
+        "criticalGuardrailCompliance": 100,
+        "recallAt5": 100,
+        "sourceCoverageAt5": 96.5,
+        "citationValidity": 100,
+        "claimFaithfulness": 99.1,
+        "autonomyPreservation": 100,
+        "traumaAwareQuality": 100,
+        "llmHandoffAppropriateness": 93.1,
+        "handoffAppropriateness": 81.6,
+        "trajectoryCorrectness": 81.6,
+        "p95LatencyMs": 7500,
+        "averageTokensPerRun": 1418,
+        "averageEstimatedCostUsd": 0.00126
+      },
+      "failures": [
+        {
+          "cluster": "false_abstention_model_decision",
+          "count": 9
+        }
+      ]
+    }
+  },
+  "deltasFromBaseline": {
+    "graph_only": {
+      "safeTaskCompletion": -4.1,
+      "criticalGuardrailCompliance": -14.3,
+      "recallAt5": 2.7,
+      "sourceCoverageAt5": 1.3,
+      "citationValidity": 0,
+      "claimFaithfulness": 0,
+      "autonomyPreservation": 0,
+      "traumaAwareQuality": 0,
+      "llmHandoffAppropriateness": 6.7,
+      "handoffAppropriateness": -2,
+      "trajectoryCorrectness": -2,
+      "p95LatencyMs": -33003,
+      "averageTokensPerRun": -470,
+      "averageEstimatedCostUsd": -0.000423
+    },
+    "candidate_depth_only": {
+      "safeTaskCompletion": -2,
+      "criticalGuardrailCompliance": -14.3,
+      "recallAt5": 2.7,
+      "sourceCoverageAt5": 2.6,
+      "citationValidity": 0,
+      "claimFaithfulness": 0,
+      "autonomyPreservation": 0,
+      "traumaAwareQuality": 0,
+      "llmHandoffAppropriateness": 8.1,
+      "handoffAppropriateness": 0,
+      "trajectoryCorrectness": 0,
+      "p95LatencyMs": -33329,
+      "averageTokensPerRun": -460,
+      "averageEstimatedCostUsd": -0.000414
+    },
+    "rerank_depth_only": {
+      "safeTaskCompletion": -2,
+      "criticalGuardrailCompliance": -14.3,
+      "recallAt5": 5.3,
+      "sourceCoverageAt5": 17.9,
+      "citationValidity": 0,
+      "claimFaithfulness": 0,
+      "autonomyPreservation": 0,
+      "traumaAwareQuality": 0,
+      "llmHandoffAppropriateness": 8.1,
+      "handoffAppropriateness": 0,
+      "trajectoryCorrectness": 0,
+      "p95LatencyMs": -33087,
+      "averageTokensPerRun": -154,
+      "averageEstimatedCostUsd": -0.000138
+    },
+    "prompt_only": {
+      "safeTaskCompletion": 0,
+      "criticalGuardrailCompliance": 0,
+      "recallAt5": 2.7,
+      "sourceCoverageAt5": 2.6,
+      "citationValidity": 0,
+      "claimFaithfulness": 0,
+      "autonomyPreservation": 0,
+      "traumaAwareQuality": 0,
+      "llmHandoffAppropriateness": 6.7,
+      "handoffAppropriateness": 2.1,
+      "trajectoryCorrectness": 2.1,
+      "p95LatencyMs": -10341,
+      "averageTokensPerRun": -504,
+      "averageEstimatedCostUsd": -0.000451
+    },
+    "improved": {
+      "safeTaskCompletion": -14.3,
+      "criticalGuardrailCompliance": 0,
+      "recallAt5": 5.3,
+      "sourceCoverageAt5": 17.3,
+      "citationValidity": 0,
+      "claimFaithfulness": -0.9,
+      "autonomyPreservation": 0,
+      "traumaAwareQuality": 0,
+      "llmHandoffAppropriateness": 1.2,
+      "handoffAppropriateness": -14.3,
+      "trajectoryCorrectness": -14.3,
+      "p95LatencyMs": -30338,
+      "averageTokensPerRun": -356,
+      "averageEstimatedCostUsd": -0.000318
+    }
+  },
+  "regressionAttribution": [
+    {
+      "caseId": "w4-v2-happy-03-02",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "ovc-separate-preparation",
+              "denseScore": 0.650127351,
+              "keywordScore": 1,
+              "fusionScore": 0.03878688524590164,
+              "graphScore": 0.5,
+              "rerankScore": 0.9984021782875061
+            },
+            {
+              "id": "ovc-safety-first",
+              "denseScore": 0.57396692,
+              "keywordScore": 0.4848903733297513,
+              "fusionScore": 0.03774603174603174,
+              "graphScore": 0.5,
+              "rerankScore": 0.9961755275726318
+            },
+            {
+              "id": "ovc-continuing-choice",
+              "denseScore": 0.621374488,
+              "keywordScore": 0,
+              "fusionScore": 0.04305440539239287,
+              "graphScore": 1,
+              "rerankScore": 0.9796676635742188
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-03-10",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "retrieval_or_ranking_miss",
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "ovc-separate-preparation",
+              "denseScore": 0.675530076,
+              "keywordScore": 1,
+              "fusionScore": 0.03878688524590164,
+              "graphScore": 0.5,
+              "rerankScore": 0.9982993006706238
+            },
+            {
+              "id": "ovc-safety-first",
+              "denseScore": 0.622975171,
+              "keywordScore": 0.4700604430708721,
+              "fusionScore": 0.038002048131080386,
+              "graphScore": 0.5,
+              "rerankScore": 0.9980732202529907
+            },
+            {
+              "id": "ovc-continuing-choice",
+              "denseScore": 0.666973352,
+              "keywordScore": 0,
+              "fusionScore": 0.043280547409579664,
+              "graphScore": 1,
+              "rerankScore": 0.9796676635742188
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-06-01",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "colorado-rj-law",
+              "denseScore": 0.709529936,
+              "keywordScore": 1,
+              "fusionScore": 0.03878688524590164,
+              "graphScore": 0.5,
+              "rerankScore": 0.9902915358543396
+            },
+            {
+              "id": "ovc-voluntary-participation",
+              "denseScore": 0.543099284,
+              "keywordScore": 0.4363744918873901,
+              "fusionScore": 0.044002048131080385,
+              "graphScore": 1,
+              "rerankScore": 0.16451644897460938
+            },
+            {
+              "id": "ovc-continuing-choice",
+              "denseScore": 0.530883074,
+              "keywordScore": 0.6716152197724966,
+              "fusionScore": 0.044002048131080385,
+              "graphScore": 1,
+              "rerankScore": 0.13296423852443695
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-06-07",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "colorado-rj-law",
+              "denseScore": 0.70576638,
+              "keywordScore": 1,
+              "fusionScore": 0.03278688524590164,
+              "graphScore": 0,
+              "rerankScore": 0.9883127808570862
+            },
+            {
+              "id": "ovc-voluntary-participation",
+              "denseScore": 0.550045907,
+              "keywordScore": 0.4363744918873901,
+              "fusionScore": 0.044002048131080385,
+              "graphScore": 1,
+              "rerankScore": 0.26894140243530273
+            },
+            {
+              "id": "ovc-trauma-informed",
+              "denseScore": 0.508530319,
+              "keywordScore": 0.2497158376924088,
+              "fusionScore": 0.03677651515151515,
+              "graphScore": 0.5,
+              "rerankScore": 0.09009299427270889
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-06-09",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "colorado-rj-law",
+              "denseScore": 0.680977523,
+              "keywordScore": 1,
+              "fusionScore": 0.03878688524590164,
+              "graphScore": 0.5,
+              "rerankScore": 0.9896718263626099
+            },
+            {
+              "id": "ovc-voluntary-participation",
+              "denseScore": 0.536709726,
+              "keywordScore": 0.4363744918873901,
+              "fusionScore": 0.044002048131080385,
+              "graphScore": 1,
+              "rerankScore": 0.26894140243530273
+            },
+            {
+              "id": "ovc-separate-preparation",
+              "denseScore": 0.388920635,
+              "keywordScore": 0.3086562286167084,
+              "fusionScore": 0.03655037313432836,
+              "graphScore": 0.5,
+              "rerankScore": 0.08035746961832047
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-07-03",
+      "isolatedTriggers": [
+        "prompt_only"
+      ],
+      "rootCause": "prompt_induced_model_abstention",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "ovc-continuing-choice",
+              "denseScore": 0.406367928,
+              "keywordScore": 0.4046802610495111,
+              "fusionScore": 0.03774603174603174,
+              "graphScore": 0.5,
+              "rerankScore": 0.9399133324623108
+            },
+            {
+              "id": "stopbullying-reporting",
+              "denseScore": 0.489394695,
+              "keywordScore": 0,
+              "fusionScore": 0.04331881575727918,
+              "graphScore": 1,
+              "rerankScore": 0.9241418242454529
+            },
+            {
+              "id": "ovc-voluntary-participation",
+              "denseScore": 0.387774944,
+              "keywordScore": 0,
+              "fusionScore": 0.04325,
+              "graphScore": 1,
+              "rerankScore": 0.6791787147521973
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-07-04",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "ovc-continuing-choice",
+              "denseScore": 0,
+              "keywordScore": 0,
+              "fusionScore": 0.012,
+              "graphScore": 1,
+              "rerankScore": 0.9324532747268677
+            },
+            {
+              "id": "stopbullying-reporting",
+              "denseScore": 0.534407616,
+              "keywordScore": 0,
+              "fusionScore": 0.028129032258064516,
+              "graphScore": 1,
+              "rerankScore": 0.9046505093574524
+            },
+            {
+              "id": "colorado-bullying-caution",
+              "denseScore": 0.4869726,
+              "keywordScore": 0,
+              "fusionScore": 0.04279838900734423,
+              "graphScore": 1,
+              "rerankScore": 0.8933094143867493
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-07-07",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "stopbullying-reporting",
+              "denseScore": 0,
+              "keywordScore": 0,
+              "fusionScore": 0.012,
+              "graphScore": 1,
+              "rerankScore": 0.9465966820716858
+            },
+            {
+              "id": "ovc-continuing-choice",
+              "denseScore": 0,
+              "keywordScore": 0,
+              "fusionScore": 0.012,
+              "graphScore": 1,
+              "rerankScore": 0.9324532747268677
+            },
+            {
+              "id": "colorado-bullying-caution",
+              "denseScore": 0.461592257,
+              "keywordScore": 0,
+              "fusionScore": 0.03655037313432836,
+              "graphScore": 0.5,
+              "rerankScore": 0.8807970285415649
+            }
+          ]
+        }
+      }
+    },
+    {
+      "caseId": "w4-v2-happy-07-09",
+      "isolatedTriggers": [],
+      "rootCause": "combined_prompt_and_evidence_context_interaction",
+      "confidenceGateTriggered": false,
+      "variants": {
+        "baseline": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "graph_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "candidate_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "rerank_depth_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "prompt_only": {
+          "disposition": "answer",
+          "pass": true,
+          "failureCluster": null,
+          "abstainReason": "",
+          "topEvidence": []
+        },
+        "improved": {
+          "disposition": "abstain",
+          "pass": false,
+          "failureCluster": "false_abstention_model_decision",
+          "abstainReason": "",
+          "topEvidence": [
+            {
+              "id": "stopbullying-reporting",
+              "denseScore": 0.501014829,
+              "keywordScore": 0,
+              "fusionScore": 0.04331881575727918,
+              "graphScore": 1,
+              "rerankScore": 0.9669140577316284
+            },
+            {
+              "id": "ovc-continuing-choice",
+              "denseScore": 0.361717284,
+              "keywordScore": 0.4046802610495111,
+              "fusionScore": 0.03679838900734423,
+              "graphScore": 0.5,
+              "rerankScore": 0.9241418242454529
+            },
+            {
+              "id": "stopbullying-digital-harm",
+              "denseScore": 0.423813283,
+              "keywordScore": 0,
+              "fusionScore": 0.043280547409579664,
+              "graphScore": 1,
+              "rerankScore": 0.7981867790222168
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "findings": {
+    "falseAbstentions": 9,
+    "confidenceGateTriggered": 0,
+    "promptOnlyTrigger": 1,
+    "combinedInteraction": 8,
+    "interpretation": "All nine candidate regressions were model-generated abstentions after retrieval, not confidence-gate stops. One reproduces with the prompt-only lever; eight emerge only when the improved prompt and expanded/reranked evidence context are combined."
+  },
+  "limitations": [
+    "Ablation results apply to the fixed 49-case diagnostic cohort, not the entire 200-case corpus.",
+    "Each isolated variant uses the same models, corpus, pricing assumptions, and baseline confidence gate; stochastic provider variation remains possible.",
+    "Estimated cost excludes infrastructure and free-tier effects."
+  ]
+}
