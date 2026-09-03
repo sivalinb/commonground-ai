@@ -3032,7 +3032,6 @@ export default function Home() {
                       'Prompt and iteration log',
                       'docs/PROMPTS_AND_ITERATIONS.md',
                     ],
-                    ['Five-minute demo guide', 'docs/FIVE_MINUTE_DEMO.md'],
                   ].map(([label, path]) => (
                     <a
                       key={path}

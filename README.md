@@ -149,7 +149,6 @@ Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97%
 - [`docs/WEEK_1_3_PROJECT_REPORT.md`](docs/WEEK_1_3_PROJECT_REPORT.md) — cumulative Week 1–3 report
 - [`docs/PROMPTS_AND_ITERATIONS.md`](docs/PROMPTS_AND_ITERATIONS.md) — AI-assisted development prompt and iteration log
 - [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md) — metrics, datasets, targets, and ablation method
-- [`docs/FIVE_MINUTE_DEMO.md`](docs/FIVE_MINUTE_DEMO.md) — timed demonstration script
 - [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) — baseline/post-improvement evidence and failure analysis
 - [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md) — current 200-case baseline/post-improvement results and release decision
 - [`docs/WEEK_4_REVIEWER_GUIDE.md`](docs/WEEK_4_REVIEWER_GUIDE.md) — independent human calibration procedure
