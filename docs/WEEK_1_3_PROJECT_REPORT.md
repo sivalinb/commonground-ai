@@ -10,7 +10,7 @@ Source code: https://github.com/sivalinb/commonground-ai
 
 ### Verification snapshot
 
-Documentation and provider behavior were rechecked on September 2, 2026. The public demo, GitHub source, submission documents, and executable evaluation reports agree on the current system scope and measured results. The quality workflow covers type checking, linting, 47 deterministic unit tests, the 48-case safety suite, 24-query retrieval preflight, the 40-case benchmark validator, the 200-case v2 golden-dataset validator, and the production build.
+Documentation and provider behavior were rechecked on September 3, 2026. The public demo, GitHub source, submission documents, and executable evaluation reports agree on the current system scope and measured results. The quality workflow covers type checking, linting, 47 deterministic unit tests, the 48-case safety suite, 24-query retrieval preflight, the 40-case benchmark validator, the 200-case v2 golden-dataset validator, and the production build.
 
 ## Week 1 — Data application with vibe coding
 

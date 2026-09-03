@@ -2,36 +2,42 @@
 
 Victim-centered restorative-justice practice copilot demonstrating live retrieval-augmented generation, structured model outputs, independent safety review, human approval, evaluations, and privacy-minimized observability.
 
-[**Open the public demo**](https://commonground-rj-ai.siva-babu.chatgpt.site)
+[**Open the public demo**](https://commonground-rj-ai.siva-babu.chatgpt.site) · [**Read the reviewer-friendly system brief**](https://docs.google.com/document/d/1ljztlw9UGJ5nFPxkM02W1-dk_WQldZh6XMlJLtcOhq8/edit)
 
 ![CommonGround AI preview](public/og.jpg)
 
 > **Training and portfolio demonstration only.** This application does not determine guilt, credibility, remorse, mental health, legal eligibility, risk, or whether anyone should participate in a restorative process. Do not enter real case information or personally identifiable information.
 
-## What the demo shows
+## Why this exists
 
-- A public, accessible case workspace with three fictional scenarios
-- A public Trust Center with security, privacy, accessibility, AI-limitations, and live configuration-status pages
-- Server-enforced training-only attestation before generative text or voice processing
-- A five-agent practice lab with a fictional participant, evidence agent, facilitator coach, victim-services reviewer, and structured evaluator
-- Browser-native voice dictation and read-aloud with English and Spanish practice output
-- Deterministic privacy screening before external AI calls
-- A real LangGraph state machine with conditional stop paths and a durable human-approval checkpoint
-- Fireworks Qwen3 embeddings, reranking, JSON-schema-constrained generation, and an independent safety critic
-- Hybrid retrieval using Pinecone dense search, local BM25, reciprocal-rank fusion, and jurisdiction filtering
-- Neo4j Aura GraphRAG expansion over approved source, safeguard, and jurisdiction relationships
-- An isolated `commonground-rj-v1` namespace in the configured Pinecone Serverless index
-- A Fireworks safety critic plus an independent Mistral cross-provider release panel
-- Claim-level source citations, deterministic citation validation, groundedness signals, abstention, and required human approval
-- Metadata-only LangSmith production traces and evaluator feedback
-- You.com freshness research restricted to authoritative public domains
-- Fireworks policy-change triage that recommends curator review but cannot publish or re-index content
-- A visible corpus relationship map connecting jurisdictions, safeguards, and source nodes
-- Role-based Fireworks model routing with safe fallback to the primary configured model
-- Deepgram Nova-3 transcription and Aura-2 bilingual read-aloud with no application audio retention
-- A versioned 48-case safety suite, a 24-query retrieval suite, a 200-case LangSmith golden dataset, two complete 200-case provider experiments, and 47 deterministic unit tests
-- Cloudflare D1 approval and distributed rate-limit records, with optional Turnstile enforcement
-- Append-only, narrative-free D1 audit events for privacy blocks, workflow handoffs, reviewer decisions, practice runs, and corpus monitoring
+Restorative conversations depend on voluntary participation, careful language, and informed human judgment. Guidance is often scattered across agencies and websites, generic AI can produce unsupported or coercive language, and real cases should not be exposed casually to AI systems.
+
+CommonGround gives facilitators and victim-services practitioners a safe place to prepare with fictional scenarios and approved public guidance. It supports practice and reflection while keeping consequential decisions with trained people.
+
+## Product journey
+
+1. Choose a fictional scenario and jurisdiction.
+2. Retrieve approved evidence through semantic, lexical, and relationship-aware search.
+3. Generate structured, cited guidance—or safely abstain.
+4. Practice the conversation with specialized agents and receive coaching plus victim-services review.
+5. Require a person to approve, revise, reject, or escalate the result.
+
+## Reviewer quick path
+
+1. [Try the public application](https://commonground-rj-ai.siva-babu.chatgpt.site) with one fictional scenario.
+2. Open the [Evaluation Lab](https://commonground-rj-ai.siva-babu.chatgpt.site/#evals) and inspect the release decision.
+3. Inspect the [versioned 200-case LangSmith dataset](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/c62c1460-3673-447a-8eba-454628212369).
+4. Expand the nine child runs in the [direct case-level LangSmith trace](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true).
+5. Follow the [documentation index](docs/README.md) for current results, ablation evidence, human calibration, operations, and reproduction.
+
+## What makes the system agentic
+
+- **Reliable evidence:** Pinecone semantic retrieval, BM25 exact-term retrieval, reciprocal-rank fusion, and Fireworks reranking.
+- **Connected safeguards:** Neo4j GraphRAG expands jurisdiction and victim-safety relationships.
+- **Structured orchestration:** LangGraph coordinates bounded tools, five specialized practice agents, retries, and safe-stop paths.
+- **Independent review:** Fireworks and Mistral check grounding, autonomy, coercion, and handoff quality.
+- **Human control:** a durable interrupt-and-resume checkpoint prevents autonomous release.
+- **Measurable quality:** LangSmith traces, deterministic evaluators, an LLM judge, ablations, and a blinded human-calibration protocol.
 
 ## Architecture
 
@@ -146,19 +152,11 @@ The 200-case dataset is verified in LangSmith, and a [direct case-level trace](h
 
 Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97% citation precision**, **100% claim faithfulness**, **100% correct abstention**, and **7.93 s P95 latency**. On the 10-query ablation, GraphRAG reached **100%** Recall@5 and task success versus **70%** for vector-only and hybrid modes.
 
-## Course submission evidence
+## Documentation and reviewer evidence
 
-- [`docs/WEEK_1_3_PROJECT_REPORT.md`](docs/WEEK_1_3_PROJECT_REPORT.md) — cumulative Week 1–3 report
-- [`docs/PROMPTS_AND_ITERATIONS.md`](docs/PROMPTS_AND_ITERATIONS.md) — AI-assisted development prompt and iteration log
-- [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md) — metrics, datasets, targets, and ablation method
-- [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) — baseline/post-improvement evidence and failure analysis
-- [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md) — current 200-case baseline/post-improvement results and release decision
-- [`docs/WEEK_4_REVIEWER_GUIDE.md`](docs/WEEK_4_REVIEWER_GUIDE.md) — independent human calibration procedure
-- [`docs/WEEK_4_ABLATION_REPORT.md`](docs/WEEK_4_ABLATION_REPORT.md) — one-change-at-a-time results and nine-regression attribution
-- [`data/evaluator-contract.json`](data/evaluator-contract.json) — machine-readable evaluator panel, score anchors, release thresholds, pairwise policy, and production privacy boundary
-- [`evals/human-calibration-sample-v1.csv`](evals/human-calibration-sample-v1.csv) — deterministic 30-case blinded reviewer worksheet
+Start with the [`docs/README.md`](docs/README.md) documentation index. It separates the current 200-case evidence from the historical 40-case snapshot and provides distinct paths for reviewers, engineers, evaluators, and controlled-pilot planners.
 
-Recommended reviewer path: begin with the [evaluation methodology](docs/EVALUATION_METHODOLOGY.md), inspect the [200-case baseline and improved results](docs/FULL_CORPUS_EVALUATION_REPORT.md), verify the [one-change-at-a-time ablation and regression analysis](docs/WEEK_4_ABLATION_REPORT.md), open the [case-level LangSmith trace](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true), and finish with the [independent calibration protocol](docs/WEEK_4_REVIEWER_GUIDE.md). The public Evaluation Lab presents the same evidence visually; repository artifacts remain the source of record.
+The current evidence source of truth is [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md), supported by the [evaluation methodology](docs/EVALUATION_METHODOLOGY.md), [ablation report](docs/WEEK_4_ABLATION_REPORT.md), [human-review procedure](docs/WEEK_4_REVIEWER_GUIDE.md), [machine-readable evaluator contract](data/evaluator-contract.json), and [30-case blinded worksheet](evals/human-calibration-sample-v1.csv).
 
 ## Knowledge base
 
@@ -261,4 +259,4 @@ An agency deployment requires its own security, accessibility, legal, records-re
 
 ## Project status
 
-The public demo is operational with Fireworks, Pinecone, Mistral, Deepgram, Neo4j Aura, LangSmith, You.com, LangGraph, D1-backed durable metadata, and enforced Cloudflare Turnstile verification.
+The public demo is operational with Fireworks, Pinecone, Mistral, Deepgram, Neo4j Aura, LangSmith, You.com, LangGraph, D1-backed durable metadata, and enforced Cloudflare Turnstile verification. The current model candidate is **not yet passed for release**: it clears the critical-safety veto and 15 of 16 numeric thresholds, but handoff quality is 94.4% against the predeclared 95% requirement. Independent human calibration remains pending at 0/30.
