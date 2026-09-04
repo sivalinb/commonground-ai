@@ -40,14 +40,16 @@ export function TrustShell({
       >
         Skip to main content
       </a>
-      <header className="border-b border-white/10 bg-slate-950 text-white">
+      <header className="cg-trust-header border-b border-white/10 bg-slate-950 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <a href="/" className="flex items-center gap-3 rounded-xl">
             <span className="grid size-10 place-items-center rounded-xl bg-teal-300 text-slate-950">
               <HeartHandshake className="size-5" />
             </span>
             <span>
-              <span className="block text-sm font-semibold">CommonGround AI</span>
+              <span className="block text-sm font-semibold">
+                CommonGround AI
+              </span>
               <span className="block text-[10px] text-slate-400">
                 Public training demonstration
               </span>
@@ -69,8 +71,11 @@ export function TrustShell({
         </p>
       </div>
 
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[230px_minmax(0,1fr)] lg:py-12">
-        <nav aria-label="Trust center" className="lg:sticky lg:top-6 lg:self-start">
+      <div className="cg-main mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[230px_minmax(0,1fr)] lg:py-12">
+        <nav
+          aria-label="Trust center"
+          className="lg:sticky lg:top-6 lg:self-start"
+        >
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             Product trust
           </p>
@@ -109,7 +114,7 @@ export function TrustShell({
         </article>
       </div>
 
-      <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
+      <footer className="cg-footer border-t border-slate-800 bg-slate-950 text-slate-400">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-[11px] sm:flex-row sm:justify-between sm:px-6">
           <span>CommonGround AI · evidence-led, human-reviewed</span>
           <span>Training demonstration · fictional scenarios only</span>

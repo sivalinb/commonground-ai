@@ -719,7 +719,7 @@ export default function Home() {
       >
         Skip to main content
       </a>
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/[0.97] text-white shadow-[0_12px_40px_-24px_rgba(15,23,42,0.8)] backdrop-blur-xl">
+      <header className="cg-app-header sticky top-0 z-40 border-b border-white/10 bg-slate-950/[0.97] text-white shadow-[0_12px_40px_-24px_rgba(15,23,42,0.8)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => setActiveView('home')}
@@ -774,7 +774,7 @@ export default function Home() {
                   key={group.label}
                   type="button"
                   onClick={() => setActiveView(group.items[0][0])}
-                  className={`group/category relative h-10 rounded-xl border px-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-3 ${
+                  className={`cg-category-button group/category relative h-10 rounded-xl border px-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:px-3 ${
                     isActive
                       ? group.activeClass
                       : 'border-white/[0.07] bg-white/[0.025] text-slate-300 hover:border-white/15 hover:bg-white/[0.055] hover:text-white'
@@ -803,7 +803,39 @@ export default function Home() {
           </div>
           {activeTabGroup && (
             <div className="border-t border-white/[0.07] bg-black/20">
-              <div className="mx-auto flex max-w-[1480px] flex-wrap items-center justify-center gap-1.5 px-3 py-2 sm:px-6">
+              <div className="mx-auto px-3 py-2 sm:hidden">
+                <label className="flex min-h-11 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.055] px-3">
+                  <span
+                    className={`size-2 shrink-0 rounded-full ${activeTabGroup.marker}`}
+                  />
+                  <span className="sr-only">
+                    Choose a view in {activeTabGroup.label}
+                  </span>
+                  <select
+                    value={activeView}
+                    onChange={(event) =>
+                      setActiveView(event.target.value as View)
+                    }
+                    className="min-w-0 flex-1 appearance-none bg-transparent py-2.5 text-sm font-semibold text-white outline-none"
+                    aria-label={`Choose a view in ${activeTabGroup.label}`}
+                  >
+                    {activeTabGroup.items.map(([value, label]) => (
+                      <option
+                        key={value}
+                        value={value}
+                        className="bg-slate-950 text-white"
+                      >
+                        {activeTabGroup.label} · {label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronRight
+                    className="size-4 rotate-90 text-slate-400"
+                    aria-hidden="true"
+                  />
+                </label>
+              </div>
+              <div className="mx-auto hidden max-w-[1480px] flex-wrap items-center justify-center gap-1.5 px-3 py-2 sm:flex sm:px-6">
                 <span className="mr-1 hidden items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.13em] text-slate-500 lg:flex">
                   <span
                     className={`size-1.5 rounded-full ${activeTabGroup.marker}`}
@@ -831,16 +863,21 @@ export default function Home() {
         </nav>
         <div className="border-t border-amber-300/20 bg-amber-200 text-amber-950">
           <div className="mx-auto flex max-w-[1480px] items-center justify-center gap-2 px-4 py-1.5 text-center text-[10px] font-semibold sm:px-6">
-            <LockKeyhole className="size-3 shrink-0" /> Controlled training
-            pilot · fictional or de-identified information only · no automated
-            decisions or agency actions
+            <LockKeyhole className="size-3 shrink-0" />
+            <span className="sm:hidden">
+              Training demo · fictional data · human approval
+            </span>
+            <span className="hidden sm:inline">
+              Controlled training pilot · fictional or de-identified information
+              only · no automated decisions or agency actions
+            </span>
           </div>
         </div>
       </header>
 
       <div
         id="main-content"
-        className="mx-auto max-w-[1480px] scroll-mt-32 px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pt-8"
+        className="cg-main mx-auto max-w-[1480px] scroll-mt-32 px-4 pb-20 pt-6 sm:px-6 lg:px-8 lg:pt-8"
       >
         {activeView === 'home' && (
           <section aria-label="CommonGround AI overview" className="space-y-6">
@@ -858,7 +895,7 @@ export default function Home() {
                 aria-hidden="true"
               />
               <div className="relative grid lg:min-h-[610px] lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-                <div className="flex flex-col justify-center px-6 py-10 sm:px-10 sm:py-14 lg:px-14 xl:px-16">
+                <div className="cg-hero-copy flex flex-col justify-center px-6 py-10 sm:px-10 sm:py-14 lg:px-14 xl:px-16">
                   <div className="mb-6 flex flex-wrap gap-2">
                     <Badge className="border border-teal-300/20 bg-teal-300/10 text-teal-100">
                       Human-led restorative practice
@@ -887,7 +924,7 @@ export default function Home() {
                     <Button
                       size="lg"
                       onClick={() => setActiveView('workspace')}
-                      className="h-12 rounded-full bg-teal-300 px-6 font-semibold text-slate-950 shadow-[0_12px_32px_-12px_rgba(45,212,191,0.75)] hover:bg-teal-200"
+                      className="h-12 w-full rounded-full bg-teal-300 px-6 font-semibold text-slate-950 shadow-[0_12px_32px_-12px_rgba(45,212,191,0.75)] hover:bg-teal-200 sm:w-auto"
                     >
                       <Play /> Try the guided case
                     </Button>
@@ -899,7 +936,7 @@ export default function Home() {
                           .getElementById('how-it-works')
                           ?.scrollIntoView({ behavior: 'smooth' })
                       }
-                      className="h-12 rounded-full border-white/15 bg-white/[0.05] px-6 text-white hover:bg-white/10 hover:text-white"
+                      className="h-12 w-full rounded-full border-white/15 bg-white/[0.05] px-6 text-white hover:bg-white/10 hover:text-white sm:w-auto"
                     >
                       See the human journey <ChevronRight />
                     </Button>
@@ -920,7 +957,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <figure className="relative mx-4 mb-4 min-h-[360px] overflow-hidden rounded-[1.5rem] border border-white/10 sm:mx-6 sm:mb-6 lg:m-5 lg:ml-0 lg:min-h-0">
+                <figure className="cg-hero-figure relative mx-4 mb-4 min-h-[360px] overflow-hidden rounded-[1.5rem] border border-white/10 sm:mx-6 sm:mb-6 lg:m-5 lg:ml-0 lg:min-h-0">
                   <Image
                     src="/commonground-rj-hero-v4.jpg"
                     alt="A diverse, voluntary restorative-practice circle in a welcoming community room. A male facilitator with a clipboard and a victim-services advocate support participants while an open chair and pathway represent choice; a subtle evidence, privacy, and human-approval network illustrates CommonGround AI assisting the process."
@@ -2074,13 +2111,13 @@ export default function Home() {
                     <div className="grid grid-cols-3 gap-2 text-center">
                       {[
                         [
-                          evalReport.ablation.summaries.rerank_depth_only.metrics
-                            .recallAt5,
+                          evalReport.ablation.summaries.rerank_depth_only
+                            .metrics.recallAt5,
                           'Rerank Recall@5',
                         ],
                         [
-                          evalReport.ablation.summaries.rerank_depth_only.metrics
-                            .sourceCoverageAt5,
+                          evalReport.ablation.summaries.rerank_depth_only
+                            .metrics.sourceCoverageAt5,
                           'Source coverage',
                         ],
                         [
@@ -2088,7 +2125,10 @@ export default function Home() {
                           'Interaction cases',
                         ],
                       ].map(([value, label]) => (
-                        <div key={String(label)} className="rounded-xl border bg-white/70 p-3">
+                        <div
+                          key={String(label)}
+                          className="rounded-xl border bg-white/70 p-3"
+                        >
                           <p className="font-mono text-xl font-semibold">
                             {value}
                             {String(label).includes('case') ? '' : '%'}
@@ -3305,7 +3345,7 @@ export default function Home() {
         )}
       </div>
 
-      <footer className="border-t border-slate-800 bg-slate-950 text-slate-300">
+      <footer className="cg-footer border-t border-slate-800 bg-slate-950 text-slate-300">
         <div className="mx-auto grid max-w-[1480px] gap-8 px-4 py-10 text-xs sm:px-6 md:grid-cols-[minmax(0,1.3fr)_minmax(220px,0.7fr)] lg:px-8">
           <div className="max-w-2xl">
             <span className="mb-4 grid size-11 place-items-center rounded-2xl bg-teal-300 text-slate-950">

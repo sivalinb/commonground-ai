@@ -4,6 +4,8 @@ Victim-centered restorative-justice practice copilot demonstrating live retrieva
 
 [**Open the public demo**](https://commonground-rj-ai.siva-babu.chatgpt.site) · [**Read the reviewer-friendly system brief**](https://docs.google.com/document/d/1ljztlw9UGJ5nFPxkM02W1-dk_WQldZh6XMlJLtcOhq8/edit)
 
+The same public URL is optimized for desktop and iPhone, including safe-area spacing, touch-sized controls, compact non-scrolling navigation, readable mobile cards, and an iOS-friendly viewport.
+
 ![CommonGround AI preview](public/og.jpg)
 
 > **Training and portfolio demonstration only.** This application does not determine guilt, credibility, remorse, mental health, legal eligibility, risk, or whether anyone should participate in a restorative process. Do not enter real case information or personally identifiable information.

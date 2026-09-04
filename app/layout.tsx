@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -38,6 +38,13 @@ export const metadata: Metadata = {
       'Explore a live LangGraph workflow with hybrid retrieval, claim-level citations, safety gates, human approval, and executable evaluations.',
     images: ['https://commonground-rj-ai.siva-babu.chatgpt.site/og.jpg'],
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#020617',
 };
 
 export default function RootLayout({
