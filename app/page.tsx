@@ -495,6 +495,12 @@ const tabGroups: Array<{
   },
 ];
 
+const mobileProductTabs: Array<[View, string, typeof MessageSquareText]> = [
+  ['home', 'Home', HeartHandshake],
+  ['workspace', 'Guided case', MessageSquareText],
+  ['practice', 'Practice', Bot],
+];
+
 function Score({ value }: { value: number }) {
   return (
     <span className="rounded-md bg-slate-950 px-2 py-1 font-mono text-[11px] font-semibold text-white">
@@ -605,6 +611,9 @@ export default function Home() {
   );
   const activeTabGroup = tabGroups.find((group) =>
     group.items.some(([value]) => value === activeView),
+  );
+  const isProductView = mobileProductTabs.some(
+    ([value]) => value === activeView,
   );
 
   function chooseScenario(key: ScenarioKey) {
@@ -751,6 +760,7 @@ export default function Home() {
               href="https://github.com/sivalinb/commonground-ai"
               target="_blank"
               rel="noreferrer"
+              className="hidden sm:inline-flex"
             >
               <Button
                 variant="outline"
@@ -762,7 +772,7 @@ export default function Home() {
           </div>
         </div>
         <nav
-          className="border-t border-white/[0.07]"
+          className="hidden border-t border-white/[0.07] sm:block"
           aria-label="Application sections"
         >
           <div className="mx-auto grid max-w-3xl grid-cols-3 gap-1.5 px-3 py-1.5 sm:px-6">
@@ -861,6 +871,48 @@ export default function Home() {
             </div>
           )}
         </nav>
+        <nav
+          className="cg-mobile-product-nav border-t border-white/[0.07] bg-slate-950/95 px-3 py-2 sm:hidden"
+          aria-label="Product actions"
+        >
+          <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
+            {mobileProductTabs.map(([value, label, Icon]) => {
+              const isActive = activeView === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setActiveView(value)}
+                  className={`flex min-h-12 items-center justify-center gap-1.5 rounded-xl border px-2 text-[11px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200 ${
+                    isActive
+                      ? 'border-teal-300/40 bg-teal-300 text-slate-950 shadow-[0_8px_24px_-14px_rgba(45,212,191,0.9)]'
+                      : 'border-white/10 bg-white/[0.045] text-slate-300'
+                  }`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <Icon className="size-3.5 shrink-0" />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+        {!isProductView && (
+          <div className="border-t border-sky-300/20 bg-sky-950/80 px-4 py-2 sm:hidden">
+            <div className="mx-auto flex max-w-md items-center justify-between gap-3 text-[11px] text-sky-100">
+              <span className="flex items-center gap-1.5 font-semibold">
+                <Layers3 className="size-3.5" /> Reviewer evidence view
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveView('home')}
+                className="min-h-9 rounded-full border border-sky-200/25 bg-white/10 px-3 font-semibold"
+              >
+                Back to product
+              </button>
+            </div>
+          </div>
+        )}
         <div className="border-t border-amber-300/20 bg-amber-200 text-amber-950">
           <div className="mx-auto flex max-w-[1480px] items-center justify-center gap-2 px-4 py-1.5 text-center text-[10px] font-semibold sm:px-6">
             <LockKeyhole className="size-3 shrink-0" />
@@ -936,9 +988,17 @@ export default function Home() {
                           .getElementById('how-it-works')
                           ?.scrollIntoView({ behavior: 'smooth' })
                       }
-                      className="h-12 w-full rounded-full border-white/15 bg-white/[0.05] px-6 text-white hover:bg-white/10 hover:text-white sm:w-auto"
+                      className="hidden h-12 w-full rounded-full border-white/15 bg-white/[0.05] px-6 text-white hover:bg-white/10 hover:text-white sm:inline-flex sm:w-auto"
                     >
                       See the human journey <ChevronRight />
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => setActiveView('practice')}
+                      className="h-12 w-full rounded-full border-white/15 bg-white/[0.05] px-6 text-white hover:bg-white/10 hover:text-white sm:hidden"
+                    >
+                      <Bot /> Practice a conversation
                     </Button>
                   </div>
                   <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-slate-400">
@@ -967,7 +1027,7 @@ export default function Home() {
                     className="object-cover object-[center_72%]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#06100f] via-transparent to-slate-950/10" />
-                  <div className="absolute inset-x-4 bottom-4 grid grid-cols-2 gap-2 sm:inset-x-6 sm:bottom-6 sm:grid-cols-4">
+                  <div className="absolute inset-x-4 bottom-4 hidden grid-cols-2 gap-2 sm:inset-x-6 sm:bottom-6 sm:grid sm:grid-cols-4">
                     {[
                       ['01', 'Describe'],
                       ['02', 'Retrieve'],
@@ -989,7 +1049,7 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/65 px-3 py-2 text-[10px] font-semibold backdrop-blur-md">
+                  <div className="absolute right-5 top-5 hidden items-center gap-2 rounded-full border border-white/15 bg-slate-950/65 px-3 py-2 text-[10px] font-semibold backdrop-blur-md sm:flex">
                     <span className="relative flex size-2">
                       <span className="absolute inline-flex size-full animate-ping rounded-full bg-teal-300 opacity-70" />
                       <span className="relative inline-flex size-2 rounded-full bg-teal-300" />
@@ -1000,7 +1060,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="hidden gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-4">
               {[
                 ['200', 'golden evaluation cases', BarChart3],
                 ['10', 'reviewed public sources', BookOpenCheck],
@@ -1095,7 +1155,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="hidden gap-4 sm:grid lg:grid-cols-3">
               {[
                 {
                   eyebrow: 'Start here',
@@ -1181,7 +1241,7 @@ export default function Home() {
               <Button
                 variant="outline"
                 onClick={() => setActiveView('architecture')}
-                className="shrink-0 rounded-full bg-white"
+                className="hidden shrink-0 rounded-full bg-white sm:inline-flex"
               >
                 Read the safety contract <ChevronRight />
               </Button>
