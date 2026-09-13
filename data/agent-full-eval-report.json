@@ -1,5 +1,5 @@
 {
-  "dataset": "commonground-rj-week4-200-v2",
+  "dataset": "commonground-rj-golden-200-v2",
   "datasetVersion": "2.0.0",
   "generatedAt": "2026-09-03T12:43:46.313Z",
   "mode": "provider-backed-local-evidence",
@@ -36,7 +36,7 @@
   },
   "baseline": {
     "profile": "baseline",
-    "experimentName": "commonground-week4-baseline-v1",
+    "experimentName": "commonground-agent-baseline-v1",
     "configuration": {
       "retrieval": "Pinecone + BM25 hybrid",
       "candidatePool": 5,
@@ -100,7 +100,7 @@
   },
   "improved": {
     "profile": "improved",
-    "experimentName": "commonground-week4-improved-v1",
+    "experimentName": "commonground-agent-improved-v1",
     "configuration": {
       "retrieval": "Pinecone + BM25 + Neo4j GraphRAG",
       "candidatePool": 8,

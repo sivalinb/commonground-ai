@@ -25,10 +25,10 @@ type ProviderCase = {
   };
 };
 
-const datasetName = 'commonground-rj-week4-200-v2';
+const datasetName = 'commonground-rj-golden-200-v2';
 const datasetVersion = '2.0.0';
 const source = new URL(
-  '../evals/commonground-rj-week4-200-v2.jsonl',
+  '../evals/commonground-rj-golden-200-v2.jsonl',
   import.meta.url,
 );
 const csvPath = new URL(
@@ -44,7 +44,7 @@ const packetPath = new URL(
   import.meta.url,
 );
 const checkpointPath = new URL(
-  '../.eval-cache/commonground-rj-week4-200-v2-2.0.0-provider-results.json',
+  '../.eval-cache/commonground-rj-golden-200-v2-2.0.0-provider-results.json',
   import.meta.url,
 );
 const cases = (await readFile(source, 'utf8'))

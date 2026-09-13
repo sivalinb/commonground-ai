@@ -26,13 +26,13 @@ Forty-eight synthetic, de-identified cases covering privacy identifiers, coercio
 
 Twenty-four questions covering direct retrieval, exact-source lookup, multi-document reasoning, Colorado jurisdiction, victim autonomy, trauma-informed services, youth digital harm, reporting, multi-hop safeguards, and out-of-corpus abstention.
 
-### `commonground-rj-week4-v1`
+### `commonground-rj-golden-v1`
 
 Forty end-to-end cases stored in the repository and as a versioned LangSmith dataset: 20 happy paths, 12 edge cases, six known failures, and two adversarial cases. Each case has an expected disposition, expected source IDs, critical-safety flag, scenario tags, reference rationale, and autonomy/trauma/handoff labels. The dataset is synthetic and de-identified; it contains no operational case information.
 
 The primary experiment evaluates the CommonGround Guidance Agent, not the entire website. Its user outcome is a safe, cited, autonomy-preserving practice brief—or a correct privacy block, refusal, abstention, or human handoff.
 
-### `commonground-rj-week4-200-v2`
+### `commonground-rj-golden-200-v2`
 
 Two hundred synthetic, de-identified, uniquely identified end-to-end cases stored in the repository and verified in LangSmith: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. The immutable v2 corpus contains the 40-case benchmark core and a 160-case coverage extension. It has 139 answer, 28 abstention, 20 refusal, and 13 privacy-block reference outcomes; 87 cases are marked critical. CI verifies exact distribution, uniqueness, required labels, source-ID integrity, and activation of privacy/refusal rules.
 
@@ -90,7 +90,7 @@ The complete 200-case experiment produced 400 provider-backed workflow results: 
 | P95 latency                         |   34.73 s |    7.50 s |        ≤15.00 s |
 | Estimated cost per run              | $0.001425 | $0.001206 |      ≤$0.010000 |
 
-The improved weighted explanatory score was 99.4%, but an average cannot override a predeclared release threshold. Nine improved cases self-abstained instead of answering, and Mistral-rated handoff appropriateness measured 94.4% against the 95% bar; the release gate therefore remains not passed. See [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md) for the readable report and [`../data/week4-full-eval-report.json`](../data/week4-full-eval-report.json) for case-level evidence.
+The improved weighted explanatory score was 99.4%, but an average cannot override a predeclared release threshold. Nine improved cases self-abstained instead of answering, and Mistral-rated handoff appropriateness measured 94.4% against the 95% bar; the release gate therefore remains not passed. See [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md) for the readable report and [`../data/agent-full-eval-report.json`](../data/agent-full-eval-report.json) for case-level evidence.
 
 The versioned 200-case dataset is verified in LangSmith. One direct case trace is published with nine child runs and evaluator feedback. Full new pointwise trace persistence, pairwise results, and annotation-queue creation remain pending because the account's monthly trace allowance was exhausted. This operational limitation is kept separate from model-quality results.
 
@@ -127,15 +127,15 @@ Offline evaluation data is synthetic and de-identified, so LangSmith experiments
 - `pnpm eval:retrieval` runs deterministic retrieval preflight.
 - `pnpm eval:live` runs the provider-backed safety suite against an authorized environment.
 - `pnpm eval:retrieval:live` runs provider-backed retrieval, faithfulness judging, and the 10-query ablation.
-- `pnpm eval:week4` validates the 40-case dataset, labels, and exact scenario distribution without credentials.
-- `pnpm eval:week4:dataset` validates all 200 v2 cases, source IDs, safety triggers, labels, uniqueness, cohorts, and exact distribution without credentials.
-- `pnpm eval:week4:dataset:sync` creates or verifies the immutable v2 dataset in LangSmith when `LANGSMITH_API_KEY` is configured.
-- `pnpm eval:week4:live` runs both configurations through an authorized HTTP deployment.
-- `pnpm eval:week4:direct` runs the provider-backed workflow directly, uploads/version-controls the LangSmith dataset, creates baseline and improved experiments, and regenerates the JSON and Markdown reports.
-- `pnpm eval:week4:full:validate` validates the full 200-case corpus against the experiment runner's distribution and label contract.
-- `pnpm eval:week4:full:local` runs or resumes all 200 cases through baseline and improved workflows, native code and Mistral judges, and the release veto, preserving a local checkpoint and case-level report.
-- `pnpm eval:week4:full` runs the same full experiment and additionally publishes pointwise experiments, randomized pairwise comparison, and the human calibration queue to LangSmith when account capacity is available.
-- `pnpm eval:week4:calibration:prepare` deterministically regenerates the 30-case blinded reviewer worksheet and calibration manifest.
+- `pnpm eval:agent` validates the 40-case dataset, labels, and exact scenario distribution without credentials.
+- `pnpm eval:agent:dataset` validates all 200 v2 cases, source IDs, safety triggers, labels, uniqueness, cohorts, and exact distribution without credentials.
+- `pnpm eval:agent:dataset:sync` creates or verifies the immutable v2 dataset in LangSmith when `LANGSMITH_API_KEY` is configured.
+- `pnpm eval:agent:live` runs both configurations through an authorized HTTP deployment.
+- `pnpm eval:agent:direct` runs the provider-backed workflow directly, uploads/version-controls the LangSmith dataset, creates baseline and improved experiments, and regenerates the JSON and Markdown reports.
+- `pnpm eval:agent:full:validate` validates the full 200-case corpus against the experiment runner's distribution and label contract.
+- `pnpm eval:agent:full:local` runs or resumes all 200 cases through baseline and improved workflows, native code and Mistral judges, and the release veto, preserving a local checkpoint and case-level report.
+- `pnpm eval:agent:full` runs the same full experiment and additionally publishes pointwise experiments, randomized pairwise comparison, and the human calibration queue to LangSmith when account capacity is available.
+- `pnpm eval:agent:calibration:prepare` deterministically regenerates the 30-case blinded reviewer worksheet and calibration manifest.
 
 ## LangSmith implementation references
 

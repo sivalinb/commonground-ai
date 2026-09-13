@@ -29,11 +29,11 @@ type Family = Omit<
 };
 
 const source = new URL(
-  '../evals/commonground-rj-week4-v1.jsonl',
+  '../evals/commonground-rj-golden-v1.jsonl',
   import.meta.url,
 );
 const destination = new URL(
-  '../evals/commonground-rj-week4-200-v2.jsonl',
+  '../evals/commonground-rj-golden-200-v2.jsonl',
   import.meta.url,
 );
 

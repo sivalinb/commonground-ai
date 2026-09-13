@@ -1,10 +1,10 @@
 {
-  "dataset": "commonground-rj-week4-200-v2",
+  "dataset": "commonground-rj-golden-200-v2",
   "datasetVersion": "2.0.0",
   "generatedAt": "2026-09-02T17:04:02.725Z",
   "langsmith": {
     "datasetId": "c62c1460-3673-447a-8eba-454628212369",
-    "datasetName": "commonground-rj-week4-200-v2",
+    "datasetName": "commonground-rj-golden-200-v2",
     "datasetUrl": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/c62c1460-3673-447a-8eba-454628212369",
     "versionTag": "v2.0.0",
     "versionStrategy": "immutable_dataset_name_and_metadata",

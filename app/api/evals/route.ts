@@ -3,12 +3,12 @@ import evaluatorContract from '@/data/evaluator-contract.json';
 import calibrationManifest from '@/data/human-calibration-manifest.json';
 import calibrationReport from '@/data/human-calibration-report.json';
 import langsmithPublication from '@/data/langsmith-publication-status.json';
-import traceEvidence from '@/data/week4-trace-evidence.json';
-import ablation from '@/data/week4-ablation-report.json';
+import traceEvidence from '@/data/agent-trace-evidence.json';
+import ablation from '@/data/agent-ablation-report.json';
 import retrieval from '@/data/retrieval-eval-report.json';
-import week4Dataset from '@/data/week4-dataset-manifest.json';
-import week4Core from '@/data/week4-eval-report.json';
-import week4 from '@/data/week4-full-eval-summary.json';
+import agentDataset from '@/data/agent-dataset-manifest.json';
+import agentCore from '@/data/agent-eval-report.json';
+import agentEvaluation from '@/data/agent-full-eval-summary.json';
 import { secureJson } from '@/lib/http';
 
 export async function GET() {
@@ -34,8 +34,8 @@ export async function GET() {
     langsmithPublication,
     traceEvidence,
     ablation,
-    week4Dataset,
-    week4,
-    week4Core,
+    agentDataset,
+    agentEvaluation,
+    agentCore,
   });
 }

@@ -6,7 +6,7 @@ This guide calibrates automated evaluators against restorative-justice and victi
 
 ## Review sample
 
-Review the checked-in, deterministic 30-case sample from `commonground-rj-week4-200-v2`, recording whether each selected case belongs to the provider-tested core or the golden extension:
+Review the checked-in, deterministic 30-case sample from `commonground-rj-golden-200-v2`, recording whether each selected case belongs to the provider-tested core or the golden extension:
 
 - 15 happy-path cases
 - 9 edge cases
@@ -17,7 +17,7 @@ Include at least one youth-safety case, one Colorado case, one no-contact case, 
 
 The complete reviewer worksheet is checked in at [`../evals/human-calibration-sample-v1.csv`](../evals/human-calibration-sample-v1.csv). It is ready for offline blinded review. The LangSmith annotation-queue workflow and six required rubric fields are implemented, but queue creation remains blocked by the workspace's monthly unique-trace limit; no human-calibration result is claimed yet.
 
-After all 30 cases are scored, run `pnpm eval:week4:calibration:score` for the offline worksheet or `pnpm eval:week4:calibration:sync` after completing the LangSmith queue. The scorer requires reviewer role, review date, five anchored 0–4 scores, and an explicit critical-failure yes/no decision for every case. It deliberately reports agreement as pending if even one case is incomplete.
+After all 30 cases are scored, run `pnpm eval:agent:calibration:score` for the offline worksheet or `pnpm eval:agent:calibration:sync` after completing the LangSmith queue. The scorer requires reviewer role, review date, five anchored 0–4 scores, and an explicit critical-failure yes/no decision for every case. It deliberately reports agreement as pending if even one case is incomplete.
 
 ## Blind scoring rubric
 

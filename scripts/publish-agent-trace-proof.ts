@@ -15,16 +15,16 @@ type GoldenCase = {
   referenceRationale: string;
 };
 
-const datasetName = 'commonground-rj-week4-200-v2';
+const datasetName = 'commonground-rj-golden-200-v2';
 const datasetVersion = '2.0.0';
-const projectName = 'commonground-week4-trace-proof-v2';
+const projectName = 'commonground-agent-trace-proof-v2';
 const caseId = process.env.TRACE_PROOF_CASE_ID || 'w4-happy-01';
 const datasetPath = new URL(
-  '../evals/commonground-rj-week4-200-v2.jsonl',
+  '../evals/commonground-rj-golden-200-v2.jsonl',
   import.meta.url,
 );
 const evidencePath = new URL(
-  '../data/week4-trace-evidence.json',
+  '../data/agent-trace-evidence.json',
   import.meta.url,
 );
 
@@ -99,7 +99,7 @@ for (let attempt = 0; attempt < 3 && !root; attempt += 1) {
 if (!root) {
   const fallbackProject =
     process.env.TRACE_PROOF_FALLBACK_PROJECT ||
-    'commonground-week4-improved-v1';
+    'commonground-agent-improved-v1';
   for await (const run of client.listRuns({
     projectName: fallbackProject,
     isRoot: true,
@@ -212,7 +212,7 @@ const projectUrl = runUrl.split('/r/')[0];
 const traceDatasetVersion = String(metadata.dataset_version || datasetVersion);
 const evidence = {
   dataset:
-    traceDatasetVersion === '1.0.0' ? 'commonground-rj-week4-v1' : datasetName,
+    traceDatasetVersion === '1.0.0' ? 'commonground-rj-golden-v1' : datasetName,
   datasetVersion: traceDatasetVersion,
   generatedAt: new Date().toISOString(),
   caseId: String(metadata.case_id || selected.id),

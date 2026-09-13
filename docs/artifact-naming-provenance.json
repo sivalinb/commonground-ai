@@ -1,0 +1,186 @@
+{
+  "sourceCommit": "badd4ebdb4c50f1826e31936f4a87f6581e22fb8",
+  "operation": "Descriptive naming and linked artifact normalization; no model inference or metric changes.",
+  "artifacts": [
+    {
+      "path": ".github/workflows/quality.yml",
+      "sourceBlob": "d30a9e84f689b2c283c0be077947cdb4636babea",
+      "sourceSha256": "99c252673024e17ee68eba67f733e812bd0ef52f5fc6de9881c448d0cb573ab7",
+      "normalizedSha256": "5481869b459a37c6518cf03e4648f4305d265b30dfe17a177b55861f47943502"
+    },
+    {
+      "path": "README.md",
+      "sourceBlob": "68124cd8a83236baad34a2f4c07cecb7513819b4",
+      "sourceSha256": "3b446077c936de274ab7a4e2a4e803b2497466993c2f037f42cefc98d502dbb1",
+      "normalizedSha256": "d000a50fc5b39b0cbd03483f0d1a5afb21402fcfa5d8388573084c67f6fd9c83"
+    },
+    {
+      "path": "app/api/evals/route.ts",
+      "sourceBlob": "73255c574d4dec9105703c07ba822f80c2b50897",
+      "sourceSha256": "838f4ffd7c6413455769fa06156b1a414fb3bc2bbaca66758310c0c1c130279e",
+      "normalizedSha256": "630d872f6c55c647258d6e005ab1563e099a3f839bc4fe2838cc6a4e8f6a958c"
+    },
+    {
+      "path": "app/page.tsx",
+      "sourceBlob": "6cb58be81100fdb9dfee53cee27b163cee25a4e0",
+      "sourceSha256": "384b6efaa8876364d414177c8576b516b4a66e5106a30486b5b7f7145cd3fca1",
+      "normalizedSha256": "fc4317e9583943b0632b91eb81e0a4df0fd4a681c52a1622582b387ea2bf7849"
+    },
+    {
+      "path": "data/human-calibration-manifest.json",
+      "sourceBlob": "17868a0a9d2f46495ce062e312a54f4e87afd4dd",
+      "sourceSha256": "de3ef56ef8b5c192595847c32212871be106c23400bc83dd3a9d84b3155be185",
+      "normalizedSha256": "0994e1848cd2595d7e46bfb2c9f873a59a26243e5ccb6c31d23df03141796127"
+    },
+    {
+      "path": "data/human-calibration-report.json",
+      "sourceBlob": "74e722f6c2982b17c1ef493a3ab689a11392154e",
+      "sourceSha256": "cdd0b702b239824944651b0e34dd7904c8834ff927131e8c22aec571f25144f6",
+      "normalizedSha256": "14b4d54f02f529c290f255d18dfc52ca0e1cd45f3ffea49bfd2454d406e0f4a8"
+    },
+    {
+      "path": "data/human-calibration-review-packet.json",
+      "sourceBlob": "8ab2093639701e5f88aa7659bd17a171542bdc0c",
+      "sourceSha256": "46de2e8d4a07e549260a7b3c373e35620b3c15ca2a2c330616ee23517312af01",
+      "normalizedSha256": "62d84d35025ee90179e4204d7dcda2e86f1d8f6b3d11d3f2571bb1512a419980"
+    },
+    {
+      "path": "data/langsmith-publication-status.json",
+      "sourceBlob": "5c679931f574a3fe643ec518fd7802b11c4c0351",
+      "sourceSha256": "e5ed09fafa4ec2122fe069eb2449e56a206a247b8484bc1244ebee94a6e36471",
+      "normalizedSha256": "ead2d5d6a60a8c5ee2ea8ac9c9842f3852410b5d872ccbafa33c41cbb5d0666a"
+    },
+    {
+      "path": "data/agent-ablation-report.json",
+      "sourceBlob": "763d22a87c95e1e849bfffb6fdd16c165273e588",
+      "sourceSha256": "4cb9c86118ec2fe8d6bd3416d9e71b6c781f26c11d05ee9a81ff1ec1fd1165ed",
+      "normalizedSha256": "d53f27a459600a0af2b536c044ae6943f1b90534da009e60cc70146b669feea8"
+    },
+    {
+      "path": "data/agent-dataset-manifest.json",
+      "sourceBlob": "210510339b42ff5bbbce106c0beb7145669fa0b5",
+      "sourceSha256": "a99b9e8ddcc5124dccfb86d69f65e61bc03d5c49cffe628bfc241331b309aa21",
+      "normalizedSha256": "6043420678e7c588fda3795fe88e244a51ae11a07167baedd9956b6206a736b0"
+    },
+    {
+      "path": "data/agent-eval-report.json",
+      "sourceBlob": "428aae92ec66c8423a5e7bce2dd85ceb9709ba76",
+      "sourceSha256": "5c128117e2db16b72d16b78fd4084e5db58fb75bcb31b8b353afbfdbd057fe9a",
+      "normalizedSha256": "84784f03efde3144d09689b3dbc567f138744684b6c42de626122446e6d3f4df"
+    },
+    {
+      "path": "data/agent-full-eval-report.json",
+      "sourceBlob": "cafcf86b10eef29bd40f3af2fc286ca4751c716b",
+      "sourceSha256": "b553fae8636712f8d6f636f180344b50840e5e8e85ce36cbcca4b54bea106553",
+      "normalizedSha256": "7181f4ef95dc2d8490faf97773c2757dcc86da40487d2d79b6a2c3a8b6809b7f"
+    },
+    {
+      "path": "data/agent-full-eval-summary.json",
+      "sourceBlob": "45314a7ea20418be50f605cd045f9622764de0a4",
+      "sourceSha256": "fabb555f4101d44080ec97a81e5316bd5172892469b965756809e1c07bcf71ae",
+      "normalizedSha256": "14f10b702afb94d447709fb998acae9d3bc524b34457d327d1f0b233b4dfa328"
+    },
+    {
+      "path": "data/agent-trace-evidence.json",
+      "sourceBlob": "b905a2f5019158ce99d850a0a283371756597029",
+      "sourceSha256": "b63523ddf34385029a3baf2d2653051ab6d99764229c29d8bfb4896573794551",
+      "normalizedSha256": "6f88305824383149cf69b82a0a72a4a2677a42da747edbd8e78dd48c7ca33cbb"
+    },
+    {
+      "path": "docs/EVALUATION_METHODOLOGY.md",
+      "sourceBlob": "e499a83579841cfc88f3f3438326b02edad20b6f",
+      "sourceSha256": "e173f018c1f1ba4b60054e1c322db2df78e5e20ce554137e17fd4d78ef9fca8d",
+      "normalizedSha256": "8861726fe3c968201eb266611d8855c61736b4ffaddb6f390852593ec8c21af2"
+    },
+    {
+      "path": "docs/FULL_CORPUS_EVALUATION_REPORT.md",
+      "sourceBlob": "41fb6c91fe4feff8e6424aff7dfe335338e63548",
+      "sourceSha256": "7154256b0709440068fa247bc483391f081a7303626cfb66f0cafa111b833961",
+      "normalizedSha256": "032e6ed4be45adb0d2e90b96f2612f82eebea75238f9b1ebabf0f5e84c5e22ff"
+    },
+    {
+      "path": "docs/PROMPTS_AND_ITERATIONS.md",
+      "sourceBlob": "bc3df28730adbb9d95acd5869d3730f3fe97323f",
+      "sourceSha256": "f60a558fc1129e397e920a6ab385de88c51ff6bc338dd6d40791db009ef153bc",
+      "normalizedSha256": "e02e9ad782f847c23f04b28dac3fa78951ac65f43289b36d10b09fc50c474fbd"
+    },
+    {
+      "path": "docs/README.md",
+      "sourceBlob": "00e75bf8829a17c82ff936ccb975cd45fff07873",
+      "sourceSha256": "3c8df146ea34a21032dfc4642101034aac0c1a2ecdc79d5af5df9ce7a5989660",
+      "normalizedSha256": "3bb5eadc993ef718979b53635c601c9ad89fcdb05097004075556afd9d9b18ee"
+    },
+    {
+      "path": "docs/PROJECT_REPORT.md",
+      "sourceBlob": "4d2ee1372717f17b9c9fa393d3bc13988000e653",
+      "sourceSha256": "2cd05a86a7124366ac19f80deadf08822f1e9bd79beeb7a52b85ce91ae447740",
+      "normalizedSha256": "416b158c71bedacbe1b0e1119d037edb79a30bacb0b986525c5a64ac758d1c85"
+    },
+    {
+      "path": "docs/ABLATION_REPORT.md",
+      "sourceBlob": "f426fc2d51801ea6fe01e86435f8f88a98f39d96",
+      "sourceSha256": "cfbde47bb3511b1a6e883157376adbb976b4b2afec8759ef73dce827b84b605d",
+      "normalizedSha256": "8ed6776c74e5a139c46d4e2b94ce5b0377094d32a4016343d2f0b6dc41fde122"
+    },
+    {
+      "path": "docs/AGENT_EVALUATION_REPORT.md",
+      "sourceBlob": "2a80193c7e4dde33f723f2c7a9803b977126a506",
+      "sourceSha256": "bd9069e047f88d2cc618450fa0b18b7dd21676b12cd1d962034210458a11535d",
+      "normalizedSha256": "260b9181c6a54210f27a6b628f34b9a78a8fa3d4a90c944bd089ef8a0b425866"
+    },
+    {
+      "path": "docs/REVIEWER_GUIDE.md",
+      "sourceBlob": "8f25497de0db5b4c3ba22d6ab21862fbef10e445",
+      "sourceSha256": "e9464680ce70440e0cac1d9b019b8d53f4db218061086bb1f68e3ecfd6be0e84",
+      "normalizedSha256": "8a795c4e28105365d20cd563bed7ee590aa708b6fa6ed7622448b272ab4197b6"
+    },
+    {
+      "path": "package.json",
+      "sourceBlob": "3235ff2ad4959e68b46eab988882debf822ed882",
+      "sourceSha256": "517984da2ce57e5700ec458c6e6cb67a2f41bcb70ae46ae6f57fb2446b54929b",
+      "normalizedSha256": "3d8041a9893de9ab393728486d4c542c16bd54845156c0b1d1e82786fd2f4a5f"
+    },
+    {
+      "path": "scripts/generate-agent-dataset.ts",
+      "sourceBlob": "90d073968d86b2d6d3b211743ca0851072b74f53",
+      "sourceSha256": "b96e2c714adaf4140332d7089a4d57a081bd2b85eda7c0bfb92e9bdf793fbd21",
+      "normalizedSha256": "f39dc4396de40c2116344bda7681a6279b2ea1b1e58da33a3f763b107e8bfa30"
+    },
+    {
+      "path": "scripts/prepare-human-calibration.ts",
+      "sourceBlob": "688a65d8d2c2692d25eafee46525e6d05982fe53",
+      "sourceSha256": "f5aed9cff629f537430484ed005e5fa387e61088dfb67a867a5cbebdb193f1af",
+      "normalizedSha256": "3f042c196cd9d68c70ed26a4ba124f1870dd25cfe04ba56609d5f3a8cc3670e6"
+    },
+    {
+      "path": "scripts/publish-agent-trace-proof.ts",
+      "sourceBlob": "0bc02cf0fd76917c9fa3ec498e4dcc802f14d316",
+      "sourceSha256": "b42f8f25194788a38c89f4ac2c25cc031643c955220504bfda431beeb3f44886",
+      "normalizedSha256": "5f982cbac21b0ee76ca98229553ebd99cd0d521044e8c97f6ef41c68f8ce4f08"
+    },
+    {
+      "path": "scripts/run-agent-ablations.ts",
+      "sourceBlob": "ee51aa85f656d850731c7782b5761d71e9acbeb1",
+      "sourceSha256": "4299ed05e39b22076270793dfcfa14eb14511aaef5f36e5182f8e3b176910727",
+      "normalizedSha256": "351ad624b75524c447a1c76b231e8e5eb4ee34f599f2bafe9b498d80c09a10ac"
+    },
+    {
+      "path": "scripts/run-agent-evals.ts",
+      "sourceBlob": "0cbd535530faa0da5d39f825f2fbdc1363991ab3",
+      "sourceSha256": "1a5a1c3b7bd2528e80218f8b357a11a939e86324747772b9925b4f91ec9576c4",
+      "normalizedSha256": "5181e50abfd9ebbd8b92d0b2ede33c05c46967f0c75feba485bbb39962f3ed3f"
+    },
+    {
+      "path": "scripts/score-human-calibration.ts",
+      "sourceBlob": "4058517d5e5ee6011fe05a086544d61d4b68f791",
+      "sourceSha256": "243117b14dcb90ddc86ac178e71ee357cee990e5471a688f45204d4cdc1bf391",
+      "normalizedSha256": "fa42f7a2afc391b5825f5a156ead11df1ccd624a93db1561960b9294bf29974d"
+    },
+    {
+      "path": "scripts/sync-agent-dataset.ts",
+      "sourceBlob": "4b60433586049e096480ce3e647adb9503f74b04",
+      "sourceSha256": "b1d659c04fc686d41890d889688d5e078b558c3fcb476f0db149232ecea90f79",
+      "normalizedSha256": "4554a6208ca59670112e925270d19604b19d0498a35acce9549135d5e33feb75"
+    }
+  ]
+}

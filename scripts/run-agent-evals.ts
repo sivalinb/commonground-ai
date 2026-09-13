@@ -120,31 +120,31 @@ type CaseResult = {
 
 const fullCorpus = process.argv.includes('--scope=all');
 const DATASET_NAME = fullCorpus
-  ? 'commonground-rj-week4-200-v2'
-  : 'commonground-rj-week4-v1';
+  ? 'commonground-rj-golden-200-v2'
+  : 'commonground-rj-golden-v1';
 const DATASET_VERSION = fullCorpus ? '2.0.0' : '1.0.0';
 const datasetPath = new URL(
   fullCorpus
-    ? '../evals/commonground-rj-week4-200-v2.jsonl'
-    : '../evals/commonground-rj-week4-v1.jsonl',
+    ? '../evals/commonground-rj-golden-200-v2.jsonl'
+    : '../evals/commonground-rj-golden-v1.jsonl',
   import.meta.url,
 );
 const reportPath = new URL(
   fullCorpus
-    ? '../data/week4-full-eval-report.json'
-    : '../data/week4-eval-report.json',
+    ? '../data/agent-full-eval-report.json'
+    : '../data/agent-eval-report.json',
   import.meta.url,
 );
 const reportSummaryPath = new URL(
   fullCorpus
-    ? '../data/week4-full-eval-summary.json'
-    : '../data/week4-eval-summary.json',
+    ? '../data/agent-full-eval-summary.json'
+    : '../data/agent-eval-summary.json',
   import.meta.url,
 );
 const reportMarkdownPath = new URL(
   fullCorpus
     ? '../docs/FULL_CORPUS_EVALUATION_REPORT.md'
-    : '../docs/WEEK_4_EVALUATION_REPORT.md',
+    : '../docs/AGENT_EVALUATION_REPORT.md',
   import.meta.url,
 );
 const checkpointDirectory = new URL('../.eval-cache/', import.meta.url);
@@ -484,7 +484,7 @@ async function judge(payload: JudgePayload) {
       apiKey: directRuntime.mistralKey,
       model: directRuntime.mistralModel,
       schema: judgeSchema,
-      schemaName: 'week4_agent_quality_v1',
+      schemaName: 'guidance_agent_quality_v1',
       maxTokens: 650,
       jsonSchema: {
         type: 'object',
@@ -624,7 +624,7 @@ async function judgePairwise(
 }
 
 async function runCase(item: GoldenCase, profile: Profile) {
-  const experimentName = `commonground-week4-${profile}-v1`;
+  const experimentName = `commonground-agent-${profile}-v1`;
   const evaluationContext = {
     caseId: item.id,
     datasetVersion: DATASET_VERSION,
@@ -792,7 +792,7 @@ function summarize(profile: Profile, results: CaseResult[]) {
     }));
   return {
     profile,
-    experimentName: `commonground-week4-${profile}-v1`,
+    experimentName: `commonground-agent-${profile}-v1`,
     configuration:
       profile === 'baseline'
         ? {
@@ -1174,7 +1174,7 @@ async function createLangSmithExperiments(
       {
         data: datasetName,
         evaluators: langSmithEvaluators(byCase),
-        experimentPrefix: `commonground-week4-${profile}`,
+        experimentPrefix: `commonground-agent-${profile}`,
         description:
           profile === 'baseline'
             ? 'Frozen CommonGround baseline: hybrid retrieval, five candidates, top-three reranking, baseline prompt.'
@@ -1821,7 +1821,7 @@ await writeFile(
 );
 if (fullCorpus) {
   const manifestPath = new URL(
-    '../data/week4-dataset-manifest.json',
+    '../data/agent-dataset-manifest.json',
     import.meta.url,
   );
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
@@ -1916,7 +1916,7 @@ ${report.targetedImprovements
 
 ${improved.topFailureClusters.length ? improved.topFailureClusters.map((item) => `- **${item.cluster}**: ${item.count} case(s), estimated failed-run cost $${item.estimatedCostUsd}, trace IDs ${item.exampleTraceIds.join(', ') || 'not emitted before the privacy/API boundary'}.`).join('\n') : '- No post-improvement failures were observed in this run.'}
 
-The controlled 49-case ablation found that all nine candidate regressions were model-generated abstentions after retrieval, not evidence-confidence-gate stops. One reproduced with the prompt-only lever; eight appeared only when the improved prompt and expanded/reranked evidence context were combined. See [the per-improvement ablation report](WEEK_4_ABLATION_REPORT.md).
+The controlled 49-case ablation found that all nine candidate regressions were model-generated abstentions after retrieval, not evidence-confidence-gate stops. One reproduced with the prompt-only lever; eight appeared only when the improved prompt and expanded/reranked evidence context were combined. See [the per-improvement ablation report](ABLATION_REPORT.md).
 
 ## LangSmith evidence
 
@@ -1939,7 +1939,7 @@ ${report.limitations.map((item) => `- ${item}`).join('\n')}
 
 ## Reproduction
 
-\`pnpm eval:week4\` validates the 40-case core without credentials. \`pnpm eval:week4:full:validate\` validates the 200-case corpus with the same evaluator contract. \`pnpm eval:week4:full:local\` runs or resumes all 200 cases with checkpointed provider and native Mistral-judge evidence. \`pnpm eval:week4:direct\` publishes the provider-backed core to LangSmith. \`pnpm eval:week4:full\` publishes all 200 cases, pairwise comparison, and the human queue when LangSmith capacity is available.
+\`pnpm eval:agent\` validates the 40-case core without credentials. \`pnpm eval:agent:full:validate\` validates the 200-case corpus with the same evaluator contract. \`pnpm eval:agent:full:local\` runs or resumes all 200 cases with checkpointed provider and native Mistral-judge evidence. \`pnpm eval:agent:direct\` publishes the provider-backed core to LangSmith. \`pnpm eval:agent:full\` publishes all 200 cases, pairwise comparison, and the human queue when LangSmith capacity is available.
 `;
 await writeFile(reportMarkdownPath, markdown);
 console.log(

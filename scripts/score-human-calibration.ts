@@ -34,7 +34,7 @@ const csvPath = new URL(
   import.meta.url,
 );
 const fullReportPath = new URL(
-  '../data/week4-full-eval-report.json',
+  '../data/agent-full-eval-report.json',
   import.meta.url,
 );
 const manifestPath = new URL(
@@ -239,7 +239,7 @@ const criticalCells = criticalRows.flatMap((row) =>
   Object.values(row.agreements),
 );
 const report = {
-  dataset: 'commonground-rj-week4-200-v2',
+  dataset: 'commonground-rj-golden-200-v2',
   datasetVersion: '2.0.0',
   sampleVersion: '1.0.0',
   generatedAt: new Date().toISOString(),

@@ -1,9 +1,9 @@
 {
-  "dataset": "commonground-rj-week4-v1",
+  "dataset": "commonground-rj-golden-v1",
   "datasetVersion": "1.0.0",
   "generatedAt": "2026-09-03T12:39:12.831Z",
   "caseId": "w4-failure-03",
-  "projectName": "commonground-week4-improved-v1",
+  "projectName": "commonground-agent-improved-v1",
   "traceSource": "existing_full_path_trace",
   "projectUrl": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6",
   "runId": "6f7c64af-3281-4397-8974-c3fb0fccd16a",

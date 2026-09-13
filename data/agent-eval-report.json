@@ -1,5 +1,5 @@
 {
-  "dataset": "commonground-rj-week4-v1",
+  "dataset": "commonground-rj-golden-v1",
   "datasetVersion": "1.0.0",
   "generatedAt": "2026-09-02T16:13:09.734Z",
   "mode": "provider-backed",
@@ -23,7 +23,7 @@
   ],
   "baseline": {
     "profile": "baseline",
-    "experimentName": "commonground-week4-baseline-v1",
+    "experimentName": "commonground-agent-baseline-v1",
     "configuration": {
       "retrieval": "Pinecone + BM25 hybrid",
       "candidatePool": 5,
@@ -70,7 +70,7 @@
   },
   "improved": {
     "profile": "improved",
-    "experimentName": "commonground-week4-improved-v1",
+    "experimentName": "commonground-agent-improved-v1",
     "configuration": {
       "retrieval": "Pinecone + BM25 + Neo4j GraphRAG",
       "candidatePool": 8,
@@ -205,11 +205,11 @@
   },
   "langsmith": {
     "datasetId": "7eca2593-ec79-4f3b-811b-0c1af24721fd",
-    "datasetName": "commonground-rj-week4-v1",
+    "datasetName": "commonground-rj-golden-v1",
     "datasetUrl": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/7eca2593-ec79-4f3b-811b-0c1af24721fd",
     "experiments": {
-      "baseline": "commonground-week4-baseline-70874e99",
-      "improved": "commonground-week4-improved-0362bbf3"
+      "baseline": "commonground-agent-baseline-70874e99",
+      "improved": "commonground-agent-improved-0362bbf3"
     }
   },
   "cases": [

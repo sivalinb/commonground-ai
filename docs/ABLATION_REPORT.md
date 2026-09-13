@@ -1,4 +1,4 @@
-# Week 4 Per-Improvement Ablation Report
+# Per-Improvement Ablation Report
 
 Generated: 2026-09-03T12:43:03.643Z
 

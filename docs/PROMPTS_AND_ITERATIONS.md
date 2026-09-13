@@ -24,7 +24,7 @@ This log summarizes the AI-assisted development instructions used to build Commo
 
 ## Rubric-completion iteration
 
-> Compare the project against Week 1–3 handouts and close the remaining gaps: measurable RAG targets, retrieval evaluation, vector/hybrid/graph comparison, provider-backed claim faithfulness, durable LangGraph interrupt/resume, signed reviewer sessions, tool-failure tests, course evidence, and submission documentation.
+> Compare the project against project requirements and close the remaining gaps: measurable RAG targets, retrieval evaluation, vector/hybrid/graph comparison, provider-backed claim faithfulness, durable LangGraph interrupt/resume, signed reviewer sessions, tool-failure tests, course evidence, and submission documentation.
 
 ## Important changes made after evaluation
 

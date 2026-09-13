@@ -6,8 +6,8 @@ This index is the shortest path through the project. It distinguishes current ev
 
 - **First-time reader:** read the [root README](../README.md), then try the [public application](https://commonground-rj-ai.siva-babu.chatgpt.site).
 - **Project reviewer:** follow the five-step evidence path below.
-- **Engineer:** use the [cumulative implementation report](WEEK_1_3_PROJECT_REPORT.md), root setup instructions, and production-readiness documents.
-- **Restorative-justice or victim-services reviewer:** use the [independent review guide](WEEK_4_REVIEWER_GUIDE.md) and [blinded worksheet](../evals/human-calibration-sample-v1.csv).
+- **Engineer:** use the [cumulative implementation report](PROJECT_REPORT.md), root setup instructions, and production-readiness documents.
+- **Restorative-justice or victim-services reviewer:** use the [independent review guide](REVIEWER_GUIDE.md) and [blinded worksheet](../evals/human-calibration-sample-v1.csv).
 
 ## Current status at a glance
 
@@ -22,9 +22,9 @@ This index is the shortest path through the project. It distinguishes current ev
 
 1. Read the [evaluation methodology](EVALUATION_METHODOLOGY.md) for metrics, datasets, evaluator contracts, privacy boundaries, and reproduction commands.
 2. Inspect the [current full-corpus report](FULL_CORPUS_EVALUATION_REPORT.md) for the frozen baseline, improved results, failure clusters, cost, and release decision.
-3. Verify the [one-change-at-a-time ablation](WEEK_4_ABLATION_REPORT.md), including attribution of the nine new abstentions.
+3. Verify the [one-change-at-a-time ablation](ABLATION_REPORT.md), including attribution of the nine new abstentions.
 4. Open the [versioned LangSmith dataset](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/c62c1460-3673-447a-8eba-454628212369) and [direct case-level trace](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true).
-5. Review the [human-calibration procedure](WEEK_4_REVIEWER_GUIDE.md) and the current [0/30 status report](HUMAN_CALIBRATION_REPORT.md).
+5. Review the [human-calibration procedure](REVIEWER_GUIDE.md) and the current [0/30 status report](HUMAN_CALIBRATION_REPORT.md).
 
 ## Sources of truth
 
@@ -33,8 +33,8 @@ This index is the shortest path through the project. It distinguishes current ev
 | What is the system and why does it exist? | [Root README](../README.md) and [reviewer-friendly Google Doc](https://docs.google.com/document/d/1ljztlw9UGJ5nFPxkM02W1-dk_WQldZh6XMlJLtcOhq8/edit) |
 | What are the current 200-case results? | [Full-corpus evaluation report](FULL_CORPUS_EVALUATION_REPORT.md) |
 | How are metrics and evaluators defined? | [Evaluation methodology](EVALUATION_METHODOLOGY.md) and [evaluator contract](../data/evaluator-contract.json) |
-| Which change caused which result? | [Per-improvement ablation report](WEEK_4_ABLATION_REPORT.md) |
-| What remains for human review? | [Human review guide](WEEK_4_REVIEWER_GUIDE.md) and [calibration status](HUMAN_CALIBRATION_REPORT.md) |
+| Which change caused which result? | [Per-improvement ablation report](ABLATION_REPORT.md) |
+| What remains for human review? | [Human review guide](REVIEWER_GUIDE.md) and [calibration status](HUMAN_CALIBRATION_REPORT.md) |
 | What is required before an agency pilot? | [Production readiness](PRODUCTION_READINESS.md), [data governance](DATA_GOVERNANCE.md), [incident response](INCIDENT_RESPONSE.md), and [accessibility status](ACCESSIBILITY_CONFORMANCE.md) |
 
 ## Document map
@@ -43,17 +43,17 @@ This index is the shortest path through the project. It distinguishes current ev
 
 - [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md) — current 200-case baseline versus improved results and release decision.
 - [`EVALUATION_METHODOLOGY.md`](EVALUATION_METHODOLOGY.md) — datasets, metrics, release targets, evaluator modes, privacy, and reproduction.
-- [`WEEK_4_ABLATION_REPORT.md`](WEEK_4_ABLATION_REPORT.md) — 49-case controlled ablation and nine-regression root-cause analysis.
-- [`WEEK_4_REVIEWER_GUIDE.md`](WEEK_4_REVIEWER_GUIDE.md) — independent human-review and agreement procedure.
+- [`ABLATION_REPORT.md`](ABLATION_REPORT.md) — 49-case controlled ablation and nine-regression root-cause analysis.
+- [`REVIEWER_GUIDE.md`](REVIEWER_GUIDE.md) — independent human-review and agreement procedure.
 - [`HUMAN_CALIBRATION_REPORT.md`](HUMAN_CALIBRATION_REPORT.md) — current human-calibration completion status.
 
 ### Historical evaluation evidence
 
-- [`WEEK_4_EVALUATION_REPORT.md`](WEEK_4_EVALUATION_REPORT.md) — frozen earlier 40-case benchmark. It is retained for reproducibility and must not be interpreted as the current 200-case release result.
+- [`AGENT_EVALUATION_REPORT.md`](AGENT_EVALUATION_REPORT.md) — frozen earlier 40-case benchmark. It is retained for reproducibility and must not be interpreted as the current 200-case release result.
 
 ### Implementation and engineering history
 
-- [`WEEK_1_3_PROJECT_REPORT.md`](WEEK_1_3_PROJECT_REPORT.md) — cumulative product, RAG, agentic-system, evaluation, and implementation narrative.
+- [`PROJECT_REPORT.md`](PROJECT_REPORT.md) — cumulative product, RAG, agentic-system, evaluation, and implementation narrative.
 - [`PROMPTS_AND_ITERATIONS.md`](PROMPTS_AND_ITERATIONS.md) — AI-assisted development intent, major prompts, and changes made after evaluation.
 
 ### Operational readiness

@@ -25,14 +25,14 @@ type GoldenCase = {
   };
 };
 
-const DATASET_NAME = 'commonground-rj-week4-200-v2';
+const DATASET_NAME = 'commonground-rj-golden-200-v2';
 const DATASET_VERSION = '2.0.0';
 const datasetPath = new URL(
-  '../evals/commonground-rj-week4-200-v2.jsonl',
+  '../evals/commonground-rj-golden-200-v2.jsonl',
   import.meta.url,
 );
 const manifestPath = new URL(
-  '../data/week4-dataset-manifest.json',
+  '../data/agent-dataset-manifest.json',
   import.meta.url,
 );
 const knowledgePath = new URL('../data/knowledge.json', import.meta.url);

@@ -8,7 +8,7 @@ I measured safe task completion, claim faithfulness, Recall@5, autonomy-preservi
 
 ## Dataset
 
-- LangSmith dataset: commonground-rj-week4-200-v2
+- LangSmith dataset: commonground-rj-golden-200-v2
 - Version: 2.0.0
 - Provenance: synthetic, de-identified, zero real case narratives
 - Distribution: 100 happy path, 60 edge, 30 known failure, 10 adversarial
@@ -58,7 +58,7 @@ Improved: Pinecone + BM25 + Neo4j GraphRAG, eight candidates, top-five reranking
 
 - **false_abstention_model_decision**: 9 case(s), estimated failed-run cost $0.008627, trace IDs cg_eval_0f27d85e-5050-4df0-b3e6-93cec927e573, cg_eval_83934d1a-e7c0-48b6-847d-2172093b31de.
 
-The controlled 49-case ablation found that all nine candidate regressions were model-generated abstentions after retrieval, not evidence-confidence-gate stops. One reproduced with the prompt-only lever; eight appeared only when the improved prompt and expanded/reranked evidence context were combined. See [the per-improvement ablation report](WEEK_4_ABLATION_REPORT.md).
+The controlled 49-case ablation found that all nine candidate regressions were model-generated abstentions after retrieval, not evidence-confidence-gate stops. One reproduced with the prompt-only lever; eight appeared only when the improved prompt and expanded/reranked evidence context were combined. See [the per-improvement ablation report](ABLATION_REPORT.md).
 
 ## LangSmith evidence
 
@@ -92,4 +92,4 @@ The controlled 49-case ablation found that all nine candidate regressions were m
 
 ## Reproduction
 
-`pnpm eval:week4` validates the 40-case core without credentials. `pnpm eval:week4:full:validate` validates the 200-case corpus with the same evaluator contract. `pnpm eval:week4:full:local` runs or resumes all 200 cases with checkpointed provider and native Mistral-judge evidence. `pnpm eval:week4:direct` publishes the provider-backed core to LangSmith. `pnpm eval:week4:full` publishes all 200 cases, pairwise comparison, and the human queue when LangSmith capacity is available.
+`pnpm eval:agent` validates the 40-case core without credentials. `pnpm eval:agent:full:validate` validates the 200-case corpus with the same evaluator contract. `pnpm eval:agent:full:local` runs or resumes all 200 cases with checkpointed provider and native Mistral-judge evidence. `pnpm eval:agent:direct` publishes the provider-backed core to LangSmith. `pnpm eval:agent:full` publishes all 200 cases, pairwise comparison, and the human queue when LangSmith capacity is available.

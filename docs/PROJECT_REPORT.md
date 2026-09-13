@@ -1,4 +1,4 @@
-# CommonGround AI — Week 1–4 Cumulative Project Report
+# CommonGround AI — Cumulative Project Report
 
 ## Project overview
 
@@ -12,7 +12,7 @@ Source code: https://github.com/sivalinb/commonground-ai
 
 Documentation and provider behavior were rechecked on September 3, 2026. The public demo, GitHub source, submission documents, and executable evaluation reports agree on the current system scope and measured results. The quality workflow covers type checking, linting, 47 deterministic unit tests, the 48-case safety suite, 24-query retrieval preflight, the 40-case benchmark validator, the 200-case v2 golden-dataset validator, and the production build.
 
-## Week 1 — Data application with vibe coding
+## Data application with vibe coding
 
 ### Problem statement
 
@@ -29,7 +29,7 @@ Restorative-justice learners need a practical way to rehearse victim-centered la
 
 The project was developed iteratively: first the working case-analysis surface, then RAG, safety gates, multi-agent practice, observability, GraphRAG, voice, abuse controls, and finally rubric evidence. Each stage was compiled, tested, reviewed, and deployed before the next stage.
 
-## Week 2 — Evaluated RAG application
+## Evaluated RAG application
 
 ### RAG one-liner
 
@@ -70,7 +70,7 @@ The repository contains a 24-query retrieval dataset covering direct, multi-docu
 
 The September 1, 2026 provider-backed run passed all 24 tasks and every declared release target: 94.2% Recall@5, 94.2% mean reciprocal rank, 97% citation precision, 100% claim faithfulness, 100% correct abstention, and 7.93-second P95 latency. The controlled 10-query ablation measured 100% Recall@5 and task success for GraphRAG, compared with 70% for both vector-only and hybrid modes. These are versioned experimental results over the synthetic course dataset, not claims about field effectiveness.
 
-## Week 3 — Agentic AI system
+## Agentic AI system
 
 ### Agent one-liner
 
@@ -102,13 +102,13 @@ All provider actions are reads or draft generation. The application does not sen
 - Duplicate or expired approvals are rejected.
 - Provider calls have timeouts and bounded retries; deterministic failures stop safely.
 
-## Week 4 — Agent evaluation and improvement
+## Agent evaluation and improvement
 
-The CommonGround Guidance Agent is evaluated as a single defined system. The immutable `commonground-rj-week4-200-v2` LangSmith golden dataset contains 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. It includes the original 40-case provider-tested benchmark core plus a 160-case coverage extension. Every case includes an expected disposition, expected sources, critical-safety flag, tags, reference rationale, and autonomy/trauma/handoff labels.
+The CommonGround Guidance Agent is evaluated as a single defined system. The immutable `commonground-rj-golden-200-v2` LangSmith golden dataset contains 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. It includes the original 40-case provider-tested benchmark core plus a 160-case coverage extension. Every case includes an expected disposition, expected sources, critical-safety flag, tags, reference rationale, and autonomy/trauma/handoff labels.
 
 The frozen baseline uses hybrid retrieval, five candidates, top-three reranking, no graph expansion, and the prior prompt. The improved agent adds Neo4j GraphRAG expansion, eight candidates, top-five reranking, GraphRAG-aware confidence, explicit unsupported-request abstention, autonomy-focused examples, and stronger retry recovery. Both configurations completed all 200 golden cases, producing 400 provider results. Deterministic code evaluators covered every result, and the independent Mistral judge scored all 269 answer outputs: 139 baseline answers plus 130 improved answers. The improved configuration passed the zero-tolerance critical-safety veto and 15 of 16 numeric thresholds, while measuring a 94.4% LLM handoff score against the predeclared 95% bar. It retained 100% Recall@5, 88.6% complete expected-source coverage@5, 99.6% claim faithfulness, and 7.5-second P95 latency.
 
-The provider-backed September 2 run records safe task completion, critical guardrail compliance, Recall@5, full expected-source coverage, citation validity, independent Mistral faithfulness/autonomy/trauma/handoff scores, trajectory correctness, p50/p95 latency, tokens, normalized cost, case-level trace IDs, and failure clusters. The detailed baseline/post-improvement results are generated in `docs/WEEK_4_EVALUATION_REPORT.md`.
+The provider-backed September 2 run records safe task completion, critical guardrail compliance, Recall@5, full expected-source coverage, citation validity, independent Mistral faithfulness/autonomy/trauma/handoff scores, trajectory correctness, p50/p95 latency, tokens, normalized cost, case-level trace IDs, and failure clusters. The detailed baseline/post-improvement results are generated in `docs/AGENT_EVALUATION_REPORT.md`.
 
 ### Evaluator design
 

@@ -8,7 +8,7 @@ I measured safe task completion, claim faithfulness, Recall@5, autonomy-preservi
 
 ## Dataset
 
-- LangSmith dataset: [commonground-rj-week4-v1](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/7eca2593-ec79-4f3b-811b-0c1af24721fd)
+- LangSmith dataset: [commonground-rj-golden-v1](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/7eca2593-ec79-4f3b-811b-0c1af24721fd)
 - Version: 1.0.0
 - Provenance: synthetic, de-identified, zero real case narratives
 - Distribution: 20 happy path, 12 edge, 6 known failure, 2 adversarial
@@ -16,7 +16,7 @@ I measured safe task completion, claim faithfulness, Recall@5, autonomy-preservi
 
 ### Golden-corpus expansion
 
-- LangSmith dataset: [commonground-rj-week4-200-v2](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/c62c1460-3673-447a-8eba-454628212369)
+- LangSmith dataset: [commonground-rj-golden-200-v2](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/datasets/c62c1460-3673-447a-8eba-454628212369)
 - Version strategy: immutable dataset name plus `2.0.0` metadata
 - Verified examples: 200
 - Distribution: 100 happy path, 60 edge, 30 known failure, 10 adversarial
@@ -24,7 +24,7 @@ I measured safe task completion, claim faithfulness, Recall@5, autonomy-preservi
 - Reference outcomes: 139 answer, 28 abstain, 20 refuse, 13 privacy block; 87 critical cases
 - Validation: exact distribution, unique IDs and narratives, known source IDs, required labels, and deterministic privacy/refusal activation
 
-The numeric baseline-versus-improved results below remain the frozen 40-case historical benchmark. The current 200-case provider experiment is complete and published separately in [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md), with case-level evidence in [`../data/week4-full-eval-report.json`](../data/week4-full-eval-report.json).
+The numeric baseline-versus-improved results below remain the frozen 40-case historical benchmark. The current 200-case provider experiment is complete and published separately in [`FULL_CORPUS_EVALUATION_REPORT.md`](FULL_CORPUS_EVALUATION_REPORT.md), with case-level evidence in [`../data/agent-full-eval-report.json`](../data/agent-full-eval-report.json).
 
 ### Evaluator panel v2 implementation status
 
@@ -71,8 +71,8 @@ Improved: Pinecone + BM25 + Neo4j GraphRAG, eight candidates, top-five reranking
 
 ## LangSmith evidence
 
-- Baseline experiment: commonground-week4-baseline-70874e99
-- Improved experiment: commonground-week4-improved-0362bbf3
+- Baseline experiment: commonground-agent-baseline-70874e99
+- Improved experiment: commonground-agent-improved-0362bbf3
 - Every provider-backed case includes case ID, dataset version, expected disposition, experiment name, prompt/corpus versions, stage hierarchy, latency, token count, output disposition, and evaluator feedback.
 - Production traces remain metadata-only. Synthetic LangSmith dataset examples contain the fictional test prompt and reference output so experiments are reproducible.
 
@@ -94,6 +94,6 @@ Improved: Pinecone + BM25 + Neo4j GraphRAG, eight candidates, top-five reranking
 
 ## Reproduction
 
-`pnpm eval:week4` validates the 40-case experiment core. `pnpm eval:week4:dataset` validates the 200-case v2 corpus without credentials. `pnpm eval:week4:dataset:sync` verifies it in LangSmith. `pnpm eval:week4:live` runs the controlled provider experiment through an authorized HTTP environment. `pnpm eval:week4:direct` runs the provider-backed 40-case pipeline directly and publishes its experiments to LangSmith.
+`pnpm eval:agent` validates the 40-case experiment core. `pnpm eval:agent:dataset` validates the 200-case v2 corpus without credentials. `pnpm eval:agent:dataset:sync` verifies it in LangSmith. `pnpm eval:agent:live` runs the controlled provider experiment through an authorized HTTP environment. `pnpm eval:agent:direct` runs the provider-backed 40-case pipeline directly and publishes its experiments to LangSmith.
 
-For the current evidence, `pnpm eval:week4:full:local` runs or resumes both 200-case configurations with checkpointed provider results and native Mistral judging. `pnpm eval:week4:full` additionally persists LangSmith pointwise experiments, pairwise comparison, and the annotation queue when trace capacity is available.
+For the current evidence, `pnpm eval:agent:full:local` runs or resumes both 200-case configurations with checkpointed provider results and native Mistral judging. `pnpm eval:agent:full` additionally persists LangSmith pointwise experiments, pairwise comparison, and the annotation queue when trace capacity is available.

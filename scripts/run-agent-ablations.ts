@@ -82,24 +82,24 @@ const datasetVersion = '2.0.0';
 const reportVersion = '1.0.0';
 const live = process.argv.includes('--live');
 const datasetPath = new URL(
-  '../evals/commonground-rj-week4-200-v2.jsonl',
+  '../evals/commonground-rj-golden-200-v2.jsonl',
   import.meta.url,
 );
 const fullReportPath = new URL(
-  '../data/week4-full-eval-report.json',
+  '../data/agent-full-eval-report.json',
   import.meta.url,
 );
 const cacheDirectory = new URL('../.eval-cache/', import.meta.url);
 const cachePath = new URL(
-  `week4-per-improvement-ablation-${reportVersion}.json`,
+  `agent-per-improvement-ablation-${reportVersion}.json`,
   cacheDirectory,
 );
 const reportPath = new URL(
-  '../data/week4-ablation-report.json',
+  '../data/agent-ablation-report.json',
   import.meta.url,
 );
 const markdownPath = new URL(
-  '../docs/WEEK_4_ABLATION_REPORT.md',
+  '../docs/ABLATION_REPORT.md',
   import.meta.url,
 );
 const regressionCaseIds = [
@@ -312,7 +312,7 @@ async function judge(item: GoldenCase, result: PublicResult, apiKey: string) {
     apiKey,
     model: process.env.MISTRAL_MODEL || 'mistral-small-latest',
     schema: judgeSchema,
-    schemaName: 'week4_ablation_quality_v1',
+    schemaName: 'agent_ablation_quality_v1',
     maxTokens: 650,
     jsonSchema: {
       type: 'object',
@@ -674,7 +674,7 @@ for (const item of selectedCases.filter(
       evaluation: {
         caseId: item.id,
         datasetVersion,
-        experimentName: 'commonground-week4-regression-diagnostics-v1',
+        experimentName: 'commonground-agent-regression-diagnostics-v1',
         expectedDisposition: item.expectedDisposition,
         expectedSourceIds: item.expectedSourceIds,
         referenceRationale: item.referenceRationale,
@@ -800,7 +800,7 @@ const regressionAttribution = regressionCaseIds.map((caseId) => {
 });
 const report = {
   reportVersion,
-  dataset: 'commonground-rj-week4-200-v2',
+  dataset: 'commonground-rj-golden-200-v2',
   datasetVersion,
   generatedAt: new Date().toISOString(),
   design:
@@ -866,7 +866,7 @@ const headers = variantOrder
         : variants[variant].label,
   )
   .join(' | ');
-const markdown = `# Week 4 Per-Improvement Ablation Report
+const markdown = `# Per-Improvement Ablation Report
 
 Generated: ${report.generatedAt}
 

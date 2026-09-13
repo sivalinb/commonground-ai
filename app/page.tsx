@@ -255,7 +255,7 @@ type EvalReport = {
       graph: Record<string, number | null>;
     };
   };
-  week4Dataset: {
+  agentDataset: {
     dataset: string;
     datasetVersion: string;
     total: number;
@@ -289,7 +289,7 @@ type EvalReport = {
       };
     };
   };
-  week4: {
+  agentEvaluation: {
     dataset: string;
     datasetVersion: string;
     generatedAt: string;
@@ -301,8 +301,8 @@ type EvalReport = {
       answerOutputs: number;
       llmJudgedAnswerOutputs: number;
     };
-    baseline: Week4Experiment;
-    improved: Week4Experiment;
+    baseline: AgentExperiment;
+    improved: AgentExperiment;
     deltas: Record<string, number | null>;
     releaseGate: {
       passed: boolean;
@@ -339,7 +339,7 @@ type EvalReport = {
   };
 };
 
-type Week4Experiment = {
+type AgentExperiment = {
   profile: string;
   experimentName: string;
   total: number;
@@ -2010,12 +2010,12 @@ export default function Home() {
               title="200 golden cases. Two complete provider runs. One honest release gate."
               description="The full v2 corpus ran through the frozen baseline and improved GraphRAG configuration. All 269 answer outputs received an independent Mistral review; deterministic evaluators covered all 400 results. LangSmith holds the versioned dataset; full experiment and direct-trace publication are implemented but blocked by the workspace's monthly unique-trace limit."
             />
-            {evalReport?.week4 && (
+            {evalReport?.agentEvaluation && (
               <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
                   {
                     value:
-                      evalReport.week4.evaluationCoverage
+                      evalReport.agentEvaluation.evaluationCoverage
                         .providerWorkflowResults,
                     label: 'Provider workflows',
                     detail: '200 baseline + 200 improved',
@@ -2023,14 +2023,14 @@ export default function Home() {
                   },
                   {
                     value:
-                      evalReport.week4.evaluationCoverage
+                      evalReport.agentEvaluation.evaluationCoverage
                         .llmJudgedAnswerOutputs,
                     label: 'LLM-judged answers',
                     detail: '139 baseline + 130 improved',
                     icon: BrainCircuit,
                   },
                   {
-                    value: evalReport.week4.improved.topFailureClusters.reduce(
+                    value: evalReport.agentEvaluation.improved.topFailureClusters.reduce(
                       (sum, cluster) => sum + cluster.count,
                       0,
                     ),
@@ -2040,7 +2040,7 @@ export default function Home() {
                   },
                   {
                     value:
-                      evalReport.week4.releaseGate.criticalSafetyVeto
+                      evalReport.agentEvaluation.releaseGate.criticalSafetyVeto
                         ?.failures || 0,
                     label: 'Critical veto failures',
                     detail: 'Zero-tolerance gate',
@@ -2157,7 +2157,7 @@ export default function Home() {
                     </div>
                     <CardAction>
                       <a
-                        href="https://github.com/sivalinb/commonground-ai/blob/main/data/week4-ablation-report.json"
+                        href="https://github.com/sivalinb/commonground-ai/blob/main/data/agent-ablation-report.json"
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -2308,18 +2308,18 @@ export default function Home() {
                 </CardContent>
               </Card>
             )}
-            {evalReport?.week4 && evalReport.week4Dataset && (
+            {evalReport?.agentEvaluation && evalReport.agentDataset && (
               <div className="mb-6 space-y-5">
                 <Card className="overflow-hidden border-teal-200 bg-gradient-to-br from-teal-50 via-background to-sky-50">
                   <CardHeader>
                     <div>
                       <div className="mb-2 flex flex-wrap gap-2">
                         <Badge className="bg-teal-700 text-white">
-                          LangSmith v{evalReport.week4Dataset.datasetVersion}
+                          LangSmith v{evalReport.agentDataset.datasetVersion}
                         </Badge>
                         <Badge variant="outline">
                           {
-                            evalReport.week4Dataset.langsmith
+                            evalReport.agentDataset.langsmith
                               .verifiedExampleCount
                           }{' '}
                           examples verified
@@ -2327,17 +2327,17 @@ export default function Home() {
                       </div>
                       <CardTitle>200-case golden evaluation corpus</CardTitle>
                       <CardDescription className="mt-1 max-w-3xl">
-                        {evalReport.week4Dataset.dataset} is an immutable v2
+                        {evalReport.agentDataset.dataset} is an immutable v2
                         dataset:{' '}
-                        {evalReport.week4Dataset.cohorts.providerBenchmarkCore}{' '}
+                        {evalReport.agentDataset.cohorts.providerBenchmarkCore}{' '}
                         benchmark-core cases plus{' '}
-                        {evalReport.week4Dataset.cohorts.goldenExtension}{' '}
+                        {evalReport.agentDataset.cohorts.goldenExtension}{' '}
                         expanded coverage cases.
                       </CardDescription>
                     </div>
                     <CardAction>
                       <a
-                        href={evalReport.week4Dataset.langsmith.datasetUrl}
+                        href={evalReport.agentDataset.langsmith.datasetUrl}
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -2348,7 +2348,7 @@ export default function Home() {
                     </CardAction>
                   </CardHeader>
                   <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    {Object.entries(evalReport.week4Dataset.distribution).map(
+                    {Object.entries(evalReport.agentDataset.distribution).map(
                       ([split, count]) => (
                         <div
                           key={split}
@@ -2360,7 +2360,7 @@ export default function Home() {
                             </span>
                             <span className="text-xs font-semibold text-teal-700">
                               {Math.round(
-                                (count / evalReport.week4Dataset.total) * 100,
+                                (count / evalReport.agentDataset.total) * 100,
                               )}
                               %
                             </span>
@@ -2371,7 +2371,7 @@ export default function Home() {
                           <Progress
                             className="mt-3"
                             value={
-                              (count / evalReport.week4Dataset.total) * 100
+                              (count / evalReport.agentDataset.total) * 100
                             }
                           />
                         </div>
@@ -2380,7 +2380,7 @@ export default function Home() {
                     <div className="sm:col-span-2 xl:col-span-4 rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs leading-5 text-sky-950">
                       <strong>Evidence status:</strong> all{' '}
                       {
-                        evalReport.week4Dataset.evaluationStatus
+                        evalReport.agentDataset.evaluationStatus
                           .deterministicValidation
                       }{' '}
                       cases completed baseline and improved provider runs. The
@@ -2407,45 +2407,45 @@ export default function Home() {
                     <div>
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Badge className="border border-teal-300/25 bg-teal-300/10 text-teal-100">
-                          Full corpus v{evalReport.week4.datasetVersion}
+                          Full corpus v{evalReport.agentEvaluation.datasetVersion}
                         </Badge>
                         <Badge className="border border-sky-300/25 bg-sky-300/10 text-sky-100">
-                          {evalReport.week4.mode}
+                          {evalReport.agentEvaluation.mode}
                         </Badge>
                       </div>
                       <CardTitle className="text-white">
                         Baseline → post-improvement evidence
                       </CardTitle>
                       <CardDescription className="mt-1 text-slate-400">
-                        {evalReport.week4.dataset} ·{' '}
-                        {evalReport.week4.improved.total} identical cases per
+                        {evalReport.agentEvaluation.dataset} ·{' '}
+                        {evalReport.agentEvaluation.improved.total} identical cases per
                         experiment
                       </CardDescription>
                     </div>
                     <CardAction className="flex flex-col items-end gap-2">
                       <Badge
                         className={
-                          evalReport.week4.releaseGate.passed
+                          evalReport.agentEvaluation.releaseGate.passed
                             ? 'bg-emerald-400 text-slate-950'
                             : 'bg-amber-300 text-slate-950'
                         }
                       >
-                        {evalReport.week4.releaseGate.passed
+                        {evalReport.agentEvaluation.releaseGate.passed
                           ? 'Release gates passed'
                           : 'Measured gaps remain'}
                       </Badge>
                       <div className="flex flex-wrap justify-end gap-2">
                         <a
-                          href="https://github.com/sivalinb/commonground-ai/blob/main/data/week4-full-eval-report.json"
+                          href="https://github.com/sivalinb/commonground-ai/blob/main/data/agent-full-eval-report.json"
                           target="_blank"
                           rel="noreferrer"
                           className="text-[10px] font-semibold text-teal-200 hover:text-white"
                         >
                           Public result data ↗
                         </a>
-                        {evalReport.week4.langsmith?.datasetUrl && (
+                        {evalReport.agentEvaluation.langsmith?.datasetUrl && (
                           <a
-                            href={evalReport.week4.langsmith.datasetUrl}
+                            href={evalReport.agentEvaluation.langsmith.datasetUrl}
                             target="_blank"
                             rel="noreferrer"
                             className="text-[10px] font-semibold text-sky-200 hover:text-white"
@@ -2463,9 +2463,9 @@ export default function Home() {
                       ['claimFaithfulness', 'Faithfulness', '%'],
                       ['p95LatencyMs', 'P95 latency', 'ms'],
                     ].map(([key, label, unit]) => {
-                      const baseline = evalReport.week4.baseline.metrics[key];
-                      const improved = evalReport.week4.improved.metrics[key];
-                      const delta = evalReport.week4.deltas[key];
+                      const baseline = evalReport.agentEvaluation.baseline.metrics[key];
+                      const improved = evalReport.agentEvaluation.improved.metrics[key];
+                      const delta = evalReport.agentEvaluation.deltas[key];
                       const lowerIsBetter = key === 'p95LatencyMs';
                       const favorable =
                         typeof delta === 'number' &&
@@ -2518,7 +2518,7 @@ export default function Home() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-2">
-                      {evalReport.week4.targetedImprovements.map(
+                      {evalReport.agentEvaluation.targetedImprovements.map(
                         (improvement, index) => (
                           <div
                             key={improvement.id}
@@ -2546,7 +2546,7 @@ export default function Home() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      {Object.entries(evalReport.week4.distribution).map(
+                      {Object.entries(evalReport.agentEvaluation.distribution).map(
                         ([split, count]) => (
                           <div key={split}>
                             <div className="mb-1.5 flex items-center justify-between text-xs">
@@ -2556,7 +2556,7 @@ export default function Home() {
                               <span className="font-mono font-semibold">
                                 {count} ·{' '}
                                 {Math.round(
-                                  (count / evalReport.week4.improved.total) *
+                                  (count / evalReport.agentEvaluation.improved.total) *
                                     100,
                                 )}
                                 %
@@ -2564,7 +2564,7 @@ export default function Home() {
                             </div>
                             <Progress
                               value={
-                                (count / evalReport.week4.improved.total) * 100
+                                (count / evalReport.agentEvaluation.improved.total) * 100
                               }
                             />
                           </div>
@@ -2620,8 +2620,8 @@ export default function Home() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      {evalReport.week4.improved.topFailureClusters.length ? (
-                        evalReport.week4.improved.topFailureClusters.map(
+                      {evalReport.agentEvaluation.improved.topFailureClusters.length ? (
+                        evalReport.agentEvaluation.improved.topFailureClusters.map(
                           (cluster) => (
                             <div
                               key={cluster.cluster}
@@ -2660,7 +2660,7 @@ export default function Home() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-2 sm:grid-cols-2">
-                      {evalReport.week4.monitoringPlan.map((monitor) => (
+                      {evalReport.agentEvaluation.monitoringPlan.map((monitor) => (
                         <div
                           key={monitor.signal}
                           className="flex items-center justify-between gap-2 rounded-xl border p-3"
@@ -3257,7 +3257,7 @@ export default function Home() {
         )}
 
         {activeView === 'course' && (
-          <section aria-label="Week 1 through Week 4 course evidence">
+          <section aria-label="Applied AI capability evidence">
             <SectionHeading
               eyebrow="Cumulative course evidence"
               title="One project demonstrating four layers of applied AI learning."
@@ -3266,7 +3266,7 @@ export default function Home() {
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {[
                 {
-                  week: 'Week 1',
+                  layer: 'Application',
                   title: 'Vibe-coded data application',
                   score: 'Complete',
                   icon: Code2,
@@ -3278,7 +3278,7 @@ export default function Home() {
                   ],
                 },
                 {
-                  week: 'Week 2',
+                  layer: 'Retrieval',
                   title: 'Evaluated hybrid RAG + GraphRAG',
                   score: 'Complete',
                   icon: Database,
@@ -3290,7 +3290,7 @@ export default function Home() {
                   ],
                 },
                 {
-                  week: 'Week 3',
+                  layer: 'Agents',
                   title: 'Agentic AI system',
                   score: 'Complete',
                   icon: GitBranch,
@@ -3302,7 +3302,7 @@ export default function Home() {
                   ],
                 },
                 {
-                  week: 'Week 4',
+                  layer: 'Evaluation',
                   title: 'Agent evaluation and improvement',
                   score: 'Complete',
                   icon: BarChart3,
@@ -3313,13 +3313,13 @@ export default function Home() {
                     'Failure clusters, trace IDs, latency, tokens, cost, and deltas',
                   ],
                 },
-              ].map(({ week, title, score, icon: Icon, items }) => (
-                <Card key={week} className="border border-border/70">
+              ].map(({ layer, title, score, icon: Icon, items }) => (
+                <Card key={layer} className="border border-border/70">
                   <CardHeader>
                     <span className="mb-2 grid size-11 place-items-center rounded-2xl bg-primary/10 text-primary">
                       <Icon className="size-5" />
                     </span>
-                    <CardTitle>{week}</CardTitle>
+                    <CardTitle>{layer}</CardTitle>
                     <CardDescription>{title}</CardDescription>
                     <CardAction>
                       <Badge className="bg-emerald-700 text-white">
@@ -3381,7 +3381,7 @@ export default function Home() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {[
-                    ['Project report', 'docs/WEEK_1_3_PROJECT_REPORT.md'],
+                    ['Project report', 'docs/PROJECT_REPORT.md'],
                     ['Evaluation method', 'docs/EVALUATION_METHODOLOGY.md'],
                     [
                       'Prompt and iteration log',

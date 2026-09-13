@@ -146,9 +146,9 @@ Evaluator feedback keys cover grounding, safety approval, citation validity, hum
 
 The `rj-retrieval-v1` dataset adds 24 labeled retrieval questions and explicit targets for Recall@5, mean reciprocal rank, citation precision, claim faithfulness, correct abstention, and P95 latency. Provider-backed mode uses Mistral as an independent claim-to-evidence judge and compares vector-only, hybrid, and GraphRAG retrieval on 10 shared queries. See [`docs/EVALUATION_METHODOLOGY.md`](docs/EVALUATION_METHODOLOGY.md).
 
-The original `commonground-rj-week4-v1` LangSmith dataset contains a frozen 40-case benchmark. Its historical provider result remains available in [`docs/WEEK_4_EVALUATION_REPORT.md`](docs/WEEK_4_EVALUATION_REPORT.md) for reproducibility.
+The original `commonground-rj-golden-v1` LangSmith dataset contains a frozen 40-case benchmark. Its historical provider result remains available in [`docs/AGENT_EVALUATION_REPORT.md`](docs/AGENT_EVALUATION_REPORT.md) for reproducibility.
 
-The immutable `commonground-rj-week4-200-v2` LangSmith dataset expands coverage to **200 cases**: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. Every case has a unique synthetic narrative, expected disposition, source labels, critical flag, scenario tags, rationale, and autonomy/trauma/handoff labels. The full corpus completed two provider-backed configurations—400 workflow results—with deterministic code evaluation on every result and independent Mistral LLM-as-Judge review on all **269 answer outputs**. The count reconciles to 139 baseline answers plus 130 improved answers; the improved model self-abstained on nine answer-expected cases after retrieval. The improved configuration passed the zero-tolerance critical-safety veto and 15 of 16 numeric release thresholds, but remains below the predeclared LLM handoff-quality bar (**94.4% measured; 95% target**). It also measured **100% Recall@5**, **88.6% complete expected-source coverage@5**, **99.6% claim faithfulness**, and **7.5 s P95 latency**. A controlled 49-case ablation attributes one abstention to the prompt-only lever and eight to the combined prompt-plus-evidence context. See [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md), [`docs/WEEK_4_ABLATION_REPORT.md`](docs/WEEK_4_ABLATION_REPORT.md), and the checked-in [case-level JSON evidence](data/week4-full-eval-report.json).
+The immutable `commonground-rj-golden-200-v2` LangSmith dataset expands coverage to **200 cases**: 100 happy paths, 60 edge cases, 30 known failures, and 10 adversarial cases. Every case has a unique synthetic narrative, expected disposition, source labels, critical flag, scenario tags, rationale, and autonomy/trauma/handoff labels. The full corpus completed two provider-backed configurations—400 workflow results—with deterministic code evaluation on every result and independent Mistral LLM-as-Judge review on all **269 answer outputs**. The count reconciles to 139 baseline answers plus 130 improved answers; the improved model self-abstained on nine answer-expected cases after retrieval. The improved configuration passed the zero-tolerance critical-safety veto and 15 of 16 numeric release thresholds, but remains below the predeclared LLM handoff-quality bar (**94.4% measured; 95% target**). It also measured **100% Recall@5**, **88.6% complete expected-source coverage@5**, **99.6% claim faithfulness**, and **7.5 s P95 latency**. A controlled 49-case ablation attributes one abstention to the prompt-only lever and eight to the combined prompt-plus-evidence context. See [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md), [`docs/ABLATION_REPORT.md`](docs/ABLATION_REPORT.md), and the checked-in [case-level JSON evidence](data/agent-full-eval-report.json).
 
 The 200-case dataset is verified in LangSmith, and a [direct case-level trace](https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/3679e122-955c-478a-8f0f-dddab5ee1fd6/r/6f7c64af-3281-4397-8974-c3fb0fccd16a?poll=true) exposes nine child runs plus code-evaluator feedback. Full 200-case experiment, randomized pairwise, and 30-case human-queue publication are implemented, but the latest new-trace attempt was rejected with HTTP 429 because the workspace reached its monthly unique-trace allowance. The local report preserves complete provider and judge evidence without presenting blocked LangSmith artifacts as completed. Independent 30-case human calibration also remains pending and is never replaced by an AI-generated claim.
 
@@ -158,7 +158,7 @@ Latest production run: **24/24 tasks**, **94.2% Recall@5**, **94.2% MRR**, **97%
 
 Start with the [`docs/README.md`](docs/README.md) documentation index. It separates the current 200-case evidence from the historical 40-case snapshot and provides distinct paths for reviewers, engineers, evaluators, and controlled-pilot planners.
 
-The current evidence source of truth is [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md), supported by the [evaluation methodology](docs/EVALUATION_METHODOLOGY.md), [ablation report](docs/WEEK_4_ABLATION_REPORT.md), [human-review procedure](docs/WEEK_4_REVIEWER_GUIDE.md), [machine-readable evaluator contract](data/evaluator-contract.json), and [30-case blinded worksheet](evals/human-calibration-sample-v1.csv).
+The current evidence source of truth is [`docs/FULL_CORPUS_EVALUATION_REPORT.md`](docs/FULL_CORPUS_EVALUATION_REPORT.md), supported by the [evaluation methodology](docs/EVALUATION_METHODOLOGY.md), [ablation report](docs/ABLATION_REPORT.md), [human-review procedure](docs/REVIEWER_GUIDE.md), [machine-readable evaluator contract](data/evaluator-contract.json), and [30-case blinded worksheet](evals/human-calibration-sample-v1.csv).
 
 ## Knowledge base
 
@@ -230,8 +230,8 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm eval
-pnpm eval:week4
-pnpm eval:week4:dataset
+pnpm eval:agent
+pnpm eval:agent:dataset
 pnpm build
 ```
 
@@ -262,3 +262,5 @@ An agency deployment requires its own security, accessibility, legal, records-re
 ## Project status
 
 The public demo is operational with Fireworks, Pinecone, Mistral, Deepgram, Neo4j Aura, LangSmith, You.com, LangGraph, D1-backed durable metadata, and enforced Cloudflare Turnstile verification. The current model candidate is **not yet passed for release**: it clears the critical-safety veto and 15 of 16 numeric thresholds, but handoff quality is 94.4% against the predeclared 95% requirement. Independent human calibration remains pending at 0/30.
+
+[Artifact naming and provenance](docs/ARTIFACT_NAMING.md) explains the descriptive labels and traceability of recorded evidence.
